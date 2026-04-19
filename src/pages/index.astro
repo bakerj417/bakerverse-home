@@ -225,6 +225,7 @@ const projects = (await getCollection('projects'))
     position: relative;
     min-height: calc(100vh - 72px);
     display: grid;
+    grid-template-columns: minmax(0, 1fr);
     place-items: center;
     overflow: hidden;
     isolation: isolate;
