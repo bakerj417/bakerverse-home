@@ -3,7 +3,7 @@ import { nav, site } from '@/data/site';
 const { pathname } = Astro.url;
 ---
 
-<header class="nav-root">
+<header class="nav-root" data-nav-root>
   <a href="/" class="nav-brand" aria-label="Joseph Baker — home">
     <span class="nav-monogram" aria-hidden="true">JB</span>
     <span class="nav-brand-text">
@@ -12,7 +12,25 @@ const { pathname } = Astro.url;
     </span>
   </a>
 
-  <nav class="nav-links" aria-label="Primary">
+  <button
+    type="button"
+    class="nav-toggle"
+    aria-label="Open menu"
+    aria-expanded="false"
+    aria-controls="primary-nav"
+    data-nav-toggle
+  >
+    <span class="nav-toggle-bar" aria-hidden="true"></span>
+    <span class="nav-toggle-bar" aria-hidden="true"></span>
+    <span class="nav-toggle-bar" aria-hidden="true"></span>
+  </button>
+
+  <nav
+    id="primary-nav"
+    class="nav-links"
+    aria-label="Primary"
+    data-nav-panel
+  >
     {nav.map((item) => {
       const isActive =
         item.href === '/' ? pathname === '/' : pathname.startsWith(item.href);
@@ -27,13 +45,67 @@ const { pathname } = Astro.url;
         </a>
       );
     })}
+    <a
+      href={site.resumeUrl}
+      target="_blank"
+      rel="noopener noreferrer"
+      class="btn-gold nav-resume nav-resume--panel"
+    >
+      <span>Resume</span>
+      <span aria-hidden="true">⤓</span>
+    </a>
   </nav>
 
-  <a href={site.resumeUrl} target="_blank" rel="noopener noreferrer" class="btn-gold nav-resume">
+  <a
+    href={site.resumeUrl}
+    target="_blank"
+    rel="noopener noreferrer"
+    class="btn-gold nav-resume nav-resume--desktop"
+  >
     <span>Resume</span>
     <span aria-hidden="true">⤓</span>
   </a>
 </header>
+
+<script>
+  const root = document.querySelector<HTMLElement>('[data-nav-root]');
+  const toggle = document.querySelector<HTMLButtonElement>('[data-nav-toggle]');
+  const panel = document.querySelector<HTMLElement>('[data-nav-panel]');
+
+  if (root && toggle && panel) {
+    const close = () => {
+      root.removeAttribute('data-nav-open');
+      toggle.setAttribute('aria-expanded', 'false');
+      toggle.setAttribute('aria-label', 'Open menu');
+      document.body.style.overflow = '';
+    };
+
+    const open = () => {
+      root.setAttribute('data-nav-open', '');
+      toggle.setAttribute('aria-expanded', 'true');
+      toggle.setAttribute('aria-label', 'Close menu');
+      document.body.style.overflow = 'hidden';
+    };
+
+    toggle.addEventListener('click', () => {
+      if (root.hasAttribute('data-nav-open')) close();
+      else open();
+    });
+
+    panel.querySelectorAll<HTMLAnchorElement>('a').forEach((link) => {
+      link.addEventListener('click', close);
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && root.hasAttribute('data-nav-open')) close();
+    });
+
+    const mq = window.matchMedia('(min-width: 900px)');
+    mq.addEventListener('change', (e) => {
+      if (e.matches) close();
+    });
+  }
+</script>
 
 <style>
   .nav-root {
@@ -43,19 +115,27 @@ const { pathname } = Astro.url;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 2rem;
-    padding: 1rem 2rem;
+    gap: 1rem;
+    padding: 0.85rem 1.1rem;
     background: linear-gradient(180deg, rgba(7, 6, 10, 0.92) 0%, rgba(7, 6, 10, 0.7) 80%, transparent 100%);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
     border-bottom: 1px solid rgba(240, 185, 11, 0.08);
   }
 
+  @media (min-width: 900px) {
+    .nav-root {
+      gap: 2rem;
+      padding: 1rem 2rem;
+    }
+  }
+
   .nav-brand {
     display: inline-flex;
     align-items: center;
-    gap: 0.75rem;
+    gap: 0.6rem;
     color: var(--ink-100);
+    min-width: 0;
   }
 
   .nav-brand:hover {
@@ -65,8 +145,9 @@ const { pathname } = Astro.url;
   .nav-monogram {
     display: grid;
     place-items: center;
-    width: 36px;
-    height: 36px;
+    width: 34px;
+    height: 34px;
+    flex-shrink: 0;
     font-family: var(--font-display);
     font-size: 0.85rem;
     font-weight: 700;
@@ -84,6 +165,7 @@ const { pathname } = Astro.url;
     display: flex;
     flex-direction: column;
     line-height: 1.1;
+    min-width: 0;
   }
 
   .nav-brand-name {
@@ -92,16 +174,70 @@ const { pathname } = Astro.url;
     font-size: 0.95rem;
     color: var(--ink-100);
     letter-spacing: 0.02em;
+    white-space: nowrap;
   }
 
   .nav-brand-tagline {
     font-family: var(--font-mono);
-    font-size: 0.65rem;
+    font-size: 0.62rem;
     color: var(--ink-500);
     letter-spacing: 0.12em;
     text-transform: uppercase;
+    white-space: nowrap;
   }
 
+  /* -------- HAMBURGER TOGGLE (mobile only) -------- */
+  .nav-toggle {
+    position: relative;
+    display: inline-flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+    width: 42px;
+    height: 42px;
+    background: transparent;
+    border: 1px solid rgba(240, 185, 11, 0.25);
+    border-radius: 2px;
+    cursor: pointer;
+    transition: border-color var(--dur-fast) var(--ease-standard);
+    -webkit-tap-highlight-color: transparent;
+    flex-shrink: 0;
+  }
+
+  .nav-toggle:hover {
+    border-color: var(--gold-400);
+  }
+
+  .nav-toggle-bar {
+    display: block;
+    width: 20px;
+    height: 2px;
+    background: var(--gold-300);
+    border-radius: 1px;
+    transition:
+      transform var(--dur-fast) var(--ease-standard),
+      opacity var(--dur-fast) var(--ease-standard);
+  }
+
+  @media (min-width: 900px) {
+    .nav-toggle {
+      display: none;
+    }
+  }
+
+  /* Toggle becomes an X when panel is open */
+  .nav-root[data-nav-open] .nav-toggle-bar:nth-child(1) {
+    transform: translateY(7px) rotate(45deg);
+  }
+  .nav-root[data-nav-open] .nav-toggle-bar:nth-child(2) {
+    opacity: 0;
+  }
+  .nav-root[data-nav-open] .nav-toggle-bar:nth-child(3) {
+    transform: translateY(-7px) rotate(-45deg);
+  }
+
+  /* -------- NAV LINKS PANEL -------- */
   .nav-links {
     display: none;
     align-items: center;
@@ -114,11 +250,47 @@ const { pathname } = Astro.url;
     }
   }
 
+  /* Mobile: open state becomes a full-width dropdown panel under the header. */
+  @media (max-width: 899px) {
+    .nav-root[data-nav-open] .nav-links {
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 0;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      padding: 0.75rem 1rem 1.25rem;
+      background: linear-gradient(
+        180deg,
+        rgba(7, 6, 10, 0.98) 0%,
+        rgba(13, 12, 20, 0.98) 100%
+      );
+      border-bottom: 1px solid rgba(240, 185, 11, 0.15);
+      box-shadow: 0 20px 40px -20px rgba(0, 0, 0, 0.8);
+      max-height: calc(100vh - 60px);
+      overflow-y: auto;
+      animation: nav-panel-in 0.22s var(--ease-ornate) both;
+    }
+  }
+
+  @keyframes nav-panel-in {
+    from {
+      opacity: 0;
+      transform: translateY(-6px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
   .nav-link {
     position: relative;
     display: inline-flex;
     align-items: center;
-    gap: 0.45rem;
+    gap: 0.5rem;
     padding: 0.5rem 0.8rem;
     font-family: var(--font-display);
     font-size: 0.82rem;
@@ -128,6 +300,18 @@ const { pathname } = Astro.url;
     color: var(--ink-500);
     border-radius: 2px;
     transition: color var(--dur-fast) var(--ease-standard);
+  }
+
+  @media (max-width: 899px) {
+    .nav-link {
+      padding: 0.85rem 0.5rem;
+      font-size: 0.95rem;
+      border-bottom: 1px solid rgba(240, 185, 11, 0.06);
+    }
+
+    .nav-link:last-of-type {
+      border-bottom: none;
+    }
   }
 
   .nav-link:hover {
@@ -146,6 +330,12 @@ const { pathname } = Astro.url;
     transition: width var(--dur-base) var(--ease-ornate);
   }
 
+  @media (max-width: 899px) {
+    .nav-link::after {
+      display: none;
+    }
+  }
+
   .nav-link:hover::after,
   .nav-link.is-active::after {
     width: 60%;
@@ -161,18 +351,32 @@ const { pathname } = Astro.url;
     opacity: 0.8;
   }
 
-  .nav-label {
-    /* reserved for potential tweaks */
-  }
-
+  /* -------- RESUME BUTTON -------- */
   .nav-resume {
     font-size: 0.8rem;
     padding: 0.55rem 1.1rem;
   }
 
-  @media (max-width: 899px) {
-    .nav-resume {
+  /* Desktop: show the inline resume button next to the nav. */
+  .nav-resume--desktop {
+    display: none;
+  }
+
+  @media (min-width: 900px) {
+    .nav-resume--desktop {
+      display: inline-flex;
+    }
+    .nav-resume--panel {
       display: none;
+    }
+  }
+
+  /* Mobile: resume button sits at the bottom of the open panel. */
+  @media (max-width: 899px) {
+    .nav-resume--panel {
+      margin-top: 0.75rem;
+      justify-content: center;
+      width: 100%;
     }
   }
 </style>
