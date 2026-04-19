@@ -125,8 +125,56 @@ const { pathname } = Astro.url;
     if (root?.hasAttribute('data-nav-open')) closeNav();
   });
 
-  window.matchMedia('(min-width: 900px)').addEventListener('change', (e) => {
-    if (e.matches) closeNav();
+  const desktopMq = window.matchMedia('(min-width: 900px)');
+  desktopMq.addEventListener('change', (e) => {
+    if (e.matches) {
+      closeNav();
+      const root = document.querySelector<HTMLElement>('[data-nav-root]');
+      root?.removeAttribute('data-nav-hidden');
+    }
+  });
+
+  // Hide-on-scroll-down / show-on-scroll-up — mobile only. rAF-gated
+  // to avoid per-event layout reads. Small deltas are ignored to
+  // prevent jitter. Header always re-shows near the top of the page
+  // and whenever the panel is open.
+  const HIDE_AFTER = 80;
+  const DELTA = 6;
+  let lastY = window.scrollY;
+  let ticking = false;
+
+  function onScroll() {
+    if (ticking) return;
+    ticking = true;
+    window.requestAnimationFrame(() => {
+      ticking = false;
+      if (desktopMq.matches) return;
+      const root = document.querySelector<HTMLElement>('[data-nav-root]');
+      if (!root) return;
+      if (root.hasAttribute('data-nav-open')) {
+        root.removeAttribute('data-nav-hidden');
+        lastY = window.scrollY;
+        return;
+      }
+      const y = window.scrollY;
+      const dy = y - lastY;
+      if (Math.abs(dy) < DELTA) return;
+      if (y < HIDE_AFTER) {
+        root.removeAttribute('data-nav-hidden');
+      } else if (dy > 0) {
+        root.setAttribute('data-nav-hidden', '');
+      } else {
+        root.removeAttribute('data-nav-hidden');
+      }
+      lastY = y;
+    });
+  }
+
+  window.addEventListener('scroll', onScroll, { passive: true });
+  document.addEventListener('astro:page-load', () => {
+    lastY = window.scrollY;
+    const root = document.querySelector<HTMLElement>('[data-nav-root]');
+    root?.removeAttribute('data-nav-hidden');
   });
 </script>
 
@@ -144,6 +192,20 @@ const { pathname } = Astro.url;
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
     border-bottom: 1px solid rgba(240, 185, 11, 0.08);
+    transition: transform 280ms var(--ease-ornate);
+    will-change: transform;
+  }
+
+  @media (max-width: 899px) {
+    .nav-root[data-nav-hidden] {
+      transform: translateY(-105%);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .nav-root {
+      transition: none;
+    }
   }
 
   @media (min-width: 900px) {
