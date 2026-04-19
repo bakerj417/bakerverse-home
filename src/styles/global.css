@@ -20,10 +20,12 @@
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
     scroll-behavior: smooth;
+    overflow-x: hidden;
   }
 
   body {
     min-height: 100vh;
+    overflow-x: hidden;
     background:
       radial-gradient(ellipse at top, rgba(240, 185, 11, 0.06) 0%, transparent 55%),
       radial-gradient(ellipse at bottom, rgba(164, 30, 34, 0.04) 0%, transparent 60%),
