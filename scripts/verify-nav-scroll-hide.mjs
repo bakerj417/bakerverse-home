@@ -37,10 +37,13 @@ await page.waitForTimeout(250);
 const afterDown = await read();
 console.log('after scroll down', afterDown);
 
-await page.evaluate(() => window.scrollTo({ top: 400, behavior: 'instant' }));
+// Tiny upward scroll — the user wants a small nudge up to reveal,
+// so they can tap the header / hamburger without scrolling all the
+// way back to the top.
+await page.evaluate(() => window.scrollTo({ top: 585, behavior: 'instant' }));
 await page.waitForTimeout(250);
 const afterUp = await read();
-console.log('after scroll up', afterUp);
+console.log('after tiny scroll up (15px)', afterUp);
 
 await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }));
 await page.waitForTimeout(250);

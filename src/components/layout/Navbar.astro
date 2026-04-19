@@ -135,13 +135,21 @@ const { pathname } = Astro.url;
   });
 
   // Hide-on-scroll-down / show-on-scroll-up — mobile only. rAF-gated
-  // to avoid per-event layout reads. Small deltas are ignored to
-  // prevent jitter. Header always re-shows near the top of the page
-  // and whenever the panel is open.
+  // to avoid per-event layout reads. Thresholds are asymmetric: any
+  // small upward scroll reveals the header so the user can reach
+  // it quickly, but a committed downward push is required to hide.
+  // A touchmove listener provides an instant-reveal path for
+  // up-swipes so iOS coalesced scroll events never delay a reveal.
   const HIDE_AFTER = 80;
-  const DELTA = 6;
+  const SHOW_DELTA = 2;
+  const HIDE_DELTA = 10;
   let lastY = window.scrollY;
   let ticking = false;
+
+  function showNav() {
+    const root = document.querySelector<HTMLElement>('[data-nav-root]');
+    root?.removeAttribute('data-nav-hidden');
+  }
 
   function onScroll() {
     if (ticking) return;
@@ -158,23 +166,45 @@ const { pathname } = Astro.url;
       }
       const y = window.scrollY;
       const dy = y - lastY;
-      if (Math.abs(dy) < DELTA) return;
       if (y < HIDE_AFTER) {
         root.removeAttribute('data-nav-hidden');
-      } else if (dy > 0) {
-        root.setAttribute('data-nav-hidden', '');
-      } else {
-        root.removeAttribute('data-nav-hidden');
+        lastY = y;
+        return;
       }
-      lastY = y;
+      if (dy <= -SHOW_DELTA) {
+        root.removeAttribute('data-nav-hidden');
+        lastY = y;
+      } else if (dy >= HIDE_DELTA) {
+        root.setAttribute('data-nav-hidden', '');
+        lastY = y;
+      }
     });
   }
 
   window.addEventListener('scroll', onScroll, { passive: true });
+
+  // iOS can coalesce scroll events during a fast flick. We also watch
+  // the touch itself: if the finger moves DOWN the screen (i.e. the
+  // page scrolls UP), reveal the header immediately.
+  let touchStartY: number | null = null;
+  window.addEventListener('touchstart', (e) => {
+    if (desktopMq.matches) return;
+    touchStartY = e.touches[0]?.clientY ?? null;
+  }, { passive: true });
+  window.addEventListener('touchmove', (e) => {
+    if (desktopMq.matches) return;
+    if (touchStartY == null) return;
+    const y = e.touches[0]?.clientY;
+    if (y == null) return;
+    if (y - touchStartY > 8) showNav();
+  }, { passive: true });
+  window.addEventListener('touchend', () => {
+    touchStartY = null;
+  }, { passive: true });
+
   document.addEventListener('astro:page-load', () => {
     lastY = window.scrollY;
-    const root = document.querySelector<HTMLElement>('[data-nav-root]');
-    root?.removeAttribute('data-nav-hidden');
+    showNav();
   });
 </script>
 
