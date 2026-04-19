@@ -20,7 +20,12 @@
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
     scroll-behavior: smooth;
-    overflow-x: hidden;
+    /* `overflow-x: clip` prevents horizontal scroll without
+       establishing a scroll container. `overflow-x: hidden` does
+       both, and the scroll-container side effect breaks
+       `position: sticky` descendants (the Navbar) on iOS Safari
+       and some Chromium builds. */
+    overflow-x: clip;
     /* Kill the 300ms click delay and double-tap-to-zoom gesture.
        Pinch-to-zoom still works, so a11y isn't sacrificed. */
     touch-action: manipulation;
@@ -28,7 +33,7 @@
 
   body {
     min-height: 100vh;
-    overflow-x: hidden;
+    overflow-x: clip;
     background:
       radial-gradient(ellipse at top, rgba(240, 185, 11, 0.06) 0%, transparent 55%),
       radial-gradient(ellipse at bottom, rgba(164, 30, 34, 0.04) 0%, transparent 60%),

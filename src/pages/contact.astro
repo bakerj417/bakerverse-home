@@ -611,19 +611,21 @@ const turnstileSiteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY ?? "";
   .candle {
     position: absolute;
     /* Negative top so the flame peeks above the desk's top edge,
-       enabled by .desk overflow: visible. 2× scale of source 48×96. */
+       enabled by .desk overflow: visible. Source art is 48×96;
+       width is fluid and height is derived from the 1:2 aspect
+       ratio so pixel proportions stay correct on narrow viewports. */
     top: -2rem;
-    width: 96px;
-    height: 192px;
+    width: clamp(56px, 16vw, 96px);
+    aspect-ratio: 1 / 2;
     z-index: 2;
     pointer-events: none;
   }
 
   .candle--left {
-    left: 0.75rem;
+    left: 0.5rem;
   }
   .candle--right {
-    right: 0.75rem;
+    right: 0.5rem;
   }
 
   .candle img {
@@ -662,8 +664,8 @@ const turnstileSiteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY ?? "";
     top: 1.25rem;
     left: 50%;
     transform: translateX(-50%);
-    width: 128px;
-    height: 128px;
+    width: clamp(80px, 24vw, 128px);
+    aspect-ratio: 1 / 1;
     z-index: 2;
     pointer-events: none;
   }
@@ -1376,22 +1378,20 @@ const turnstileSiteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY ?? "";
       min-height: 720px;
     }
 
+    /* Candle/inkwell sizing is handled by the clamp() + aspect-ratio
+       rules above, which scale fluidly with the viewport. Don't
+       override `left` / `right` here — doing so collides with
+       `.candle--right` and collapses both candles onto the left. */
     .candle {
-      top: 0.5rem;
-      left: 0.75rem;
-      transform: scale(0.85);
-      transform-origin: top left;
+      top: -1rem;
     }
 
     .inkwell {
-      top: 0.5rem;
-      right: 0.75rem;
-      transform: scale(0.85);
-      transform-origin: top right;
+      top: 0.75rem;
     }
 
     .parchment {
-      margin-top: 4rem;
+      margin-top: 5rem;
       padding: 2rem 1.25rem 1.5rem;
     }
   }
