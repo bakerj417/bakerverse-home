@@ -68,43 +68,66 @@ const { pathname } = Astro.url;
 </header>
 
 <script>
-  const root = document.querySelector<HTMLElement>('[data-nav-root]');
-  const toggle = document.querySelector<HTMLButtonElement>('[data-nav-toggle]');
-  const panel = document.querySelector<HTMLElement>('[data-nav-panel]');
+  // Re-bound on each astro:page-load (fires on first paint AND after
+  // every ViewTransition), so the hamburger keeps working after
+  // client-side route changes.
 
-  if (root && toggle && panel) {
-    const close = () => {
-      root.removeAttribute('data-nav-open');
-      toggle.setAttribute('aria-expanded', 'false');
-      toggle.setAttribute('aria-label', 'Open menu');
-      document.body.style.overflow = '';
-    };
+  function closeNav() {
+    const root = document.querySelector<HTMLElement>('[data-nav-root]');
+    const toggle = document.querySelector<HTMLButtonElement>('[data-nav-toggle]');
+    if (!root || !toggle) return;
+    root.removeAttribute('data-nav-open');
+    toggle.setAttribute('aria-expanded', 'false');
+    toggle.setAttribute('aria-label', 'Open menu');
+    document.body.style.overflow = '';
+  }
 
-    const open = () => {
-      root.setAttribute('data-nav-open', '');
-      toggle.setAttribute('aria-expanded', 'true');
-      toggle.setAttribute('aria-label', 'Close menu');
-      document.body.style.overflow = 'hidden';
-    };
+  function openNav() {
+    const root = document.querySelector<HTMLElement>('[data-nav-root]');
+    const toggle = document.querySelector<HTMLButtonElement>('[data-nav-toggle]');
+    if (!root || !toggle) return;
+    root.setAttribute('data-nav-open', '');
+    toggle.setAttribute('aria-expanded', 'true');
+    toggle.setAttribute('aria-label', 'Close menu');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function initNav() {
+    const root = document.querySelector<HTMLElement>('[data-nav-root]');
+    const toggle = document.querySelector<HTMLButtonElement>('[data-nav-toggle]');
+    const panel = document.querySelector<HTMLElement>('[data-nav-panel]');
+    if (!root || !toggle || !panel) return;
+
+    // Every ViewTransition yields fresh DOM nodes, so the guard check
+    // is per-node (not module-scoped). Prevents double-binding if this
+    // ever fires twice on the same DOM.
+    if (toggle.dataset.navBound === '1') return;
+    toggle.dataset.navBound = '1';
 
     toggle.addEventListener('click', () => {
-      if (root.hasAttribute('data-nav-open')) close();
-      else open();
+      if (root.hasAttribute('data-nav-open')) closeNav();
+      else openNav();
     });
 
     panel.querySelectorAll<HTMLAnchorElement>('a').forEach((link) => {
-      link.addEventListener('click', close);
-    });
-
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && root.hasAttribute('data-nav-open')) close();
-    });
-
-    const mq = window.matchMedia('(min-width: 900px)');
-    mq.addEventListener('change', (e) => {
-      if (e.matches) close();
+      link.addEventListener('click', closeNav);
     });
   }
+
+  document.addEventListener('astro:page-load', initNav);
+
+  // Document/window-level listeners survive page transitions; the
+  // handlers re-query the current DOM so they keep working after a
+  // route change without re-binding.
+  document.addEventListener('keydown', (e) => {
+    if (e.key !== 'Escape') return;
+    const root = document.querySelector<HTMLElement>('[data-nav-root]');
+    if (root?.hasAttribute('data-nav-open')) closeNav();
+  });
+
+  window.matchMedia('(min-width: 900px)').addEventListener('change', (e) => {
+    if (e.matches) closeNav();
+  });
 </script>
 
 <style>

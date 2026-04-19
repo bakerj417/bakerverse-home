@@ -21,6 +21,9 @@
     text-rendering: optimizeLegibility;
     scroll-behavior: smooth;
     overflow-x: hidden;
+    /* Kill the 300ms click delay and double-tap-to-zoom gesture.
+       Pinch-to-zoom still works, so a11y isn't sacrificed. */
+    touch-action: manipulation;
   }
 
   body {
