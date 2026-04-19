@@ -1,0 +1,178 @@
+---
+import { nav, site } from '@/data/site';
+const { pathname } = Astro.url;
+---
+
+<header class="nav-root">
+  <a href="/" class="nav-brand" aria-label="Joseph Baker — home">
+    <span class="nav-monogram" aria-hidden="true">JB</span>
+    <span class="nav-brand-text">
+      <span class="nav-brand-name">{site.name}</span>
+      <span class="nav-brand-tagline">Bakerverse · Est. 2026</span>
+    </span>
+  </a>
+
+  <nav class="nav-links" aria-label="Primary">
+    {nav.map((item) => {
+      const isActive =
+        item.href === '/' ? pathname === '/' : pathname.startsWith(item.href);
+      return (
+        <a
+          href={item.href}
+          class:list={['nav-link', isActive && 'is-active']}
+          aria-current={isActive ? 'page' : undefined}
+        >
+          <span class="nav-glyph" aria-hidden="true">{item.glyph}</span>
+          <span class="nav-label">{item.label}</span>
+        </a>
+      );
+    })}
+  </nav>
+
+  <a href={site.resumeUrl} target="_blank" rel="noopener noreferrer" class="btn-gold nav-resume">
+    <span>Resume</span>
+    <span aria-hidden="true">⤓</span>
+  </a>
+</header>
+
+<style>
+  .nav-root {
+    position: sticky;
+    top: 0;
+    z-index: 40;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 2rem;
+    padding: 1rem 2rem;
+    background: linear-gradient(180deg, rgba(7, 6, 10, 0.92) 0%, rgba(7, 6, 10, 0.7) 80%, transparent 100%);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(240, 185, 11, 0.08);
+  }
+
+  .nav-brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    color: var(--ink-100);
+  }
+
+  .nav-brand:hover {
+    color: var(--ink-100);
+  }
+
+  .nav-monogram {
+    display: grid;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    font-family: var(--font-display);
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    color: var(--gold-200);
+    background:
+      radial-gradient(circle at 30% 30%, rgba(240, 185, 11, 0.2), transparent 70%),
+      linear-gradient(180deg, rgba(29, 26, 38, 0.9), rgba(13, 12, 20, 0.95));
+    border: 1px solid var(--gold-500);
+    border-radius: 2px;
+    box-shadow: var(--shadow-gold-glow);
+  }
+
+  .nav-brand-text {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.1;
+  }
+
+  .nav-brand-name {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: var(--ink-100);
+    letter-spacing: 0.02em;
+  }
+
+  .nav-brand-tagline {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    color: var(--ink-500);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .nav-links {
+    display: none;
+    align-items: center;
+    gap: 0.25rem;
+  }
+
+  @media (min-width: 900px) {
+    .nav-links {
+      display: flex;
+    }
+  }
+
+  .nav-link {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.5rem 0.8rem;
+    font-family: var(--font-display);
+    font-size: 0.82rem;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-500);
+    border-radius: 2px;
+    transition: color var(--dur-fast) var(--ease-standard);
+  }
+
+  .nav-link:hover {
+    color: var(--gold-200);
+  }
+
+  .nav-link::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    bottom: 0.1rem;
+    width: 0;
+    height: 1px;
+    background: var(--gold-300);
+    transform: translateX(-50%);
+    transition: width var(--dur-base) var(--ease-ornate);
+  }
+
+  .nav-link:hover::after,
+  .nav-link.is-active::after {
+    width: 60%;
+  }
+
+  .nav-link.is-active {
+    color: var(--gold-200);
+  }
+
+  .nav-glyph {
+    font-size: 0.95rem;
+    color: var(--gold-400);
+    opacity: 0.8;
+  }
+
+  .nav-label {
+    /* reserved for potential tweaks */
+  }
+
+  .nav-resume {
+    font-size: 0.8rem;
+    padding: 0.55rem 1.1rem;
+  }
+
+  @media (max-width: 899px) {
+    .nav-resume {
+      display: none;
+    }
+  }
+</style>

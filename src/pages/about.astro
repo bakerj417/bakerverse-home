@@ -1,0 +1,645 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import StackBadge from '@/components/ui/StackBadge.astro';
+import RevealOnScroll from '@/components/islands/RevealOnScroll.tsx';
+import MagneticButton from '@/components/islands/MagneticButton.tsx';
+import { characterSheet, site } from '@/data/site';
+---
+
+<BaseLayout
+  title="About"
+  description="Joseph Baker — full-stack engineer, 15+ years in the craft. The story behind the Bakerverse."
+>
+  <!-- ======================================================
+       INTRO — narrative first, not bio-blurb
+       ====================================================== -->
+  <section class="section section-y-lg about-intro">
+    <div class="monument">
+      <div class="monument-frieze monument-frieze--top" aria-hidden="true">
+        <span class="monument-rune">✦</span>
+      </div>
+
+      <RevealOnScroll client:visible>
+        <p class="section-eyebrow">Codex · Who</p>
+        <h1 class="about-h1 about-h1--carved">The story so far</h1>
+      </RevealOnScroll>
+
+      <RevealOnScroll client:visible delayMs={200}>
+        <div class="about-narrative">
+          <p>
+            I'm Joseph — though most of the internet knows me as JB. Full-stack
+            engineer, fifteen years into the craft, currently writing React
+            Native and Expo for a living and weaving a personal ecosystem of
+            tools and services I've started calling <em>the Bakerverse</em>.
+          </p>
+          <p>
+            I build because it's the part of software that doesn't stop
+            being fun. The stuff I love most is what makes life a little
+            lighter for the people around me — a small service that lets
+            friends request what they need from me instead of texting, a
+            cron job that turns a recurring chore into something I never
+            have to think about, a setup at home that quietly runs small
+            utilities for family and friends.
+          </p>
+          <p>
+            Teaching is the other half of why I do this. I'd rather leave
+            a code review that makes the author a better engineer, write
+            documentation the next person can actually use, and have
+            one-on-ones where the other person walks out feeling more sure
+            of their work, not less.
+          </p>
+          <p>
+            Off the clock I'm usually heads-down on a side project,
+            raiding and running mythic+ in the current WoW season,
+            clearing a Diablo season, or 3D printing something on my
+            Bambu P2S. Based in Waxhaw, North Carolina.
+          </p>
+        </div>
+      </RevealOnScroll>
+
+      <div class="monument-frieze monument-frieze--bottom" aria-hidden="true">
+        <span class="monument-rune">✦</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======================================================
+       CHARACTER SHEET — stylized stat block
+       ====================================================== -->
+  <section class="section section-y-md">
+    <RevealOnScroll client:visible>
+      <div class="section-head">
+        <p class="section-eyebrow">Character Sheet</p>
+        <h2 class="character-h2">At a glance</h2>
+      </div>
+    </RevealOnScroll>
+
+    <RevealOnScroll client:visible>
+      <div class="character-sheet ornate-frame">
+        <header class="character-header">
+          <div class="character-portrait">
+            <img
+              src="/images/profile.jpeg"
+              alt="Joseph Baker"
+              width="120"
+              height="120"
+              loading="lazy"
+            />
+          </div>
+          <div class="character-meta">
+            <p class="character-name">{site.name}</p>
+            <p class="character-class">{characterSheet.class}</p>
+            <p class="character-level">
+              Level <span class="character-level-num">{characterSheet.level}</span>
+              <span class="character-level-sub">years in the craft</span>
+            </p>
+          </div>
+          <dl class="character-identity">
+            <div>
+              <dt>Specialization</dt>
+              <dd>{characterSheet.specialization}</dd>
+            </div>
+            <div>
+              <dt>Guild</dt>
+              <dd>{characterSheet.guild}</dd>
+            </div>
+            <div>
+              <dt>Home realm</dt>
+              <dd>{characterSheet.homeRealm}</dd>
+            </div>
+          </dl>
+        </header>
+
+        <div class="character-divider" aria-hidden="true">
+          <span class="rune">✦</span>
+        </div>
+
+        <section class="character-section">
+          <h3>Proficiencies</h3>
+          <div class="character-proficiencies">
+            {characterSheet.proficiencies.map((prof) => (
+              <StackBadge label={prof} />
+            ))}
+          </div>
+        </section>
+
+        <section class="character-section">
+          <h3>Passives</h3>
+          <ul class="character-passives">
+            <li>
+              <span class="passive-icon" aria-hidden="true">⚙</span>
+              <div>
+                <strong>Automation first.</strong>
+                If it's been done manually twice, I'll write something to do
+                it the third time.
+              </div>
+            </li>
+            <li>
+              <span class="passive-icon" aria-hidden="true">◆</span>
+              <div>
+                <strong>Design systems brain.</strong>
+                Every pattern should have a home. Fifteen years of making
+                sure components are named correctly and composition is
+                obvious.
+              </div>
+            </li>
+            <li>
+              <span class="passive-icon" aria-hidden="true">✦</span>
+              <div>
+                <strong>Systems thinker.</strong>
+                Happy to zoom out to architecture, but the muscle memory is
+                in shipping the thing.
+              </div>
+            </li>
+            <li>
+              <span class="passive-icon" aria-hidden="true">✉</span>
+              <div>
+                <strong>Warm communicator.</strong>
+                PR reviews that teach, code that other people can read,
+                docs written for the person who inherits the project next.
+              </div>
+            </li>
+          </ul>
+        </section>
+
+        <section class="character-section">
+          <h3>Active quests</h3>
+          <ul class="character-quests">
+            <li>
+              Weaving the Bakerverse — a growing network of personal and
+              family tools hosted on subdomains of this site.
+            </li>
+            <li>
+              Running a home-server stack that quietly keeps small
+              utilities humming for family and friends.
+            </li>
+            <li>
+              3D printing on a Bambu P2S and making more things than I
+              have shelves for.
+            </li>
+            <li>
+              Raiding and pushing mythic+ in the current WoW season,
+              clearing Diablo on the side.
+            </li>
+          </ul>
+        </section>
+      </div>
+    </RevealOnScroll>
+
+    <RevealOnScroll client:visible delayMs={150}>
+      <figure class="lore-quote">
+        <span class="lore-quote-rule" aria-hidden="true">
+          <span class="rune">✦</span>
+        </span>
+        <blockquote>
+          Because a resume tells you my jobs, but a character sheet tells
+          you how I'm built.
+        </blockquote>
+      </figure>
+    </RevealOnScroll>
+  </section>
+
+  <!-- ======================================================
+       RESUME + CTA
+       ====================================================== -->
+  <section class="section section-y-md about-resume-section">
+    <RevealOnScroll client:visible>
+      <div class="about-resume">
+        <div>
+          <p class="section-eyebrow">The Scroll</p>
+          <h2 class="resume-title">Looking for the formal version?</h2>
+          <p class="section-sub">
+            Resume and references available on request. Freelance and side
+            engagements go through <strong>{site.business.name}</strong>.
+          </p>
+        </div>
+        <div class="about-resume-ctas">
+          <MagneticButton
+            client:load
+            href={site.resumeUrl}
+            external
+            variant="gold"
+            ariaLabel="Download resume"
+          >
+            Unroll Resume <span aria-hidden="true">⤓</span>
+          </MagneticButton>
+          <MagneticButton
+            client:load
+            href="/contact"
+            variant="ghost"
+            ariaLabel="Start a conversation"
+          >
+            Send Word <span aria-hidden="true">✉</span>
+          </MagneticButton>
+        </div>
+      </div>
+    </RevealOnScroll>
+  </section>
+</BaseLayout>
+
+<style>
+  .about-intro {
+    max-width: 820px;
+  }
+
+  .about-h1 {
+    font-size: clamp(2.5rem, 6vw, 4.5rem);
+    line-height: 1.05;
+    margin: 1rem 0 2rem;
+  }
+
+  /* -------- MONUMENT (stone-relief framing for intro) -------- */
+  .monument {
+    position: relative;
+    padding: 2rem 1.25rem 2.25rem;
+    background:
+      radial-gradient(
+        ellipse at top,
+        rgba(240, 185, 11, 0.05),
+        transparent 60%
+      ),
+      linear-gradient(
+        180deg,
+        rgba(29, 26, 38, 0.35) 0%,
+        rgba(13, 12, 20, 0) 100%
+      );
+  }
+
+  @media (min-width: 720px) {
+    .monument {
+      padding: 2.5rem 2rem 2.75rem;
+    }
+  }
+
+  .monument-frieze {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    color: var(--gold-400);
+  }
+
+  .monument-frieze::before,
+  .monument-frieze::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(240, 185, 11, 0.35),
+      transparent
+    );
+  }
+
+  .monument-frieze--top {
+    margin-bottom: 2rem;
+  }
+
+  .monument-frieze--bottom {
+    margin-top: 2.25rem;
+  }
+
+  .monument-rune {
+    font-size: 0.9rem;
+    opacity: 0.75;
+  }
+
+  .about-h1--carved {
+    letter-spacing: 0.01em;
+    text-shadow:
+      0 1px 0 rgba(0, 0, 0, 0.65),
+      0 -1px 0 rgba(240, 185, 11, 0.06);
+  }
+
+  .about-narrative {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    font-size: 1.05rem;
+    line-height: 1.8;
+    color: var(--ink-300);
+    max-width: 42rem;
+  }
+
+  .about-narrative em {
+    color: var(--gold-200);
+    font-style: italic;
+  }
+
+  .about-narrative strong {
+    color: var(--ink-100);
+  }
+
+  .character-h2 {
+    font-size: clamp(2rem, 4vw, 3rem);
+    margin: 0.5rem 0 1rem;
+  }
+
+  .character-sheet {
+    max-width: 980px;
+    margin: 0 auto;
+    padding: 2rem !important;
+  }
+
+  @media (min-width: 768px) {
+    .character-sheet {
+      padding: 2.5rem 3rem !important;
+    }
+  }
+
+  .character-header {
+    display: grid;
+    gap: 1.5rem;
+    grid-template-columns: auto 1fr;
+    grid-template-areas:
+      "portrait meta"
+      "identity identity";
+    align-items: center;
+  }
+
+  @media (min-width: 768px) {
+    .character-header {
+      grid-template-columns: auto 1fr auto;
+      grid-template-areas: "portrait meta identity";
+      gap: 2.5rem;
+    }
+  }
+
+  .character-portrait {
+    grid-area: portrait;
+    width: 120px;
+    height: 120px;
+    border-radius: 2px;
+    overflow: hidden;
+    border: 2px solid var(--gold-400);
+    box-shadow: var(--shadow-gold-glow);
+    background: var(--bg-ember);
+  }
+
+  .character-portrait img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: sepia(0.08) saturate(1.1);
+  }
+
+  .character-meta {
+    grid-area: meta;
+  }
+
+  .character-name {
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--ink-100);
+    margin: 0 0 0.2rem;
+  }
+
+  .character-class {
+    color: var(--gold-300);
+    font-family: var(--font-display);
+    font-size: 0.9rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin: 0 0 0.5rem;
+  }
+
+  .character-level {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--ink-500);
+    margin: 0;
+  }
+
+  .character-level-num {
+    color: var(--gold-200);
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin: 0 0.3rem;
+  }
+
+  .character-level-sub {
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    font-size: 0.7rem;
+  }
+
+  .character-identity {
+    grid-area: identity;
+    display: grid;
+    gap: 0.8rem;
+    margin: 0;
+    padding: 1rem;
+    background: rgba(240, 185, 11, 0.04);
+    border-left: 2px solid var(--gold-500);
+    border-radius: 2px;
+  }
+
+  @media (min-width: 768px) {
+    .character-identity {
+      padding: 1.25rem;
+      min-width: 200px;
+    }
+  }
+
+  .character-identity div {
+    display: grid;
+    gap: 0.15rem;
+  }
+
+  .character-identity dt {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    color: var(--ink-500);
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+  }
+
+  .character-identity dd {
+    font-family: var(--font-display);
+    font-size: 0.95rem;
+    color: var(--ink-100);
+    margin: 0;
+  }
+
+  .character-divider {
+    display: flex;
+    align-items: center;
+    margin: 2rem 0;
+    gap: 1rem;
+    color: var(--gold-400);
+  }
+
+  .character-divider::before,
+  .character-divider::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(240, 185, 11, 0.4), transparent);
+  }
+
+  .character-divider .rune {
+    font-size: 1rem;
+    opacity: 0.8;
+  }
+
+  .character-section {
+    margin-bottom: 2rem;
+  }
+
+  .character-section:last-child {
+    margin-bottom: 0;
+  }
+
+  .character-section h3 {
+    font-family: var(--font-display);
+    font-size: 0.85rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--gold-300);
+    margin: 0 0 1rem;
+  }
+
+  .character-proficiencies {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+  }
+
+  .character-passives {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    gap: 1rem;
+  }
+
+  .character-passives li {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 1rem;
+    align-items: start;
+    padding: 0.8rem 1rem;
+    background: rgba(7, 6, 10, 0.4);
+    border: 1px solid rgba(240, 185, 11, 0.1);
+    border-radius: 2px;
+  }
+
+  .passive-icon {
+    font-size: 1.25rem;
+    color: var(--gold-300);
+    margin-top: 0.1rem;
+  }
+
+  .character-passives strong {
+    display: block;
+    color: var(--ink-100);
+    font-family: var(--font-display);
+    margin-bottom: 0.2rem;
+  }
+
+  .character-passives li > div {
+    color: var(--ink-300);
+    font-size: 0.95rem;
+    line-height: 1.5;
+  }
+
+  .character-quests {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    gap: 0.75rem;
+  }
+
+  .character-quests li {
+    position: relative;
+    padding-left: 1.5rem;
+    color: var(--ink-300);
+    line-height: 1.6;
+  }
+
+  .character-quests li::before {
+    content: "◆";
+    position: absolute;
+    left: 0;
+    top: 0;
+    color: var(--gold-400);
+    font-size: 0.8rem;
+  }
+
+  /* -------- LORE QUOTE (inscription under character sheet) -------- */
+  .lore-quote {
+    margin: 2.5rem auto 0;
+    max-width: 620px;
+    padding: 0;
+    text-align: center;
+  }
+
+  .lore-quote-rule {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+    color: var(--gold-400);
+  }
+
+  .lore-quote-rule::before,
+  .lore-quote-rule::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(240, 185, 11, 0.4),
+      transparent
+    );
+  }
+
+  .lore-quote-rule .rune {
+    font-size: 0.85rem;
+    opacity: 0.75;
+  }
+
+  .lore-quote blockquote {
+    margin: 0;
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: clamp(0.95rem, 1.5vw, 1.1rem);
+    line-height: 1.6;
+    color: var(--gold-200);
+    letter-spacing: 0.02em;
+    opacity: 0.88;
+  }
+
+  /* -------- RESUME SECTION -------- */
+  .about-resume {
+    display: grid;
+    gap: 2rem;
+    align-items: center;
+    padding: 2.5rem;
+    background:
+      radial-gradient(ellipse at left, rgba(240, 185, 11, 0.08), transparent 60%),
+      linear-gradient(135deg, rgba(29, 26, 38, 0.8), rgba(13, 12, 20, 0.8));
+    border: 1px solid rgba(240, 185, 11, 0.15);
+    border-radius: 2px;
+  }
+
+  @media (min-width: 720px) {
+    .about-resume {
+      grid-template-columns: 1.5fr auto;
+    }
+  }
+
+  .resume-title {
+    font-size: clamp(1.5rem, 3vw, 2.25rem);
+    margin: 0.5rem 0 1rem;
+  }
+
+  .about-resume-ctas {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+</style>

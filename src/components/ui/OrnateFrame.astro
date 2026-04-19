@@ -1,0 +1,28 @@
+---
+interface Props {
+  as?: string;
+  class?: string;
+  glow?: boolean;
+  padded?: boolean;
+}
+
+const {
+  as: Tag = 'div',
+  class: className = '',
+  glow = false,
+  padded = true,
+} = Astro.props;
+
+const classes = [
+  'ornate-frame',
+  padded && 'p-6 md:p-8',
+  glow && 'shadow-[0_0_48px_-12px_rgba(240,185,11,0.25)]',
+  className,
+]
+  .filter(Boolean)
+  .join(' ');
+---
+
+<Tag class={classes}>
+  <slot />
+</Tag>

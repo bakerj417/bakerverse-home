@@ -1,0 +1,521 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import TooltipCard from '@/components/ui/TooltipCard.astro';
+import StackBadge from '@/components/ui/StackBadge.astro';
+import RevealOnScroll from '@/components/islands/RevealOnScroll.tsx';
+import { getCollection } from 'astro:content';
+
+type Rarity = 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary' | 'artifact';
+
+const rarityRank: Record<Rarity, number> = {
+  artifact: 0,
+  legendary: 1,
+  epic: 2,
+  rare: 3,
+  uncommon: 4,
+  common: 5,
+};
+
+const quests = (await getCollection('projects')).sort((a, b) => {
+  const rA = rarityRank[a.data.rarity as Rarity];
+  const rB = rarityRank[b.data.rarity as Rarity];
+  if (rA !== rB) return rA - rB;
+  return a.data.order - b.data.order;
+});
+
+const featured = quests.filter((q) => q.data.featured);
+const rest = quests.filter((q) => !q.data.featured);
+
+const statusCopy: Record<string, string> = {
+  active: '◆ Currently active',
+  shipped: '✔ Shipped',
+  wip: '⚒ In the forge',
+  archived: '✶ Archived',
+};
+
+const rarityOrder: Rarity[] = [
+  'artifact',
+  'legendary',
+  'epic',
+  'rare',
+  'uncommon',
+  'common',
+];
+
+const rarityCounts = rarityOrder.reduce<Record<Rarity, number>>(
+  (acc, r) => {
+    acc[r] = quests.filter((q) => q.data.rarity === r).length;
+    return acc;
+  },
+  {} as Record<Rarity, number>,
+);
+---
+
+<BaseLayout
+  title="Quest Log"
+  description="Every quest Joseph Baker has undertaken — shipped products, side builds, and the ongoing campaigns. Sorted by rarity."
+>
+  <!-- ======================================================
+       INTRO — monument framing, matches /work
+       ====================================================== -->
+  <section class="section section-y-md quest-intro">
+    <div class="monument">
+      <div class="monument-frieze monument-frieze--top" aria-hidden="true">
+        <span class="monument-rune">◆</span>
+      </div>
+
+      <RevealOnScroll client:visible>
+        <p class="section-eyebrow">Quest Log</p>
+        <h1 class="quest-h1 quest-h1--carved">Quests undertaken</h1>
+      </RevealOnScroll>
+
+      <RevealOnScroll client:visible delayMs={200}>
+        <p class="quest-sub">
+          Every build, every campaign, every side-quest. Sorted by
+          rarity — tap any entry to unroll the journal and read what
+          it cost, what it taught, and what it shipped.
+        </p>
+      </RevealOnScroll>
+
+      <div class="monument-frieze monument-frieze--bottom" aria-hidden="true">
+        <span class="monument-rune">◆</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======================================================
+       FILTER BAR — rarity chips, vanilla JS
+       ====================================================== -->
+  <section class="section section-y-sm">
+    <RevealOnScroll client:visible>
+      <div
+        class="rarity-filter"
+        role="toolbar"
+        aria-label="Filter quests by rarity"
+      >
+        <button
+          type="button"
+          class="rarity-chip is-active"
+          data-rarity="all"
+          aria-pressed="true"
+        >
+          <span class="rarity-chip-label">All</span>
+          <span class="rarity-chip-count">{quests.length}</span>
+        </button>
+        {rarityOrder.map((r) =>
+          rarityCounts[r] > 0 ? (
+            <button
+              type="button"
+              class="rarity-chip"
+              data-rarity={r}
+              aria-pressed="false"
+              style={`--chip-color: var(--rarity-${r});`}
+            >
+              <span class="rarity-chip-dot" aria-hidden="true"></span>
+              <span class="rarity-chip-label">{r}</span>
+              <span class="rarity-chip-count">{rarityCounts[r]}</span>
+            </button>
+          ) : null
+        )}
+      </div>
+    </RevealOnScroll>
+  </section>
+
+  <!-- ======================================================
+       FEATURED QUESTS
+       ====================================================== -->
+  {featured.length > 0 && (
+    <section class="section section-y-md quest-section">
+      <RevealOnScroll client:visible>
+        <div class="quest-group-head">
+          <p class="section-eyebrow">Featured</p>
+          <h2 class="quest-group-h2">Marquee quests</h2>
+        </div>
+      </RevealOnScroll>
+
+      <div class="quest-grid quest-grid--featured" data-quest-grid>
+        {featured.map((quest, index) => (
+          <RevealOnScroll client:visible delayMs={index * 100}>
+            <TooltipCard
+              href={`/projects/${quest.slug}`}
+              rarity={quest.data.rarity}
+              class="quest-card"
+            >
+              <article
+                data-quest-card
+                data-rarity={quest.data.rarity}
+              >
+                <div class="quest-card-head">
+                  <span class="quest-rarity">{quest.data.rarity}</span>
+                  <span class="quest-year">{quest.data.year}</span>
+                </div>
+                <h3 class="quest-title">{quest.data.title}</h3>
+                <p class="quest-tagline">{quest.data.tagline}</p>
+                <div class="quest-stack">
+                  {quest.data.stack.slice(0, 5).map((tech) => (
+                    <StackBadge label={tech} />
+                  ))}
+                </div>
+                <div class="quest-footer">
+                  <span class="quest-status" data-status={quest.data.status}>
+                    {statusCopy[quest.data.status] ?? quest.data.status}
+                  </span>
+                  <span class="quest-cta">Open journal →</span>
+                </div>
+              </article>
+            </TooltipCard>
+          </RevealOnScroll>
+        ))}
+      </div>
+    </section>
+  )}
+
+  <!-- ======================================================
+       ALL QUESTS
+       ====================================================== -->
+  {rest.length > 0 && (
+    <section class="section section-y-md quest-section">
+      <RevealOnScroll client:visible>
+        <div class="quest-group-head">
+          <p class="section-eyebrow">The Full Log</p>
+          <h2 class="quest-group-h2">Every quest on the books</h2>
+          <p class="quest-group-sub">
+            Sorted by rarity, then by order. Use the filter above to
+            narrow by tier.
+          </p>
+        </div>
+      </RevealOnScroll>
+
+      <div class="quest-grid" data-quest-grid>
+        {rest.map((quest, index) => (
+          <RevealOnScroll client:visible delayMs={index * 60}>
+            <TooltipCard
+              href={`/projects/${quest.slug}`}
+              rarity={quest.data.rarity}
+              class="quest-card"
+            >
+              <article
+                data-quest-card
+                data-rarity={quest.data.rarity}
+              >
+                <div class="quest-card-head">
+                  <span class="quest-rarity">{quest.data.rarity}</span>
+                  <span class="quest-year">{quest.data.year}</span>
+                </div>
+                <h3 class="quest-title">{quest.data.title}</h3>
+                <p class="quest-tagline">{quest.data.tagline}</p>
+                <div class="quest-stack">
+                  {quest.data.stack.slice(0, 4).map((tech) => (
+                    <StackBadge label={tech} />
+                  ))}
+                </div>
+                <div class="quest-footer">
+                  <span class="quest-status" data-status={quest.data.status}>
+                    {statusCopy[quest.data.status] ?? quest.data.status}
+                  </span>
+                  <span class="quest-cta">Open →</span>
+                </div>
+              </article>
+            </TooltipCard>
+          </RevealOnScroll>
+        ))}
+      </div>
+
+      <p class="quest-empty" data-quest-empty hidden>
+        No quests at this rarity tier. Try another filter.
+      </p>
+    </section>
+  )}
+</BaseLayout>
+
+<script>
+  const chips = document.querySelectorAll<HTMLButtonElement>('.rarity-chip');
+  const cards = document.querySelectorAll<HTMLElement>('[data-quest-card]');
+  const empty = document.querySelector<HTMLElement>('[data-quest-empty]');
+
+  function applyFilter(rarity: string) {
+    let visible = 0;
+    cards.forEach((card) => {
+      const cardRarity = card.dataset.rarity ?? '';
+      const match = rarity === 'all' || cardRarity === rarity;
+      const wrapper = card.closest<HTMLElement>('.tooltip-card');
+      if (wrapper) wrapper.hidden = !match;
+      if (match) visible += 1;
+    });
+    if (empty) empty.hidden = visible > 0;
+  }
+
+  chips.forEach((chip) => {
+    chip.addEventListener('click', () => {
+      chips.forEach((c) => {
+        c.classList.remove('is-active');
+        c.setAttribute('aria-pressed', 'false');
+      });
+      chip.classList.add('is-active');
+      chip.setAttribute('aria-pressed', 'true');
+      applyFilter(chip.dataset.rarity ?? 'all');
+    });
+  });
+</script>
+
+<style>
+  .quest-intro {
+    max-width: 820px;
+  }
+
+  .quest-h1 {
+    font-size: clamp(2.5rem, 6vw, 4.5rem);
+    line-height: 1.05;
+    margin: 1rem 0 2rem;
+  }
+
+  .quest-h1--carved {
+    letter-spacing: 0.01em;
+    text-shadow:
+      0 1px 0 rgba(0, 0, 0, 0.65),
+      0 -1px 0 rgba(240, 185, 11, 0.06);
+  }
+
+  .quest-sub {
+    color: var(--ink-300);
+    line-height: 1.7;
+    font-size: 1.05rem;
+    max-width: 38rem;
+  }
+
+  .monument {
+    position: relative;
+    padding: 1.75rem 1.25rem 1.5rem;
+    background:
+      radial-gradient(
+        ellipse at top,
+        rgba(240, 185, 11, 0.05),
+        transparent 60%
+      ),
+      linear-gradient(
+        180deg,
+        rgba(29, 26, 38, 0.35) 0%,
+        rgba(13, 12, 20, 0) 100%
+      );
+  }
+
+  @media (min-width: 720px) {
+    .monument {
+      padding: 2rem 2rem 1.75rem;
+    }
+  }
+
+  .monument-frieze {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    color: var(--gold-400);
+  }
+
+  .monument-frieze::before,
+  .monument-frieze::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(240, 185, 11, 0.35),
+      transparent
+    );
+  }
+
+  .monument-frieze--top {
+    margin-bottom: 1.5rem;
+  }
+
+  .monument-frieze--bottom {
+    margin-top: 1.5rem;
+  }
+
+  .monument-rune {
+    font-size: 0.9rem;
+    opacity: 0.75;
+  }
+
+  .rarity-filter {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .rarity-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.9rem;
+    background: rgba(29, 26, 38, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: var(--radius-pill);
+    color: var(--ink-300);
+    font-family: var(--font-mono, ui-monospace, monospace);
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: border-color 180ms ease, color 180ms ease,
+      background 180ms ease, transform 180ms ease;
+  }
+
+  .rarity-chip:hover {
+    border-color: var(--chip-color, var(--gold-400));
+    color: var(--ink-100);
+    transform: translateY(-1px);
+  }
+
+  .rarity-chip:focus-visible {
+    outline: 2px solid var(--chip-color, var(--gold-400));
+    outline-offset: 2px;
+  }
+
+  .rarity-chip.is-active {
+    border-color: var(--chip-color, var(--gold-400));
+    color: var(--ink-100);
+    background: rgba(29, 26, 38, 0.95);
+    box-shadow: 0 0 0 1px var(--chip-color, var(--gold-400)) inset;
+  }
+
+  .rarity-chip-dot {
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 50%;
+    background: var(--chip-color, var(--gold-400));
+    box-shadow: 0 0 6px var(--chip-color, var(--gold-400));
+  }
+
+  .rarity-chip-count {
+    color: var(--ink-500);
+    font-size: 0.7rem;
+    padding: 0.1rem 0.4rem;
+    background: rgba(255, 255, 255, 0.04);
+    border-radius: var(--radius-pill);
+  }
+
+  .rarity-chip.is-active .rarity-chip-count {
+    color: var(--ink-300);
+    background: rgba(255, 255, 255, 0.08);
+  }
+
+  .quest-section {
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .quest-group-head {
+    margin-bottom: 1.5rem;
+  }
+
+  .quest-group-h2 {
+    font-size: clamp(1.75rem, 3.2vw, 2.5rem);
+    margin: 0.5rem 0 0.75rem;
+    line-height: 1.15;
+  }
+
+  .quest-group-sub {
+    color: var(--ink-500);
+    font-size: 0.97rem;
+    line-height: 1.6;
+    max-width: 42rem;
+    margin: 0;
+  }
+
+  .quest-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.25rem;
+  }
+
+  .quest-grid--featured {
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  }
+
+  .quest-card {
+    height: 100%;
+  }
+
+  .quest-card-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 0.75rem;
+    font-family: var(--font-mono, ui-monospace, monospace);
+    font-size: 0.7rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  .quest-rarity {
+    color: var(--rarity-color);
+  }
+
+  .quest-year {
+    color: var(--ink-500);
+  }
+
+  .quest-title {
+    font-size: 1.25rem;
+    line-height: 1.25;
+    margin: 0 0 0.5rem;
+    color: var(--ink-100);
+  }
+
+  .quest-tagline {
+    color: var(--ink-300);
+    line-height: 1.5;
+    margin: 0 0 1rem;
+    font-size: 0.95rem;
+  }
+
+  .quest-stack {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    margin-bottom: 1rem;
+  }
+
+  .quest-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 0.75rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    font-family: var(--font-mono, ui-monospace, monospace);
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+  }
+
+  .quest-status {
+    color: var(--ink-500);
+  }
+
+  .quest-status[data-status='active'] {
+    color: var(--rarity-uncommon);
+  }
+
+  .quest-status[data-status='wip'] {
+    color: var(--gold-300);
+  }
+
+  .quest-cta {
+    color: var(--gold-300);
+    transition: transform 180ms ease;
+  }
+
+  .quest-card:hover .quest-cta {
+    transform: translateX(2px);
+  }
+
+  .quest-empty {
+    color: var(--ink-500);
+    font-style: italic;
+    text-align: center;
+    padding: 2rem;
+  }
+</style>

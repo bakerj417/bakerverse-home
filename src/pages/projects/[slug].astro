@@ -1,0 +1,419 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import StackBadge from '@/components/ui/StackBadge.astro';
+import RevealOnScroll from '@/components/islands/RevealOnScroll.tsx';
+import MagneticButton from '@/components/islands/MagneticButton.tsx';
+import { getCollection, type CollectionEntry } from 'astro:content';
+
+// getStaticPaths runs in an isolated scope — any helpers it uses must be
+// declared inside the function body.
+export async function getStaticPaths() {
+  type Rarity =
+    | 'common'
+    | 'uncommon'
+    | 'rare'
+    | 'epic'
+    | 'legendary'
+    | 'artifact';
+
+  const rarityRank: Record<Rarity, number> = {
+    artifact: 0,
+    legendary: 1,
+    epic: 2,
+    rare: 3,
+    uncommon: 4,
+    common: 5,
+  };
+
+  const quests = await getCollection('projects');
+  const sorted = [...quests].sort((a, b) => {
+    const rA = rarityRank[a.data.rarity as Rarity];
+    const rB = rarityRank[b.data.rarity as Rarity];
+    if (rA !== rB) return rA - rB;
+    return a.data.order - b.data.order;
+  });
+
+  return sorted.map((entry, i) => ({
+    params: { slug: entry.slug },
+    props: {
+      entry,
+      prev: sorted[i - 1] ?? null,
+      next: sorted[i + 1] ?? null,
+    },
+  }));
+}
+
+interface Props {
+  entry: CollectionEntry<'projects'>;
+  prev: CollectionEntry<'projects'> | null;
+  next: CollectionEntry<'projects'> | null;
+}
+
+const { entry, prev, next } = Astro.props;
+const { Content } = await entry.render();
+const { data } = entry;
+
+const statusCopy: Record<string, string> = {
+  active: '◆ Currently active',
+  shipped: '✔ Shipped',
+  wip: '⚒ In the forge',
+  archived: '✶ Archived',
+};
+
+const rarityColor = `var(--rarity-${data.rarity})`;
+---
+
+<BaseLayout
+  title={`${data.title} — Quest Journal`}
+  description={data.tagline}
+>
+  <!-- ======================================================
+       BREADCRUMB
+       ====================================================== -->
+  <section class="section section-y-sm">
+    <nav class="quest-crumbs" aria-label="Breadcrumb">
+      <a href="/projects" class="quest-crumb-link">
+        <span aria-hidden="true">←</span> The Quest Log
+      </a>
+    </nav>
+  </section>
+
+  <!-- ======================================================
+       HEADER
+       ====================================================== -->
+  <section class="section section-y-md quest-hero">
+    <div
+      class="quest-hero-inner"
+      style={`--rarity-color: ${rarityColor};`}
+      data-rarity={data.rarity}
+    >
+      <RevealOnScroll client:visible>
+        <div class="quest-meta">
+          <span class="quest-meta-rarity">{data.rarity}</span>
+          <span class="quest-meta-divider" aria-hidden="true">·</span>
+          <span class="quest-meta-year">{data.year}</span>
+          <span class="quest-meta-divider" aria-hidden="true">·</span>
+          <span class="quest-meta-status" data-status={data.status}>
+            {statusCopy[data.status] ?? data.status}
+          </span>
+        </div>
+
+        <h1 class="quest-hero-title">{data.title}</h1>
+        <p class="quest-hero-tagline">{data.tagline}</p>
+      </RevealOnScroll>
+
+      {data.stack.length > 0 && (
+        <RevealOnScroll client:visible delayMs={150}>
+          <div class="quest-hero-stack">
+            {data.stack.map((tech) => <StackBadge label={tech} />)}
+          </div>
+        </RevealOnScroll>
+      )}
+
+      {(data.liveUrl || data.repoUrl) && (
+        <RevealOnScroll client:visible delayMs={250}>
+          <div class="quest-hero-actions">
+            {data.liveUrl && (
+              <MagneticButton
+                client:visible
+                href={data.liveUrl}
+                external
+                variant="gold"
+                ariaLabel={`Open ${data.title} live`}
+              >
+                Visit the quest <span aria-hidden="true">→</span>
+              </MagneticButton>
+            )}
+            {data.repoUrl && (
+              <MagneticButton
+                client:visible
+                href={data.repoUrl}
+                external
+                variant="ghost"
+                ariaLabel={`Open ${data.title} repository`}
+              >
+                Read the codex <span aria-hidden="true">⌘</span>
+              </MagneticButton>
+            )}
+          </div>
+        </RevealOnScroll>
+      )}
+    </div>
+  </section>
+
+  <!-- ======================================================
+       BODY — markdown content
+       ====================================================== -->
+  <section class="section section-y-md quest-body-section">
+    <RevealOnScroll client:visible>
+      <article class="quest-body prose">
+        <Content />
+      </article>
+    </RevealOnScroll>
+  </section>
+
+  <!-- ======================================================
+       PREV / NEXT
+       ====================================================== -->
+  {(prev || next) && (
+    <section class="section section-y-md quest-nav-section">
+      <nav class="quest-nav" aria-label="Quest navigation">
+        {prev ? (
+          <a href={`/projects/${prev.slug}`} class="quest-nav-link quest-nav-link--prev">
+            <span class="quest-nav-dir">← Previous quest</span>
+            <span class="quest-nav-title">{prev.data.title}</span>
+          </a>
+        ) : <span />}
+        {next ? (
+          <a href={`/projects/${next.slug}`} class="quest-nav-link quest-nav-link--next">
+            <span class="quest-nav-dir">Next quest →</span>
+            <span class="quest-nav-title">{next.data.title}</span>
+          </a>
+        ) : <span />}
+      </nav>
+    </section>
+  )}
+</BaseLayout>
+
+<style>
+  .quest-crumbs {
+    max-width: 820px;
+    margin: 0 auto;
+    font-family: var(--font-mono, ui-monospace, monospace);
+    font-size: 0.8rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .quest-crumb-link {
+    color: var(--ink-500);
+    text-decoration: none;
+    transition: color 180ms ease;
+  }
+
+  .quest-crumb-link:hover {
+    color: var(--gold-300);
+  }
+
+  .quest-hero {
+    max-width: 820px;
+    margin: 0 auto;
+  }
+
+  .quest-hero-inner {
+    position: relative;
+    padding: 2rem 1.5rem;
+    background:
+      linear-gradient(
+        180deg,
+        color-mix(in srgb, var(--rarity-color) 6%, transparent) 0%,
+        rgba(13, 12, 20, 0) 100%
+      );
+    border-left: 2px solid var(--rarity-color);
+  }
+
+  @media (min-width: 720px) {
+    .quest-hero-inner {
+      padding: 2.5rem 2.5rem;
+    }
+  }
+
+  .quest-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: var(--font-mono, ui-monospace, monospace);
+    font-size: 0.72rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+  }
+
+  .quest-meta-rarity {
+    color: var(--rarity-color);
+  }
+
+  .quest-meta-divider {
+    color: var(--ink-700);
+  }
+
+  .quest-meta-year,
+  .quest-meta-status {
+    color: var(--ink-500);
+  }
+
+  .quest-meta-status[data-status='active'] {
+    color: var(--rarity-uncommon);
+  }
+
+  .quest-meta-status[data-status='wip'] {
+    color: var(--gold-300);
+  }
+
+  .quest-hero-title {
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    line-height: 1.1;
+    margin: 0 0 1rem;
+    color: var(--ink-100);
+    letter-spacing: 0.01em;
+    text-shadow:
+      0 1px 0 rgba(0, 0, 0, 0.65),
+      0 -1px 0 rgba(240, 185, 11, 0.06);
+  }
+
+  .quest-hero-tagline {
+    color: var(--ink-300);
+    font-size: 1.1rem;
+    line-height: 1.55;
+    margin: 0 0 1.5rem;
+    max-width: 44rem;
+  }
+
+  .quest-hero-stack {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .quest-hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+
+  .quest-body-section {
+    max-width: 720px;
+    margin: 0 auto;
+  }
+
+  .quest-body {
+    color: var(--ink-300);
+    line-height: 1.75;
+    font-size: 1.02rem;
+  }
+
+  .quest-body :global(h2) {
+    font-size: clamp(1.4rem, 2.2vw, 1.75rem);
+    color: var(--ink-100);
+    margin: 2.5rem 0 1rem;
+    letter-spacing: 0.01em;
+  }
+
+  .quest-body :global(h3) {
+    font-size: 1.2rem;
+    color: var(--ink-100);
+    margin: 1.75rem 0 0.75rem;
+  }
+
+  .quest-body :global(p) {
+    margin: 0 0 1.15rem;
+  }
+
+  .quest-body :global(a) {
+    color: var(--gold-300);
+    text-decoration: underline;
+    text-decoration-color: rgba(240, 185, 11, 0.35);
+    text-underline-offset: 3px;
+    transition: text-decoration-color 180ms ease, color 180ms ease;
+  }
+
+  .quest-body :global(a:hover) {
+    color: var(--gold-200);
+    text-decoration-color: var(--gold-300);
+  }
+
+  .quest-body :global(code) {
+    font-family: var(--font-mono, ui-monospace, monospace);
+    font-size: 0.9em;
+    padding: 0.15em 0.4em;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: var(--radius-sharp);
+    color: var(--ink-100);
+  }
+
+  .quest-body :global(pre) {
+    padding: 1rem;
+    background: rgba(7, 6, 10, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: var(--radius-sharp);
+    overflow-x: auto;
+    font-size: 0.88rem;
+    line-height: 1.55;
+  }
+
+  .quest-body :global(pre code) {
+    padding: 0;
+    background: transparent;
+  }
+
+  .quest-body :global(ul),
+  .quest-body :global(ol) {
+    margin: 0 0 1.15rem;
+    padding-left: 1.5rem;
+  }
+
+  .quest-body :global(li) {
+    margin-bottom: 0.4rem;
+  }
+
+  .quest-body :global(blockquote) {
+    margin: 1.5rem 0;
+    padding: 0.5rem 1.25rem;
+    border-left: 2px solid var(--gold-400);
+    color: var(--ink-300);
+    font-style: italic;
+  }
+
+  .quest-nav-section {
+    max-width: 820px;
+    margin: 0 auto;
+  }
+
+  .quest-nav {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    padding-top: 2rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+  }
+
+  .quest-nav-link {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    padding: 1rem;
+    background: rgba(29, 26, 38, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: var(--radius-sharp);
+    color: var(--ink-100);
+    text-decoration: none;
+    transition: border-color 180ms ease, transform 180ms ease,
+      background 180ms ease;
+  }
+
+  .quest-nav-link:hover {
+    border-color: var(--gold-400);
+    transform: translateY(-1px);
+    background: rgba(29, 26, 38, 0.8);
+  }
+
+  .quest-nav-link--next {
+    text-align: right;
+  }
+
+  .quest-nav-dir {
+    font-family: var(--font-mono, ui-monospace, monospace);
+    font-size: 0.7rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-500);
+  }
+
+  .quest-nav-title {
+    font-size: 0.98rem;
+    color: var(--ink-100);
+    line-height: 1.3;
+  }
+</style>

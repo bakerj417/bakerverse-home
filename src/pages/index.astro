@@ -1,0 +1,577 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import TooltipCard from '@/components/ui/TooltipCard.astro';
+import StackBadge from '@/components/ui/StackBadge.astro';
+import EmberBackdrop from '@/components/islands/EmberBackdrop.tsx';
+import MagneticButton from '@/components/islands/MagneticButton.tsx';
+import RevealOnScroll from '@/components/islands/RevealOnScroll.tsx';
+import { characterSheet, site } from '@/data/site';
+import { getCollection } from 'astro:content';
+
+const projects = (await getCollection('projects'))
+  .filter((p) => p.data.featured)
+  .sort((a, b) => a.data.order - b.data.order)
+  .slice(0, 3);
+---
+
+<BaseLayout
+  title="Home"
+  description={site.description}
+>
+  <!-- ======================================================
+       HERO — the character-select entry
+       ====================================================== -->
+  <section class="hero">
+    <div class="hero-backdrop" aria-hidden="true">
+      <EmberBackdrop client:idle density={55} opacity={0.4} />
+      <div class="hero-forge-floor"></div>
+      <div class="hero-sigil">
+        <svg viewBox="0 0 400 400" fill="none">
+          <defs>
+            <linearGradient id="goldGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#ffd968" stop-opacity="0.9" />
+              <stop offset="100%" stop-color="#8a6208" stop-opacity="0.3" />
+            </linearGradient>
+          </defs>
+          <!-- outer ring -->
+          <circle cx="200" cy="200" r="180" stroke="url(#goldGrad)" stroke-width="1" opacity="0.35" />
+          <!-- middle ring with dashes -->
+          <circle
+            cx="200" cy="200" r="150"
+            stroke="url(#goldGrad)"
+            stroke-width="1"
+            stroke-dasharray="2 8"
+            opacity="0.6"
+          />
+          <!-- inner hex -->
+          <path
+            d="M200 80 L290 130 L290 230 L200 280 L110 230 L110 130 Z"
+            stroke="url(#goldGrad)"
+            stroke-width="1.5"
+            fill="none"
+            opacity="0.7"
+          />
+          <!-- center monogram -->
+          <text
+            x="200" y="220"
+            text-anchor="middle"
+            font-family="Cinzel, serif"
+            font-size="82"
+            font-weight="700"
+            fill="url(#goldGrad)"
+            opacity="0.85"
+          >JB</text>
+          <!-- runic marks -->
+          <text x="200" y="50" text-anchor="middle" fill="url(#goldGrad)" font-family="Cinzel" font-size="12" letter-spacing="6">BAKERVERSE</text>
+          <text x="200" y="370" text-anchor="middle" fill="url(#goldGrad)" font-family="Cinzel" font-size="10" letter-spacing="5">EST · MMXXVI</text>
+        </svg>
+      </div>
+    </div>
+
+    <div class="hero-content section">
+      <p class="section-eyebrow">Welcome, Traveler</p>
+      <h1 class="hero-name">
+        Joseph <span class="hero-name-accent">Baker</span>
+      </h1>
+      <p class="hero-role">
+        Full-stack engineer · 15 years in the craft · Builder of the Bakerverse.
+      </p>
+      <p class="hero-pitch">
+        I build React Native apps, design systems, and automation tools
+        — and I'm weaving them all into a personal ecosystem of
+        services I call the Bakerverse. Based in Waxhaw, North Carolina.
+      </p>
+
+      <div class="hero-ctas">
+        <MagneticButton
+          client:load
+          href={site.resumeUrl}
+          external
+          variant="gold"
+          ariaLabel="Download resume"
+        >
+          View Resume <span aria-hidden="true">⤓</span>
+        </MagneticButton>
+        <MagneticButton
+          client:load
+          href="/projects"
+          variant="ghost"
+          ariaLabel="Explore projects"
+        >
+          Explore the Vault <span aria-hidden="true">→</span>
+        </MagneticButton>
+      </div>
+
+      <!-- Compact stat block, live in the hero -->
+      <div class="hero-stats">
+        {characterSheet.stats.map((stat) => (
+          <div class="hero-stat">
+            <dt>{stat.label}</dt>
+            <dd>{stat.value}</dd>
+          </div>
+        ))}
+      </div>
+
+      <div class="hero-scroll-hint" aria-hidden="true">
+        <span>Scroll</span>
+        <span class="hero-scroll-line"></span>
+      </div>
+    </div>
+  </section>
+
+  <!-- section ornament — visual break after hero -->
+  <div class="section-ornament" aria-hidden="true">
+    <div class="section-ornament-line"></div>
+    <span class="section-ornament-gem">◆</span>
+    <div class="section-ornament-line section-ornament-line--right"></div>
+  </div>
+
+  <!-- ======================================================
+       FEATURED PROJECTS — marquee from content collection
+       ====================================================== -->
+  <section class="section section-y-lg">
+    <RevealOnScroll client:visible>
+      <div class="section-head">
+        <p class="section-eyebrow">Legendary Items</p>
+        <h2 class="section-title">Featured Projects</h2>
+        <p class="section-sub">
+          A curated few of the things I've built. Full inventory lives in
+          <a href="/projects" class="section-link">the Vault →</a>
+        </p>
+      </div>
+    </RevealOnScroll>
+
+    <div class="project-grid">
+      {projects.map((project, index) => (
+        <RevealOnScroll client:visible delayMs={index * 120}>
+          <TooltipCard
+            href={`/projects/${project.slug}`}
+            rarity={project.data.rarity}
+          >
+            <div class="project-card-head">
+              <span class="project-rarity">{project.data.rarity}</span>
+              <span class="project-year">{project.data.year}</span>
+            </div>
+            <h3 class="project-title">{project.data.title}</h3>
+            <p class="project-tagline">{project.data.tagline}</p>
+            <div class="project-stack">
+              {project.data.stack.slice(0, 4).map((tech) => (
+                <StackBadge label={tech} />
+              ))}
+            </div>
+            <div class="project-footer">
+              <span class="project-status" data-status={project.data.status}>
+                {project.data.status === 'active' ? '◆ Currently active' :
+                 project.data.status === 'shipped' ? '✔ Shipped' :
+                 project.data.status === 'wip' ? '⚒ In the forge' :
+                 '✶ Archived'}
+              </span>
+              <span class="project-cta">Open →</span>
+            </div>
+          </TooltipCard>
+        </RevealOnScroll>
+      ))}
+    </div>
+  </section>
+
+  <!-- ======================================================
+       BAKERVERSE TEASER
+       ====================================================== -->
+  <section class="section section-y-md">
+    <RevealOnScroll client:visible>
+      <div class="bakerverse-teaser">
+        <div class="bakerverse-teaser-inner">
+          <p class="section-eyebrow">The Wider Realm</p>
+          <h2 class="section-title">Enter the Bakerverse</h2>
+          <p class="bakerverse-copy">
+            Beyond this site lives a growing network of tools and services
+            I've built for myself, my family, and anyone who needs them —
+            from a fully automated media stack on my NAS to side-projects
+            that scratch small itches the world hasn't solved yet.
+          </p>
+          <div class="hero-ctas">
+            <MagneticButton
+              client:visible
+              href="/bakerverse"
+              variant="gold"
+              ariaLabel="Open the Bakerverse map"
+            >
+              Open the Map <span aria-hidden="true">✴</span>
+            </MagneticButton>
+          </div>
+        </div>
+        <div class="bakerverse-teaser-decor" aria-hidden="true">
+          <svg viewBox="0 0 200 200" fill="none">
+            <circle cx="100" cy="100" r="70" stroke="#d99e0b" stroke-width="1" opacity="0.3" />
+            <circle cx="100" cy="100" r="50" stroke="#d99e0b" stroke-width="1" opacity="0.5" />
+            <circle cx="100" cy="100" r="30" stroke="#d99e0b" stroke-width="1" opacity="0.7" />
+            <circle cx="100" cy="100" r="3" fill="#ffd968" />
+            <!-- satellite dots -->
+            <circle cx="170" cy="100" r="4" fill="#f0b90b" />
+            <circle cx="100" cy="30" r="3" fill="#a335ee" />
+            <circle cx="30" cy="100" r="3" fill="#0070dd" />
+            <circle cx="100" cy="170" r="3" fill="#ff8000" />
+            <circle cx="150" cy="150" r="2" fill="#1eff00" />
+          </svg>
+        </div>
+      </div>
+    </RevealOnScroll>
+  </section>
+</BaseLayout>
+
+<style>
+  /* -------- HERO -------- */
+  .hero {
+    position: relative;
+    min-height: calc(100vh - 72px);
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+    isolation: isolate;
+  }
+
+  .hero-backdrop {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background:
+      radial-gradient(ellipse at center, rgba(240, 185, 11, 0.1) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 20%, rgba(164, 30, 34, 0.06) 0%, transparent 40%);
+  }
+
+  .hero-sigil {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    pointer-events: none;
+    opacity: 0.35;
+  }
+
+  .hero-sigil svg {
+    width: min(80vmin, 720px);
+    height: min(80vmin, 720px);
+    animation: rune-rotate 160s linear infinite;
+  }
+
+  .hero-content {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    max-width: 960px;
+    padding-top: 4rem;
+    padding-bottom: 4rem;
+    animation: fade-up 1s var(--ease-ornate) both;
+  }
+
+  .hero-name {
+    font-size: clamp(3.5rem, 9vw, 7rem);
+    line-height: 0.95;
+    letter-spacing: -0.02em;
+    margin: 1rem 0 0.5rem;
+    font-weight: 600;
+  }
+
+  .hero-name-accent {
+    background: linear-gradient(180deg, var(--gold-200) 0%, var(--gold-400) 70%, var(--gold-600) 100%);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 0 24px rgba(240, 185, 11, 0.35));
+  }
+
+  .hero-role {
+    font-family: var(--font-display);
+    font-size: clamp(1rem, 1.5vw, 1.25rem);
+    color: var(--gold-300);
+    letter-spacing: 0.05em;
+    margin: 0.5rem 0 1.25rem;
+  }
+
+  .hero-pitch {
+    font-size: clamp(1rem, 1.2vw, 1.125rem);
+    color: var(--ink-300);
+    line-height: 1.6;
+    max-width: 44rem;
+    margin: 0 auto 2.5rem;
+  }
+
+  .hero-ctas {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: center;
+    margin-bottom: 3rem;
+  }
+
+  .hero-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 1rem;
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 1.25rem;
+    background: rgba(13, 12, 20, 0.4);
+    border: 1px solid rgba(240, 185, 11, 0.12);
+    border-radius: 2px;
+    backdrop-filter: blur(4px);
+  }
+
+  .hero-stat {
+    text-align: center;
+  }
+
+  .hero-stat dt {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--ink-500);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .hero-stat dd {
+    font-family: var(--font-display);
+    font-size: 1.1rem;
+    color: var(--gold-200);
+    font-weight: 600;
+    margin: 0.2rem 0 0;
+  }
+
+  .hero-scroll-hint {
+    position: absolute;
+    bottom: 1.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--ink-500);
+  }
+
+  .hero-scroll-line {
+    width: 1px;
+    height: 28px;
+    background: linear-gradient(180deg, var(--gold-400), transparent);
+  }
+
+  /* -------- SECTION HEAD -------- */
+  .section-head {
+    text-align: center;
+    max-width: 720px;
+    margin: 0 auto 3rem;
+  }
+
+  .section-title {
+    font-size: clamp(2rem, 4vw, 3rem);
+    margin: 0.5rem 0 1rem;
+  }
+
+  .section-sub {
+    color: var(--ink-300);
+    line-height: 1.6;
+  }
+
+  .section-link {
+    color: var(--gold-300);
+    font-weight: 500;
+  }
+
+  /* -------- PROJECT GRID -------- */
+  .project-grid {
+    display: grid;
+    gap: 1.5rem;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  }
+
+  .project-card-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .project-rarity {
+    color: var(--rarity-color, var(--gold-300));
+  }
+
+  .project-year {
+    color: var(--ink-500);
+  }
+
+  .project-title {
+    font-size: 1.15rem;
+    margin: 0 0 0.5rem;
+    color: var(--ink-100);
+    line-height: 1.3;
+  }
+
+  .project-tagline {
+    font-size: 0.9rem;
+    color: var(--ink-300);
+    line-height: 1.5;
+    margin: 0 0 1rem;
+    min-height: 2.8em;
+  }
+
+  .project-stack {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+    margin-bottom: 1rem;
+  }
+
+  .project-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 0.75rem;
+    border-top: 1px solid rgba(240, 185, 11, 0.08);
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+  }
+
+  .project-status {
+    color: var(--ink-500);
+  }
+
+  .project-status[data-status="active"] {
+    color: var(--rarity-uncommon);
+  }
+
+  .project-cta {
+    color: var(--gold-300);
+    transition: transform var(--dur-fast) var(--ease-standard);
+  }
+
+  .group:hover .project-cta {
+    transform: translateX(3px);
+  }
+
+  /* -------- BAKERVERSE TEASER -------- */
+  .bakerverse-teaser {
+    display: grid;
+    gap: 2.5rem;
+    align-items: center;
+    padding: 3rem 2rem;
+    background:
+      radial-gradient(ellipse at 80% 50%, rgba(240, 185, 11, 0.08) 0%, transparent 55%),
+      linear-gradient(135deg, rgba(29, 26, 38, 0.7), rgba(13, 12, 20, 0.7));
+    border: 1px solid rgba(240, 185, 11, 0.15);
+    border-radius: 2px;
+    box-shadow: var(--shadow-inset-frame);
+  }
+
+  @media (min-width: 768px) {
+    .bakerverse-teaser {
+      grid-template-columns: 1.4fr 1fr;
+    }
+  }
+
+  .bakerverse-copy {
+    color: var(--ink-300);
+    line-height: 1.7;
+    max-width: 40rem;
+    margin: 1rem 0 2rem;
+  }
+
+  .bakerverse-teaser-decor {
+    display: grid;
+    place-items: center;
+    min-height: 200px;
+  }
+
+  .bakerverse-teaser-decor svg {
+    width: min(260px, 100%);
+    height: auto;
+    animation: rune-rotate 90s linear infinite;
+  }
+
+  /* -------- FORGE FLOOR (ember origin visual) -------- */
+  .hero-forge-floor {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 140px;
+    pointer-events: none;
+  }
+
+  .hero-forge-floor::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 8%;
+    right: 8%;
+    height: 1px;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(240, 185, 11, 0.3) 15%,
+      rgba(255, 237, 176, 0.65) 50%,
+      rgba(240, 185, 11, 0.3) 85%,
+      transparent 100%
+    );
+    box-shadow: 0 0 20px 6px rgba(240, 185, 11, 0.18);
+  }
+
+  .hero-forge-floor::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 10%;
+    right: 10%;
+    height: 140px;
+    background: radial-gradient(
+      ellipse at 50% 100%,
+      rgba(240, 185, 11, 0.09) 0%,
+      rgba(240, 185, 11, 0.03) 50%,
+      transparent 70%
+    );
+  }
+
+  /* -------- SECTION ORNAMENT -------- */
+  .section-ornament {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    max-width: 480px;
+    margin: 0 auto;
+    padding: 1.5rem 2rem;
+  }
+
+  .section-ornament-line {
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(
+      90deg,
+      rgba(240, 185, 11, 0.2),
+      rgba(240, 185, 11, 0.35) 50%,
+      transparent
+    );
+  }
+
+  .section-ornament-line--right {
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(240, 185, 11, 0.35) 50%,
+      rgba(240, 185, 11, 0.2)
+    );
+  }
+
+  .section-ornament-gem {
+    font-size: 0.5rem;
+    color: var(--gold-400);
+    opacity: 0.55;
+    line-height: 1;
+  }
+</style>

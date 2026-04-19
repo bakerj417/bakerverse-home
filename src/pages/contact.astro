@@ -1,0 +1,1398 @@
+---
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import RevealOnScroll from "@/components/islands/RevealOnScroll.tsx";
+import { site, socials } from "@/data/site";
+
+const turnstileSiteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY ?? "";
+---
+
+<BaseLayout
+  title="Contact"
+  description="Send word — message Joseph Baker for work, collaboration, or freelance through Baker Software Solutions."
+>
+  <script
+    is:inline
+    src="https://challenges.cloudflare.com/turnstile/v0/api.js"
+    async
+    defer></script>
+
+  <section class="section section-y-lg contact-section">
+    <div class="monument">
+      <div class="monument-frieze monument-frieze--top" aria-hidden="true">
+        <span class="monument-rune">✉</span>
+      </div>
+
+      <RevealOnScroll client:visible>
+        <p class="section-eyebrow">Ravenroost · Contact</p>
+        <h1 class="contact-h1 contact-h1--carved">Send word</h1>
+        <p class="contact-sub">
+          The candle's lit, the ink is wet. Write the letter, seal it, and the
+          courier carries it straight to my inbox — no mail client needed.
+        </p>
+      </RevealOnScroll>
+
+      <!-- ================================================================
+           DESK — wood surface with candle + inkwell props on top,
+           parchment sits in the middle and holds the form.
+           ================================================================ -->
+      <RevealOnScroll client:visible delayMs={150}>
+        <div class="desk" id="desk" data-state="idle">
+          <div class="candle candle--left" aria-hidden="true">
+            <img
+              src="/images/contact/candle.png"
+              alt=""
+              width="48"
+              height="96"
+              loading="eager"
+              decoding="async"
+            />
+          </div>
+
+          <div class="candle candle--right" aria-hidden="true">
+            <img
+              src="/images/contact/candle.png"
+              alt=""
+              width="48"
+              height="96"
+              loading="eager"
+              decoding="async"
+            />
+          </div>
+
+          <div class="inkwell" aria-hidden="true">
+            <img
+              src="/images/contact/inkwell.png"
+              alt=""
+              width="96"
+              height="96"
+              loading="eager"
+              decoding="async"
+            />
+          </div>
+
+          <div class="candle-glow-left" aria-hidden="true"></div>
+          <div class="candle-glow-right" aria-hidden="true"></div>
+
+          <!-- ============================================================
+               PARCHMENT — holds the form. Animates into a rolled scroll
+               on "Seal the letter" click.
+               ============================================================ -->
+          <div class="parchment" id="parchment">
+            <div class="scroll-tube scroll-tube--top" aria-hidden="true"></div>
+            <div class="scroll-tube scroll-tube--bottom" aria-hidden="true">
+            </div>
+            <div class="scroll-ribbon" aria-hidden="true"></div>
+            <div class="wax-seal" aria-hidden="true">
+              <svg viewBox="0 0 80 80" width="80" height="80">
+                <defs>
+                  <radialGradient id="wax-grad" cx="40%" cy="35%" r="65%">
+                    <stop offset="0%" stop-color="#c42828"></stop>
+                    <stop offset="60%" stop-color="#8b0000"></stop>
+                    <stop offset="100%" stop-color="#4a0000"></stop>
+                  </radialGradient>
+                </defs>
+                <circle cx="40" cy="40" r="34" fill="url(#wax-grad)"></circle>
+                <circle
+                  cx="40"
+                  cy="40"
+                  r="34"
+                  fill="none"
+                  stroke="#2a0000"
+                  stroke-width="1.5"
+                  opacity="0.6"></circle>
+                <text
+                  x="40"
+                  y="50"
+                  text-anchor="middle"
+                  font-family="Cinzel, Georgia, serif"
+                  font-size="30"
+                  font-weight="700"
+                  fill="#f0b90b"
+                  opacity="0.92">JB</text
+                >
+                <circle cx="10" cy="58" r="5" fill="#8b0000" opacity="0.75"
+                ></circle>
+                <circle cx="70" cy="20" r="3" fill="#8b0000" opacity="0.6"
+                ></circle>
+                <circle cx="68" cy="62" r="4" fill="#8b0000" opacity="0.7"
+                ></circle>
+              </svg>
+            </div>
+
+            <div class="letter">
+              <p class="letter-salutation">To Joseph of the Bakerverse,</p>
+
+              <form id="contact-form" class="letter-form" novalidate>
+                <div class="field">
+                  <label for="name">Your name</label>
+                  <input
+                    id="name"
+                    name="name"
+                    type="text"
+                    autocomplete="name"
+                    maxlength="120"
+                    required
+                  />
+                </div>
+
+                <div class="field">
+                  <label for="email">Where to reach you</label>
+                  <input
+                    id="email"
+                    name="email"
+                    type="email"
+                    autocomplete="email"
+                    maxlength="254"
+                    required
+                  />
+                </div>
+
+                <div class="field">
+                  <label for="subject"
+                    >Subject <span class="field-optional">— optional</span
+                    ></label
+                  >
+                  <input
+                    id="subject"
+                    name="subject"
+                    type="text"
+                    maxlength="200"
+                    placeholder="A word from a friend"
+                    data-autofill-subject
+                  />
+                </div>
+
+                <div class="field">
+                  <label for="message">The letter itself</label>
+                  <textarea
+                    id="message"
+                    name="message"
+                    rows="6"
+                    maxlength="5000"
+                    required></textarea>
+                </div>
+
+                <div class="honeypot" aria-hidden="true">
+                  <label for="hp">Leave this empty</label>
+                  <input
+                    id="hp"
+                    name="hp"
+                    type="text"
+                    tabindex="-1"
+                    autocomplete="off"
+                  />
+                </div>
+
+                <div class="turnstile-wrap">
+                  <div
+                    class="cf-turnstile"
+                    data-sitekey={turnstileSiteKey}
+                    data-theme="dark"
+                  >
+                  </div>
+                </div>
+
+                <p
+                  class="form-error"
+                  id="form-error"
+                  role="alert"
+                  aria-live="polite"
+                >
+                </p>
+              </form>
+            </div>
+          </div>
+
+          <!-- Ritual CTA — lives OUTSIDE the parchment so it stays
+               visible while the parchment collapses into a scroll.
+               The `form` attribute keeps it as the form submit target. -->
+          <div class="ritual" id="ritual">
+            <button
+              type="submit"
+              form="contact-form"
+              class="ritual-cta"
+              id="ritual-cta"
+              data-state="idle"
+            >
+              <span class="ritual-label" data-label="idle">Seal the letter</span
+              >
+              <span class="ritual-label" data-label="sealing">Sealing…</span>
+              <span class="ritual-label" data-label="ready"
+                >Send the letter</span
+              >
+              <span class="ritual-label" data-label="sending">Sending…</span>
+              <span class="ritual-label" data-label="sent"
+                >Sealed &amp; dispatched</span
+              >
+              <span class="ritual-icon" aria-hidden="true">
+                <span class="ritual-icon-seal">✦</span>
+                <span class="ritual-icon-send">➤</span>
+                <span class="ritual-icon-sent">✓</span>
+              </span>
+            </button>
+          </div>
+
+          <!-- Courier animation intentionally omitted — revisit when
+               we have a better-quality sprite or video. -->
+
+          <div class="sent-card" id="sent-card" aria-live="polite">
+            <p class="sent-eyebrow">✦ Dispatched</p>
+            <h2 class="sent-title">Sealed &amp; dispatched</h2>
+            <p class="sent-body">
+              The courier has the letter. You'll hear back from
+              <a href={`mailto:${site.email}`}>{site.email}</a> shortly.
+            </p>
+          </div>
+        </div>
+      </RevealOnScroll>
+
+      <div class="monument-frieze monument-frieze--bottom" aria-hidden="true">
+        <span class="monument-rune">✉</span>
+      </div>
+    </div>
+
+    <RevealOnScroll client:visible delayMs={250}>
+      <div class="socials-row">
+        <p class="socials-label">Or find me elsewhere</p>
+        <ul class="socials-list">
+          {
+            socials.map((s) => (
+              <li>
+                <a
+                  href={s.href}
+                  class="social-link"
+                  target={s.href.startsWith("http") ? "_blank" : undefined}
+                  rel={
+                    s.href.startsWith("http")
+                      ? "noopener noreferrer"
+                      : undefined
+                  }
+                >
+                  <span class="social-glyph" aria-hidden="true">
+                    {s.glyph}
+                  </span>
+                  <span class="social-body">
+                    <span class="social-label">{s.label}</span>
+                    <span class="social-handle">{s.handle}</span>
+                  </span>
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+    </RevealOnScroll>
+
+    <RevealOnScroll client:visible delayMs={300}>
+      <aside class="guild-note">
+        <span class="guild-crest" aria-hidden="true">◆</span>
+        <div class="guild-body">
+          <p class="guild-name">{site.business.name}</p>
+          <p class="guild-tagline">
+            Freelance and side engagements ride under this banner. Short-run
+            builds, design-system work, or a second pair of hands on a mobile
+            app — send word the same way.
+          </p>
+        </div>
+      </aside>
+    </RevealOnScroll>
+  </section>
+</BaseLayout>
+
+<script>
+  type State = "idle" | "sealing" | "ready" | "sending" | "sent";
+
+  const form = document.getElementById(
+    "contact-form",
+  ) as HTMLFormElement | null;
+  const desk = document.getElementById("desk");
+  const cta = document.getElementById("ritual-cta") as HTMLButtonElement | null;
+  const errorBox = document.getElementById("form-error");
+  const subjectInput = document.querySelector(
+    "[data-autofill-subject]",
+  ) as HTMLInputElement | null;
+  const nameInput = document.getElementById("name") as HTMLInputElement | null;
+  const emailInput = document.getElementById(
+    "email",
+  ) as HTMLInputElement | null;
+
+  // Mirror the server's email regex so client + server agree on "valid".
+  const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  if (form && desk && cta && errorBox) {
+    const prefersReducedMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+    const SEAL_MS = prefersReducedMotion ? 0 : 900;
+
+    const setState = (state: State) => {
+      desk.setAttribute("data-state", state);
+      cta.setAttribute("data-state", state);
+    };
+
+    const showError = (message: string) => {
+      errorBox.textContent = message;
+      errorBox.classList.add("is-visible");
+    };
+
+    const clearError = () => {
+      errorBox.textContent = "";
+      errorBox.classList.remove("is-visible");
+    };
+
+    if (nameInput && subjectInput) {
+      const basePlaceholder = subjectInput.placeholder;
+      nameInput.addEventListener("input", () => {
+        const name = nameInput.value.trim();
+        subjectInput.placeholder = name
+          ? `A word from ${name}`
+          : basePlaceholder;
+      });
+    }
+
+    // Clear any custom email error while the user edits so the native
+    // validation bubble disappears as soon as they fix the problem.
+    if (emailInput) {
+      emailInput.addEventListener("input", () => {
+        emailInput.setCustomValidity("");
+      });
+    }
+
+    const getTurnstileToken = (): string => {
+      const hidden = form.querySelector<HTMLInputElement>(
+        '[name="cf-turnstile-response"]',
+      );
+      return hidden?.value ?? "";
+    };
+
+    const resetTurnstile = () => {
+      const w = (
+        window as unknown as {
+          turnstile?: { reset: (container?: Element | string) => void };
+        }
+      ).turnstile;
+      if (w && typeof w.reset === "function") {
+        const container = form.querySelector(".cf-turnstile");
+        if (container) w.reset(container);
+      }
+    };
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const state = cta.getAttribute("data-state") as State;
+
+      if (state === "idle") {
+        clearError();
+
+        // Custom email check — regex stricter than the browser's
+        // built-in `type="email"` (which accepts "a@b"). Attach the
+        // message to the field so the browser shows the error arrow
+        // pointing at the input, not a form-wide banner.
+        if (emailInput) {
+          const value = emailInput.value.trim();
+          if (value && !EMAIL_RE.test(value)) {
+            emailInput.setCustomValidity(
+              "Please enter a valid email address (for example: name@domain.com).",
+            );
+          } else {
+            emailInput.setCustomValidity("");
+          }
+        }
+
+        if (!form.reportValidity()) return;
+
+        const token = getTurnstileToken();
+        if (!token) {
+          showError(
+            "The bot-check widget is still loading. Give it a second, then try again.",
+          );
+          return;
+        }
+
+        setState("sealing");
+
+        // Scroll the desk to the top of the viewport so the rolled
+        // scroll + the open stage below are both fully in view once
+        // the animation finishes.
+        desk.scrollIntoView({
+          behavior: prefersReducedMotion ? "auto" : "smooth",
+          block: "start",
+        });
+
+        window.setTimeout(() => {
+          setState("ready");
+        }, SEAL_MS);
+        return;
+      }
+
+      if (state === "ready") {
+        clearError();
+        setState("sending");
+
+        const data = new FormData(form);
+        const payload = {
+          name: String(data.get("name") ?? ""),
+          email: String(data.get("email") ?? ""),
+          subject: String(data.get("subject") ?? ""),
+          message: String(data.get("message") ?? ""),
+          hp: String(data.get("hp") ?? ""),
+          turnstileToken: getTurnstileToken(),
+        };
+
+        try {
+          const res = await fetch("/api/contact", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+          });
+          const body = (await res.json().catch(() => ({}))) as {
+            ok?: boolean;
+            error?: string;
+          };
+
+          if (!res.ok || body.ok !== true) {
+            throw new Error(
+              body.error ?? "Something went wrong sending the letter.",
+            );
+          }
+
+          setState("sent");
+        } catch (err) {
+          const message =
+            err instanceof Error
+              ? err.message
+              : "Something went wrong. Please try again.";
+          showError(message);
+          resetTurnstile();
+          setState("ready");
+        }
+        return;
+      }
+    });
+  }
+</script>
+
+<style>
+  .contact-section {
+    max-width: 1000px;
+  }
+
+  .contact-h1 {
+    font-size: clamp(2.5rem, 6vw, 4.5rem);
+    line-height: 1.05;
+    margin: 1rem 0 1.25rem;
+  }
+
+  .contact-h1--carved {
+    letter-spacing: 0.01em;
+    text-shadow:
+      0 1px 0 rgba(0, 0, 0, 0.65),
+      0 -1px 0 rgba(240, 185, 11, 0.06);
+  }
+
+  .contact-sub {
+    max-width: 40rem;
+    margin: 0 0 3rem;
+    color: var(--ink-300);
+    line-height: 1.7;
+    font-size: 1.05rem;
+  }
+
+  .monument {
+    position: relative;
+    padding: 2rem 1.25rem 2.25rem;
+    background:
+      radial-gradient(
+        ellipse at top,
+        rgba(240, 185, 11, 0.05),
+        transparent 60%
+      ),
+      linear-gradient(
+        180deg,
+        rgba(29, 26, 38, 0.35) 0%,
+        rgba(13, 12, 20, 0) 100%
+      );
+  }
+
+  @media (min-width: 720px) {
+    .monument {
+      padding: 2.5rem 2rem 2.75rem;
+    }
+  }
+
+  .monument-frieze {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    color: var(--gold-400);
+  }
+
+  .monument-frieze::before,
+  .monument-frieze::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(240, 185, 11, 0.35),
+      transparent
+    );
+  }
+
+  .monument-frieze--top {
+    margin-bottom: 2rem;
+  }
+  .monument-frieze--bottom {
+    margin-top: 2.25rem;
+  }
+
+  .monument-rune {
+    font-size: 0.9rem;
+    opacity: 0.75;
+  }
+
+  /* =========================================================
+     Desk — dark walnut slab with candle + inkwell on top
+     ========================================================= */
+  .desk {
+    position: relative;
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 5rem 2rem 3rem;
+    /* Tall enough that when the parchment rolls up and floats to the
+       top there's a clear open stage below for the courier animation
+       (and later a real horse sprite). */
+    min-height: 760px;
+    background:
+      linear-gradient(
+        180deg,
+        rgba(0, 0, 0, 0.4) 0%,
+        transparent 3%,
+        transparent 97%,
+        rgba(0, 0, 0, 0.5) 100%
+      ),
+      radial-gradient(
+        ellipse at 10% 0%,
+        rgba(240, 185, 11, 0.18) 0%,
+        transparent 45%
+      ),
+      repeating-linear-gradient(
+        92deg,
+        rgba(255, 220, 140, 0.02) 0 2px,
+        transparent 2px 5px,
+        rgba(0, 0, 0, 0.06) 5px 7px,
+        transparent 7px 12px
+      ),
+      linear-gradient(
+        180deg,
+        #2f1d10 0%,
+        #3d2714 30%,
+        #4a2f18 60%,
+        #331e0d 100%
+      );
+    border: 1px solid #1a0f05;
+    border-radius: 4px;
+    box-shadow:
+      0 40px 100px -40px rgba(0, 0, 0, 0.95),
+      inset 0 2px 0 rgba(255, 200, 120, 0.08),
+      inset 0 -4px 20px rgba(0, 0, 0, 0.6),
+      inset 0 0 0 1px rgba(240, 185, 11, 0.06);
+    /* overflow: visible so the candle flames can peek above the
+       desk's top edge. The messenger now clips itself via
+       .messenger-stage; parchment clips its own scroll animation. */
+    overflow: visible;
+    isolation: isolate;
+  }
+
+  /* Pixel art props — display at 2× source for crisp nearest-neighbor
+     scaling. Gentle brightness + drop-shadow pulse on the candle gives
+     the static flame enough life until we have a real frame cycle. */
+  .candle {
+    position: absolute;
+    /* Negative top so the flame peeks above the desk's top edge,
+       enabled by .desk overflow: visible. 2× scale of source 48×96. */
+    top: -2rem;
+    width: 96px;
+    height: 192px;
+    z-index: 2;
+    pointer-events: none;
+  }
+
+  .candle--left {
+    left: 0.75rem;
+  }
+  .candle--right {
+    right: 0.75rem;
+  }
+
+  .candle img {
+    width: 100%;
+    height: 100%;
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+    filter: drop-shadow(0 0 14px rgba(240, 185, 11, 0.55))
+      drop-shadow(0 0 28px rgba(240, 185, 11, 0.25));
+    animation: candle-pulse 2.1s ease-in-out infinite;
+    transform-origin: 50% 100%;
+  }
+
+  @keyframes candle-pulse {
+    0%,
+    100% {
+      filter: drop-shadow(0 0 14px rgba(240, 185, 11, 0.55))
+        drop-shadow(0 0 28px rgba(240, 185, 11, 0.25));
+      transform: scale(1);
+    }
+    40% {
+      filter: drop-shadow(0 0 10px rgba(240, 185, 11, 0.4))
+        drop-shadow(0 0 20px rgba(240, 185, 11, 0.18));
+      transform: scale(0.995);
+    }
+    70% {
+      filter: drop-shadow(0 0 18px rgba(240, 185, 11, 0.7))
+        drop-shadow(0 0 34px rgba(240, 185, 11, 0.3));
+      transform: scale(1.01);
+    }
+  }
+
+  .inkwell {
+    position: absolute;
+    /* Centered at top of the desk, between the two candles. */
+    top: 1.25rem;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 128px;
+    height: 128px;
+    z-index: 2;
+    pointer-events: none;
+  }
+
+  .inkwell img {
+    width: 100%;
+    height: 100%;
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.55));
+  }
+
+  .candle-glow-left {
+    position: absolute;
+    top: -80px;
+    left: -60px;
+    width: 340px;
+    height: 340px;
+    pointer-events: none;
+    background: radial-gradient(
+      circle at center,
+      rgba(255, 217, 104, 0.28) 0%,
+      rgba(240, 185, 11, 0.08) 40%,
+      transparent 70%
+    );
+    mix-blend-mode: screen;
+    animation: candle-glow-flicker 3.8s ease-in-out infinite;
+    z-index: 1;
+  }
+
+  .candle-glow-right {
+    position: absolute;
+    top: -80px;
+    right: -60px;
+    width: 340px;
+    height: 340px;
+    pointer-events: none;
+    background: radial-gradient(
+      circle at center,
+      rgba(255, 217, 104, 0.28) 0%,
+      rgba(240, 185, 11, 0.08) 40%,
+      transparent 70%
+    );
+    mix-blend-mode: screen;
+    animation: candle-glow-flicker 3.8s ease-in-out infinite;
+    z-index: 1;
+  }
+
+  @keyframes candle-glow-flicker {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.8;
+    }
+  }
+
+  /* =========================================================
+     Parchment — transitions to a rolled scroll on submit
+     ========================================================= */
+  .parchment {
+    position: relative;
+    /* Narrower + pushed down so the centered inkwell (top) and the
+       candles (left + right corners) all stay fully visible. */
+    max-width: 440px;
+    margin: 8rem auto 1rem;
+    padding: 2.5rem 2rem 2rem;
+    background:
+      radial-gradient(
+        ellipse at 20% 20%,
+        rgba(240, 185, 11, 0.08),
+        transparent 60%
+      ),
+      radial-gradient(
+        ellipse at 80% 90%,
+        rgba(139, 0, 0, 0.06),
+        transparent 60%
+      ),
+      repeating-linear-gradient(
+        135deg,
+        rgba(240, 185, 11, 0.015) 0 2px,
+        transparent 2px 5px
+      ),
+      linear-gradient(180deg, #f2e4c1 0%, #e9d4a6 50%, #d6ba85 100%);
+    color: #3b2a16;
+    border: 1px solid rgba(90, 60, 20, 0.5);
+    border-radius: 2px;
+    box-shadow:
+      0 30px 60px -20px rgba(0, 0, 0, 0.8),
+      0 8px 24px -8px rgba(0, 0, 0, 0.5),
+      inset 0 0 80px -20px rgba(92, 65, 5, 0.35),
+      inset 0 0 0 1px rgba(240, 185, 11, 0.1);
+    transition:
+      transform 700ms var(--ease-ornate),
+      max-height 700ms var(--ease-ornate),
+      padding 700ms var(--ease-ornate),
+      filter var(--dur-base) var(--ease-standard),
+      opacity var(--dur-base) var(--ease-standard);
+    max-height: 900px;
+    overflow: hidden;
+    isolation: isolate;
+    z-index: 3;
+  }
+
+  .letter {
+    transition:
+      opacity 250ms var(--ease-standard),
+      transform 400ms var(--ease-ornate);
+    transform-origin: top center;
+  }
+
+  .letter-salutation {
+    font-family: var(--font-display);
+    font-size: 1.05rem;
+    letter-spacing: 0.04em;
+    color: #5c4105;
+    margin: 0 0 1.5rem;
+    text-align: center;
+  }
+
+  /* Form fields — parchment-tinted, intentionally uncommon */
+  .letter-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+  }
+
+  .field label {
+    font-family: var(--font-display);
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: #8a6208;
+  }
+
+  .field-optional {
+    color: #9b7d3e;
+    font-weight: 400;
+    letter-spacing: 0.12em;
+    text-transform: none;
+    font-size: 0.8em;
+  }
+
+  .field input,
+  .field textarea {
+    font-family: var(--font-body);
+    font-size: 0.95rem;
+    line-height: 1.55;
+    color: #2a1a08;
+    background: rgba(255, 251, 235, 0.55);
+    border: 1px solid rgba(92, 65, 5, 0.35);
+    border-bottom: 1px solid rgba(92, 65, 5, 0.6);
+    border-radius: 2px;
+    padding: 0.6rem 0.75rem;
+    transition:
+      border-color var(--dur-fast) var(--ease-standard),
+      background var(--dur-fast) var(--ease-standard),
+      box-shadow var(--dur-fast) var(--ease-standard);
+    width: 100%;
+  }
+
+  .field input::placeholder,
+  .field textarea::placeholder {
+    color: rgba(92, 65, 5, 0.55);
+    font-style: italic;
+  }
+
+  .field input:focus,
+  .field textarea:focus {
+    outline: none;
+    border-color: #8b0000;
+    background: rgba(255, 251, 235, 0.85);
+    box-shadow: 0 0 0 2px rgba(240, 185, 11, 0.4);
+  }
+
+  .field textarea {
+    resize: vertical;
+    min-height: 120px;
+  }
+
+  .honeypot {
+    position: absolute;
+    left: -9999px;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+  }
+
+  .turnstile-wrap {
+    display: flex;
+    justify-content: center;
+    min-height: 65px;
+  }
+
+  .form-error {
+    margin: 0;
+    min-height: 1.25rem;
+    font-family: var(--font-body);
+    font-size: 0.85rem;
+    color: #8b0000;
+    text-align: center;
+    opacity: 0;
+    transition: opacity var(--dur-base) var(--ease-standard);
+  }
+
+  .form-error.is-visible {
+    opacity: 1;
+  }
+
+  /* =========================================================
+     Ritual CTA
+     ========================================================= */
+  .ritual {
+    display: flex;
+    justify-content: center;
+    margin-top: 1.5rem;
+    transition:
+      opacity 300ms var(--ease-standard),
+      transform 400ms var(--ease-ornate);
+    position: relative;
+    z-index: 3;
+  }
+
+  /* Fade the CTA out while the seal animation plays, then fade the
+     new gold "Send the letter" button back in once the scroll has
+     finished collapsing. */
+  .desk[data-state="sealing"] .ritual {
+    opacity: 0;
+    transform: translateY(8px);
+    pointer-events: none;
+  }
+
+  .desk[data-state="ready"] .ritual {
+    opacity: 1;
+    transform: translateY(0);
+    transition-delay: 700ms;
+  }
+
+  .ritual-cta {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    min-width: 240px;
+    padding: 0.9rem 1.75rem;
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 0.95rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #f5f1e4;
+    background: linear-gradient(180deg, #5c1010 0%, #8b0000 50%, #4a0000 100%);
+    border: 1px solid #2a0000;
+    border-radius: var(--radius-sharp);
+    box-shadow:
+      0 2px 0 0 #2a0000,
+      0 0 0 1px rgba(240, 185, 11, 0.25),
+      0 0 18px -4px rgba(139, 0, 0, 0.7);
+    cursor: pointer;
+    overflow: hidden;
+    isolation: isolate;
+    transition:
+      transform var(--dur-fast) var(--ease-bounce),
+      box-shadow var(--dur-base) var(--ease-standard),
+      filter var(--dur-base) var(--ease-standard),
+      background var(--dur-base) var(--ease-standard);
+  }
+
+  .ritual-cta:hover {
+    transform: translateY(-1px);
+    filter: brightness(1.1);
+    box-shadow:
+      0 3px 0 0 #2a0000,
+      0 0 0 1px rgba(240, 185, 11, 0.4),
+      0 0 24px -4px rgba(240, 185, 11, 0.5);
+  }
+
+  .ritual-cta:active {
+    transform: translateY(1px);
+  }
+
+  .ritual-cta[data-state="sealing"],
+  .ritual-cta[data-state="sending"] {
+    cursor: wait;
+    filter: brightness(0.9);
+  }
+
+  .ritual-cta[data-state="ready"] {
+    background: linear-gradient(180deg, #b8840c 0%, #d99e0b 50%, #8a6208 100%);
+    border-color: #5c4105;
+    color: #1a0f05;
+    box-shadow:
+      0 2px 0 0 #5c4105,
+      0 0 0 1px rgba(240, 185, 11, 0.5),
+      0 0 24px -4px rgba(240, 185, 11, 0.6);
+  }
+
+  .ritual-cta[data-state="sent"] {
+    background: linear-gradient(180deg, #1a3a1a 0%, #2d5a2d 50%, #162c16 100%);
+    border-color: #0a1a0a;
+    color: #f5f1e4;
+    cursor: default;
+  }
+
+  .ritual-label {
+    display: none;
+  }
+
+  .ritual-cta[data-state="idle"] .ritual-label[data-label="idle"],
+  .ritual-cta[data-state="sealing"] .ritual-label[data-label="sealing"],
+  .ritual-cta[data-state="ready"] .ritual-label[data-label="ready"],
+  .ritual-cta[data-state="sending"] .ritual-label[data-label="sending"],
+  .ritual-cta[data-state="sent"] .ritual-label[data-label="sent"] {
+    display: inline;
+  }
+
+  .ritual-icon {
+    position: relative;
+    width: 1em;
+    height: 1em;
+    display: inline-block;
+  }
+
+  .ritual-icon > span {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transform: scale(0.6);
+    transition:
+      opacity var(--dur-base) var(--ease-standard),
+      transform var(--dur-base) var(--ease-bounce);
+  }
+
+  .ritual-cta[data-state="idle"] .ritual-icon-seal,
+  .ritual-cta[data-state="ready"] .ritual-icon-send,
+  .ritual-cta[data-state="sent"] .ritual-icon-sent {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  /* =========================================================
+     Scroll transform — parchment collapses into a rolled tube
+     ========================================================= */
+  .scroll-tube {
+    position: absolute;
+    left: -10px;
+    right: -10px;
+    height: 40px;
+    background: linear-gradient(180deg, #b89a6b 0%, #7a5c2d 50%, #5c4105 100%);
+    box-shadow:
+      inset 0 0 0 1px rgba(240, 185, 11, 0.25),
+      inset 0 2px 6px rgba(255, 220, 140, 0.2),
+      inset 0 -4px 10px rgba(0, 0, 0, 0.45),
+      0 4px 12px rgba(0, 0, 0, 0.5);
+    border-radius: 40px / 50%;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 4;
+    transition: opacity 300ms var(--ease-standard) 500ms;
+  }
+
+  .scroll-tube--top {
+    top: -12px;
+  }
+  .scroll-tube--bottom {
+    bottom: -12px;
+  }
+
+  /* Vertical ribbon — centered horizontally, wraps up + over + down
+     around the middle of the horizontal scroll tube. */
+  .scroll-ribbon {
+    position: absolute;
+    left: 50%;
+    top: -24px;
+    bottom: -24px;
+    transform: translateX(-50%) scaleX(0);
+    width: 28px;
+    background: linear-gradient(
+      90deg,
+      #4a0000 0%,
+      #8b0000 35%,
+      #c42828 50%,
+      #8b0000 65%,
+      #4a0000 100%
+    );
+    box-shadow:
+      inset 2px 0 4px rgba(255, 120, 120, 0.25),
+      inset -3px 0 6px rgba(0, 0, 0, 0.55),
+      2px 0 8px rgba(0, 0, 0, 0.45);
+    pointer-events: none;
+    z-index: 5;
+    transition:
+      transform 350ms var(--ease-bounce) 650ms,
+      opacity var(--dur-base) var(--ease-standard);
+    opacity: 0;
+  }
+
+  /* Ribbon tails — notched bow ends at top and bottom */
+  .scroll-ribbon::before,
+  .scroll-ribbon::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 14px;
+    background: inherit;
+    clip-path: polygon(0 0, 50% 60%, 100% 0, 100% 100%, 0 100%);
+  }
+
+  .scroll-ribbon::before {
+    top: -14px;
+    transform: scaleY(-1);
+  }
+
+  .scroll-ribbon::after {
+    bottom: -14px;
+  }
+
+  .wax-seal {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -180%) scale(1.8) rotate(-12deg);
+    width: 80px;
+    height: 80px;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 6;
+    filter: drop-shadow(0 6px 16px rgba(0, 0, 0, 0.55));
+    transition:
+      transform 350ms var(--ease-bounce) 850ms,
+      opacity 300ms var(--ease-standard) 850ms;
+  }
+
+  .desk[data-state="sealing"] .parchment,
+  .desk[data-state="ready"] .parchment,
+  .desk[data-state="sending"] .parchment,
+  .desk[data-state="sent"] .parchment {
+    max-height: 80px;
+    padding-top: 0.25rem;
+    padding-bottom: 0.25rem;
+    /* Drop the rolled scroll down into the middle of the desk so the
+       candle + inkwell stay clear of it, and the open space below
+       hosts the courier gallop. */
+    margin-top: 5rem;
+    margin-bottom: 0;
+  }
+
+  .desk[data-state="sealing"] .letter,
+  .desk[data-state="ready"] .letter,
+  .desk[data-state="sending"] .letter,
+  .desk[data-state="sent"] .letter {
+    opacity: 0;
+    transform: scaleY(0.2);
+    pointer-events: none;
+  }
+
+  .desk[data-state="sealing"] .scroll-tube,
+  .desk[data-state="ready"] .scroll-tube,
+  .desk[data-state="sending"] .scroll-tube,
+  .desk[data-state="sent"] .scroll-tube {
+    opacity: 1;
+  }
+
+  .desk[data-state="ready"] .scroll-ribbon,
+  .desk[data-state="sending"] .scroll-ribbon,
+  .desk[data-state="sent"] .scroll-ribbon {
+    transform: translateX(-50%) scaleX(1);
+    opacity: 1;
+  }
+
+  .desk[data-state="ready"] .wax-seal,
+  .desk[data-state="sending"] .wax-seal,
+  .desk[data-state="sent"] .wax-seal {
+    transform: translate(-50%, -50%) scale(1) rotate(-8deg);
+    opacity: 1;
+  }
+
+  .desk[data-state="sent"] .parchment {
+    transform: translateY(0px) scale(0.92);
+    opacity: 0.6;
+    filter: saturate(0.9) brightness(0.95);
+  }
+
+  /* Courier video — centered horizontally, sits directly under the
+     parchment. Hidden until state=sending/sent. `mix-blend-mode:
+     screen` knocks the MP4's solid dark background out against the
+     dark desk wood — the bright pixels (horse + rider) blend over,
+     the background "cancels" itself. If the MP4 bg isn't dark enough
+     for this trick we'll re-encode to WebM with an alpha channel. */
+  /* Sent confirmation card */
+  .sent-card {
+    position: absolute;
+    left: 50%;
+    /* Sits in the middle-lower area of the desk, below the CTA. */
+    top: 58%;
+    transform: translate(-50%, 30px);
+    max-width: 420px;
+    width: calc(100% - 3rem);
+    padding: 1.5rem 1.75rem;
+    text-align: center;
+    background:
+      radial-gradient(ellipse at top, rgba(30, 255, 0, 0.08), transparent 60%),
+      linear-gradient(180deg, rgba(29, 26, 38, 0.95), rgba(13, 12, 20, 0.95));
+    border: 1px solid rgba(30, 255, 0, 0.25);
+    border-radius: var(--radius-sharp);
+    box-shadow:
+      0 20px 60px -20px rgba(0, 0, 0, 0.8),
+      inset 0 0 0 1px rgba(30, 255, 0, 0.08);
+    opacity: 0;
+    pointer-events: none;
+    z-index: 4;
+    transition:
+      opacity 400ms var(--ease-standard) 500ms,
+      transform 500ms var(--ease-ornate) 500ms;
+  }
+
+  .desk[data-state="sent"] .sent-card {
+    opacity: 1;
+    transform: translate(-50%, 0);
+    pointer-events: auto;
+  }
+
+  .sent-eyebrow {
+    font-family: var(--font-display);
+    font-size: 0.72rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--rarity-uncommon);
+    margin: 0 0 0.5rem;
+  }
+
+  .sent-title {
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    color: var(--ink-100);
+    margin: 0 0 0.75rem;
+  }
+
+  .sent-body {
+    margin: 0;
+    color: var(--ink-300);
+    line-height: 1.6;
+    font-size: 0.95rem;
+  }
+
+  /* Socials row */
+  .socials-row {
+    max-width: 720px;
+    margin: 3rem auto 0;
+    text-align: center;
+  }
+
+  .socials-label {
+    font-family: var(--font-display);
+    font-size: 0.78rem;
+    font-weight: 500;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--gold-300);
+    margin: 0 0 1.5rem;
+  }
+
+  .socials-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    gap: 0.75rem;
+    grid-template-columns: 1fr;
+  }
+
+  @media (min-width: 640px) {
+    .socials-list {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  .social-link {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+    padding: 0.85rem 1.1rem;
+    color: var(--ink-300);
+    background: rgba(7, 6, 10, 0.5);
+    border: 1px solid rgba(240, 185, 11, 0.18);
+    border-radius: var(--radius-sharp);
+    transition: all var(--dur-base) var(--ease-standard);
+    text-align: left;
+  }
+
+  .social-link:hover {
+    border-color: var(--gold-400);
+    background: rgba(240, 185, 11, 0.06);
+    color: var(--gold-200);
+    box-shadow: var(--shadow-gold-glow);
+    transform: translateY(-1px);
+  }
+
+  .social-glyph {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    color: var(--gold-300);
+    background: rgba(240, 185, 11, 0.08);
+    border: 1px solid rgba(240, 185, 11, 0.25);
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
+
+  .social-body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    min-width: 0;
+  }
+
+  .social-label {
+    font-family: var(--font-display);
+    font-size: 0.85rem;
+    letter-spacing: 0.05em;
+    color: inherit;
+  }
+
+  .social-handle {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--ink-500);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .guild-note {
+    max-width: 720px;
+    margin: 2.5rem auto 0;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 1.25rem;
+    align-items: start;
+    padding: 1.5rem;
+    background:
+      radial-gradient(
+        ellipse at left,
+        rgba(163, 53, 238, 0.08),
+        transparent 60%
+      ),
+      linear-gradient(135deg, rgba(29, 26, 38, 0.7), rgba(13, 12, 20, 0.85));
+    border: 1px solid rgba(163, 53, 238, 0.25);
+    border-radius: var(--radius-sharp);
+    box-shadow:
+      inset 0 0 0 1px rgba(163, 53, 238, 0.08),
+      inset 0 0 24px -12px rgba(163, 53, 238, 0.3);
+  }
+
+  .guild-crest {
+    font-size: 1.4rem;
+    color: var(--purple-300);
+    padding: 0.25rem 0;
+    filter: drop-shadow(0 0 8px rgba(163, 53, 238, 0.5));
+  }
+
+  .guild-name {
+    font-family: var(--font-display);
+    font-size: 1.1rem;
+    color: var(--ink-100);
+    margin: 0 0 0.4rem;
+    letter-spacing: 0.02em;
+  }
+
+  .guild-tagline {
+    margin: 0;
+    color: var(--ink-300);
+    font-size: 0.9rem;
+    line-height: 1.6;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .candle img,
+    .candle-glow,
+    .parchment,
+    .scroll-tube,
+    .scroll-ribbon,
+    .wax-seal,
+    .letter,
+    .sent-card {
+      transition-duration: 1ms !important;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .desk {
+      padding: 4rem 1rem 2.5rem;
+      min-height: 720px;
+    }
+
+    .candle {
+      top: 0.5rem;
+      left: 0.75rem;
+      transform: scale(0.85);
+      transform-origin: top left;
+    }
+
+    .inkwell {
+      top: 0.5rem;
+      right: 0.75rem;
+      transform: scale(0.85);
+      transform-origin: top right;
+    }
+
+    .parchment {
+      margin-top: 4rem;
+      padding: 2rem 1.25rem 1.5rem;
+    }
+  }
+</style>

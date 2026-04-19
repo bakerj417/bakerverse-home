@@ -1,0 +1,498 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import RevealOnScroll from '@/components/islands/RevealOnScroll.tsx';
+import MagneticButton from '@/components/islands/MagneticButton.tsx';
+
+const portals = [
+  {
+    rune: '⌂',
+    name: 'Baker Family Tools',
+    teaser:
+      'Recipe vault, chore wheel, allowance ledger, family calendar — the small software that keeps a household running.',
+    rarity: 'rare',
+  },
+  {
+    rune: '▶',
+    name: 'The Media Realm',
+    teaser:
+      'Fully automated media stack running on the NAS. Sonarr, Radarr, Jellyfin, Tautulli — and the scripts gluing them together.',
+    rarity: 'epic',
+  },
+  {
+    rune: '⚙',
+    name: 'Automation Spire',
+    teaser:
+      'Homelab dashboards, Home Assistant flows, and the always-on bots that keep the Bakerverse humming in the background.',
+    rarity: 'uncommon',
+  },
+  {
+    rune: '◆',
+    name: 'Baker Software Solutions',
+    teaser:
+      'The freelance shingle — contract work, side engagements, and the long arc toward passive income.',
+    rarity: 'legendary',
+  },
+  {
+    rune: '✦',
+    name: 'Case Studies',
+    teaser:
+      'Long-form quest journals — the decisions, tradeoffs, and numbers behind the projects worth writing up.',
+    rarity: 'artifact',
+  },
+  {
+    rune: '✺',
+    name: 'Field Notes',
+    teaser:
+      'The blog-shaped corner of the realm. Short essays, pattern libraries, and the occasional rant about mobile tooling.',
+    rarity: 'common',
+  },
+] as const;
+---
+
+<BaseLayout
+  title="The Bakerverse"
+  description="A map of the wider realm — family tools, a media stack, automation dashboards, and every side-project Joseph Baker has nursed into existence."
+>
+  <!-- ======================================================
+       INTRO — monument framing, matches /work /projects
+       ====================================================== -->
+  <section class="section section-y-md realm-intro">
+    <div class="monument">
+      <div class="monument-frieze monument-frieze--top" aria-hidden="true">
+        <span class="monument-rune">✴</span>
+      </div>
+
+      <RevealOnScroll client:visible>
+        <p class="section-eyebrow">The Wider Realm</p>
+        <h1 class="realm-h1 realm-h1--carved">The Bakerverse</h1>
+      </RevealOnScroll>
+
+      <RevealOnScroll client:visible delayMs={180}>
+        <p class="realm-sub">
+          Beyond this landing-page keep lies a growing network of tools,
+          services, and side-quests — the family software, the media
+          realm, the automation spire, and every strange little build
+          that scratches an itch the world hasn't solved yet.
+        </p>
+      </RevealOnScroll>
+
+      <div class="monument-frieze monument-frieze--bottom" aria-hidden="true">
+        <span class="monument-rune">✴</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======================================================
+       UNDER CONSTRUCTION NOTICE
+       ====================================================== -->
+  <section class="section section-y-md realm-notice-section">
+    <RevealOnScroll client:visible>
+      <aside class="realm-notice" role="note">
+        <div class="realm-notice-head">
+          <span class="realm-notice-rune" aria-hidden="true">⚒</span>
+          <span class="realm-notice-kicker">In the forge</span>
+        </div>
+        <h2 class="realm-notice-title">Map is still being charted</h2>
+        <p class="realm-notice-copy">
+          The realm is real, but the map isn't ready. What you see below
+          is the lay of the land — the portals that will open as each
+          subdomain, dashboard, and case study comes online. Check back
+          as Phase 2 unfolds.
+        </p>
+      </aside>
+    </RevealOnScroll>
+  </section>
+
+  <!-- ======================================================
+       PORTAL GRID — sealed / coming-soon
+       ====================================================== -->
+  <section class="section section-y-md realm-portals-section">
+    <RevealOnScroll client:visible>
+      <div class="realm-portals-head">
+        <p class="section-eyebrow">Portals</p>
+        <h2 class="realm-portals-h2">Sealed, for now</h2>
+        <p class="realm-portals-sub">
+          Each of these becomes its own destination — a subdomain, a
+          case study, or a live dashboard — as it clears the forge.
+        </p>
+      </div>
+    </RevealOnScroll>
+
+    <div class="portal-grid">
+      {portals.map((portal, index) => (
+        <RevealOnScroll client:visible delayMs={index * 90}>
+          <article
+            class="portal"
+            data-rarity={portal.rarity}
+            aria-disabled="true"
+            style={`--portal-color: var(--rarity-${portal.rarity});`}
+          >
+            <div class="portal-seal" aria-hidden="true">
+              <span class="portal-rune">{portal.rune}</span>
+              <span class="portal-seal-ring"></span>
+            </div>
+            <h3 class="portal-name">{portal.name}</h3>
+            <p class="portal-teaser">{portal.teaser}</p>
+            <div class="portal-footer">
+              <span class="portal-status">
+                <span class="portal-status-dot" aria-hidden="true"></span>
+                Sealed — coming soon
+              </span>
+            </div>
+          </article>
+        </RevealOnScroll>
+      ))}
+    </div>
+  </section>
+
+  <!-- ======================================================
+       WAYPOINT BACK
+       ====================================================== -->
+  <section class="section section-y-md">
+    <RevealOnScroll client:visible>
+      <aside class="realm-footer-cta">
+        <p>
+          While the map is drawn, the Quest Log already has plenty of
+          records worth reading — every project shipped, every campaign
+          undertaken.
+        </p>
+        <div class="realm-footer-ctas">
+          <MagneticButton
+            client:load
+            href="/projects"
+            variant="gold"
+            ariaLabel="Open the Quest Log"
+          >
+            Open the Quest Log <span aria-hidden="true">◆</span>
+          </MagneticButton>
+          <MagneticButton
+            client:load
+            href="/contact"
+            variant="ghost"
+            ariaLabel="Send a message"
+          >
+            Send a raven <span aria-hidden="true">✉</span>
+          </MagneticButton>
+        </div>
+      </aside>
+    </RevealOnScroll>
+  </section>
+</BaseLayout>
+
+<style>
+  .realm-intro {
+    max-width: 820px;
+  }
+
+  .realm-h1 {
+    font-size: clamp(2.75rem, 6.5vw, 5rem);
+    line-height: 1.05;
+    margin: 1rem 0 2rem;
+  }
+
+  .realm-h1--carved {
+    letter-spacing: 0.01em;
+    text-shadow:
+      0 1px 0 rgba(0, 0, 0, 0.65),
+      0 -1px 0 rgba(240, 185, 11, 0.06);
+  }
+
+  .realm-sub {
+    color: var(--ink-300);
+    line-height: 1.7;
+    font-size: 1.05rem;
+    max-width: 42rem;
+  }
+
+  .monument {
+    position: relative;
+    padding: 1.75rem 1.25rem 1.5rem;
+    background:
+      radial-gradient(
+        ellipse at top,
+        rgba(163, 53, 238, 0.06),
+        transparent 60%
+      ),
+      linear-gradient(
+        180deg,
+        rgba(29, 26, 38, 0.35) 0%,
+        rgba(13, 12, 20, 0) 100%
+      );
+  }
+
+  @media (min-width: 720px) {
+    .monument {
+      padding: 2rem 2rem 1.75rem;
+    }
+  }
+
+  .monument-frieze {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    color: var(--gold-400);
+  }
+
+  .monument-frieze::before,
+  .monument-frieze::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(240, 185, 11, 0.35),
+      transparent
+    );
+  }
+
+  .monument-frieze--top {
+    margin-bottom: 1.5rem;
+  }
+
+  .monument-frieze--bottom {
+    margin-top: 1.5rem;
+  }
+
+  .monument-rune {
+    font-size: 0.9rem;
+    opacity: 0.85;
+  }
+
+  .realm-notice-section {
+    max-width: 820px;
+    margin: 0 auto;
+  }
+
+  .realm-notice {
+    padding: 1.5rem 1.75rem;
+    background: linear-gradient(
+      180deg,
+      rgba(240, 185, 11, 0.05) 0%,
+      rgba(29, 26, 38, 0.4) 100%
+    );
+    border: 1px solid rgba(240, 185, 11, 0.22);
+    border-radius: var(--radius-sharp);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .realm-notice::before {
+    content: '';
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 3px;
+    background: linear-gradient(
+      180deg,
+      var(--gold-300),
+      var(--gold-500)
+    );
+  }
+
+  .realm-notice-head {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .realm-notice-rune {
+    font-size: 1rem;
+    color: var(--gold-300);
+  }
+
+  .realm-notice-kicker {
+    font-family: var(--font-mono, ui-monospace, monospace);
+    font-size: 0.7rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--gold-300);
+  }
+
+  .realm-notice-title {
+    font-size: clamp(1.35rem, 2.6vw, 1.75rem);
+    line-height: 1.2;
+    margin: 0 0 0.5rem;
+    color: var(--ink-100);
+  }
+
+  .realm-notice-copy {
+    color: var(--ink-300);
+    line-height: 1.6;
+    font-size: 0.98rem;
+    margin: 0;
+  }
+
+  .realm-portals-section {
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .realm-portals-head {
+    margin-bottom: 1.5rem;
+  }
+
+  .realm-portals-h2 {
+    font-size: clamp(1.75rem, 3.2vw, 2.5rem);
+    margin: 0.5rem 0 0.75rem;
+    line-height: 1.15;
+  }
+
+  .realm-portals-sub {
+    color: var(--ink-500);
+    font-size: 0.97rem;
+    line-height: 1.6;
+    max-width: 42rem;
+    margin: 0;
+  }
+
+  .portal-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 1rem;
+  }
+
+  .portal {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 1.5rem 1.25rem 1.25rem;
+    background:
+      linear-gradient(
+        180deg,
+        color-mix(in srgb, var(--portal-color) 5%, transparent) 0%,
+        rgba(13, 12, 20, 0) 100%
+      ),
+      rgba(29, 26, 38, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: var(--radius-sharp);
+    overflow: hidden;
+    transition: border-color 200ms ease, transform 200ms ease,
+      filter 200ms ease;
+    cursor: not-allowed;
+    filter: saturate(0.85);
+  }
+
+  .portal::before {
+    content: '';
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 2px;
+    background: var(--portal-color);
+    opacity: 0.6;
+  }
+
+  .portal:hover {
+    border-color: color-mix(in srgb, var(--portal-color) 50%, transparent);
+    transform: translateY(-1px);
+    filter: saturate(1);
+  }
+
+  .portal-seal {
+    position: relative;
+    width: 48px;
+    height: 48px;
+    display: grid;
+    place-items: center;
+    margin-bottom: 0.25rem;
+  }
+
+  .portal-rune {
+    font-size: 1.35rem;
+    color: var(--portal-color);
+    z-index: 1;
+    text-shadow: 0 0 10px color-mix(in srgb, var(--portal-color) 60%, transparent);
+  }
+
+  .portal-seal-ring {
+    position: absolute;
+    inset: 0;
+    border: 1px dashed color-mix(in srgb, var(--portal-color) 55%, transparent);
+    border-radius: 50%;
+    animation: portal-spin 22s linear infinite;
+  }
+
+  @keyframes portal-spin {
+    to { transform: rotate(360deg); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .portal-seal-ring { animation: none; }
+  }
+
+  .portal-name {
+    font-size: 1.1rem;
+    line-height: 1.3;
+    color: var(--ink-100);
+    margin: 0;
+  }
+
+  .portal-teaser {
+    color: var(--ink-300);
+    line-height: 1.55;
+    font-size: 0.92rem;
+    margin: 0 0 0.75rem;
+    flex: 1;
+  }
+
+  .portal-footer {
+    padding-top: 0.75rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    font-family: var(--font-mono, ui-monospace, monospace);
+    font-size: 0.7rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-500);
+  }
+
+  .portal-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .portal-status-dot {
+    width: 0.45rem;
+    height: 0.45rem;
+    border-radius: 50%;
+    background: var(--portal-color);
+    box-shadow: 0 0 6px var(--portal-color);
+    opacity: 0.75;
+    animation: portal-pulse 2.4s ease-in-out infinite;
+  }
+
+  @keyframes portal-pulse {
+    0%, 100% { opacity: 0.45; }
+    50% { opacity: 0.95; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .portal-status-dot { animation: none; opacity: 0.75; }
+  }
+
+  .realm-footer-cta {
+    max-width: 820px;
+    margin: 2rem auto 0;
+    padding: 2rem;
+    text-align: center;
+    background: rgba(29, 26, 38, 0.5);
+    border: 1px solid rgba(240, 185, 11, 0.1);
+    border-radius: var(--radius-sharp);
+  }
+
+  .realm-footer-cta p {
+    color: var(--ink-300);
+    font-size: 1rem;
+    line-height: 1.6;
+    max-width: 42rem;
+    margin: 0 auto 1.25rem;
+  }
+
+  .realm-footer-ctas {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    justify-content: center;
+  }
+</style>

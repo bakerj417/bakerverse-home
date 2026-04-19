@@ -1,0 +1,127 @@
+/* ===========================================================
+   bakerverse — design tokens
+   ===========================================================
+   The palette, type, spacing, shadow, and motion primitives.
+   Anything that matters for the visual system lives here so a
+   refactor is a one-file change.
+
+   Theme: "Diablo loot gold on a void-black sky" — gold primary
+   accent, deep navy-black base, cream parchment ink.
+   Epic purple, blood red, and arcane blue are available
+   secondary accents — pull them for special moments.
+   =========================================================== */
+
+:root {
+  /* -- background scales -------------------------------------- */
+  --bg-void:   #07060a;
+  --bg-night:  #0d0c14;
+  --bg-dusk:   #15131d;
+  --bg-ember:  #1d1a26;
+  --bg-stone:  #2a2632;
+
+  /* -- ink (text) scales -------------------------------------- */
+  --ink-100:   #f5f1e4;
+  --ink-300:   #d8d1bc;
+  --ink-500:   #9b957f;
+  --ink-700:   #625d4e;
+
+  /* -- primary accent: epic purple ---------------------------- */
+  --purple-50:   #f5e9fd;
+  --purple-100:  #e4bdf9;
+  --purple-200:  #cc85f4;
+  --purple-300:  #b557ef;
+  --purple-400:  #a335ee;   /* ← WoW epic rarity canonical */
+  --purple-500:  #8a22d4;
+  --purple-600:  #6b15a8;
+  --purple-700:  #4d0c7a;
+
+  /* semantic alias — use this in components, not raw hex */
+  --color-primary: var(--gold-400);
+
+  /* -- legendary / artifact tier (gold) ---------------------- */
+  --gold-50:   #fff8e1;
+  --gold-100:  #ffedb0;
+  --gold-200:  #ffd968;
+  --gold-300:  #f0b90b;
+  --gold-400:  #d99e0b;
+  --gold-500:  #b8840c;
+  --gold-600:  #8a6208;
+  --gold-700:  #5c4105;
+
+  /* -- rarity (MMO loot tier) --------------------------------- */
+  --rarity-common:    #cfcfcf;
+  --rarity-uncommon:  #1eff00;
+  --rarity-rare:      #0070dd;
+  --rarity-epic:      #a335ee;
+  --rarity-legendary: #ff8000;
+  --rarity-artifact:  #e6cc80;
+
+  /* -- accents (use sparingly; gold is primary) --------------- */
+  --accent-purple:  var(--purple-400);   /* epic arcane */
+  --accent-blood:   #8b0000;             /* Diablo blood red */
+  --accent-arcane:  #5b8cff;            /* deep arcane blue */
+
+  /* -- spacing scale ------------------------------------------ */
+  --space-0:  0;
+  --space-1:  0.25rem;
+  --space-2:  0.5rem;
+  --space-3:  0.75rem;
+  --space-4:  1rem;
+  --space-6:  1.5rem;
+  --space-8:  2rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+  --space-24: 6rem;
+  --space-32: 8rem;
+
+  /* -- radii -------------------------------------------------- */
+  --radius-sharp:  2px;   /* tooltip / item-card corners */
+  --radius-soft:   8px;
+  --radius-pill:   999px;
+
+  /* -- shadow ------------------------------------------------- */
+  --shadow-tooltip:
+    0 20px 60px -20px rgba(0, 0, 0, 0.85),
+    0 8px 24px -8px rgba(0, 0, 0, 0.6);
+  --shadow-epic-glow:
+    0 0 32px -4px rgba(163, 53, 238, 0.35),
+    0 0 8px -2px rgba(163, 53, 238, 0.6);
+  --shadow-epic-glow-strong:
+    0 0 48px -4px rgba(163, 53, 238, 0.55),
+    0 0 12px -2px rgba(163, 53, 238, 0.8);
+  --shadow-inset-frame:
+    inset 0 0 0 1px rgba(240, 185, 11, 0.2),
+    inset 0 0 24px -8px rgba(240, 185, 11, 0.15);
+  --shadow-gold-glow:
+    0 0 32px -4px rgba(240, 185, 11, 0.35),
+    0 0 8px -2px rgba(240, 185, 11, 0.6);
+  --shadow-gold-glow-strong:
+    0 0 48px -4px rgba(240, 185, 11, 0.55),
+    0 0 12px -2px rgba(240, 185, 11, 0.8);
+
+  /* -- motion ------------------------------------------------- */
+  --ease-ornate:    cubic-bezier(0.19, 1, 0.22, 1);
+  --ease-bounce:    cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  --ease-standard:  cubic-bezier(0.4, 0, 0.2, 1);
+
+  --dur-fast:   150ms;
+  --dur-base:   300ms;
+  --dur-slow:   500ms;
+  --dur-page:   600ms;
+
+  /* -- typography -------------------------------------------- */
+  --font-display: "Cinzel", Georgia, serif;
+  --font-body:    "Inter", "SF Pro Text", system-ui, sans-serif;
+  --font-mono:    "JetBrains Mono", ui-monospace, monospace;
+}
+
+/* Respect reduced motion globally. Components should use vars
+   above so they honor this without bespoke code per component. */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --dur-fast: 0ms;
+    --dur-base: 0ms;
+    --dur-slow: 0ms;
+    --dur-page: 0ms;
+  }
+}

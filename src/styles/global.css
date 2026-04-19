@@ -1,0 +1,356 @@
+@import "./tokens.css";
+
+/* Google Fonts fallback — self-host for production via
+   @fontsource/* packages if we want zero-third-party fetches. */
+@import url("https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ---------------------------------------------------------------
+   base resets / body
+   --------------------------------------------------------------- */
+@layer base {
+  html {
+    font-family: var(--font-body);
+    background-color: var(--bg-night);
+    color: var(--ink-100);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    min-height: 100vh;
+    background:
+      radial-gradient(ellipse at top, rgba(240, 185, 11, 0.06) 0%, transparent 55%),
+      radial-gradient(ellipse at bottom, rgba(164, 30, 34, 0.04) 0%, transparent 60%),
+      var(--bg-night);
+    background-attachment: fixed;
+  }
+
+  h1, h2, h3, h4 {
+    font-family: var(--font-display);
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    color: var(--ink-100);
+  }
+
+  a {
+    color: var(--gold-300);
+    text-decoration: none;
+    transition: color var(--dur-fast) var(--ease-standard);
+  }
+
+  a:hover {
+    color: var(--gold-200);
+  }
+
+  ::selection {
+    background: var(--gold-400);
+    color: var(--bg-void);
+  }
+
+  /* thin gold scrollbar */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--gold-500) transparent;
+  }
+
+  *::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  *::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  *::-webkit-scrollbar-thumb {
+    background-color: var(--gold-600);
+    border-radius: 4px;
+  }
+
+  *::-webkit-scrollbar-thumb:hover {
+    background-color: var(--gold-400);
+  }
+
+  /* Focus ring — gold, visible, a11y-forward */
+  :focus-visible {
+    outline: 2px solid var(--gold-300);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+}
+
+/* ---------------------------------------------------------------
+   reusable component classes
+   --------------------------------------------------------------- */
+@layer components {
+  /* Ornate frame — used on cards, sections, tooltips.
+     Gold hairline + faint inner glow. */
+  .ornate-frame {
+    position: relative;
+    border: 1px solid rgba(240, 185, 11, 0.25);
+    background:
+      linear-gradient(180deg, rgba(29, 26, 38, 0.9) 0%, rgba(21, 19, 29, 0.95) 100%);
+    box-shadow: var(--shadow-inset-frame);
+    border-radius: var(--radius-sharp);
+  }
+
+  .ornate-frame::before,
+  .ornate-frame::after {
+    content: "";
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    pointer-events: none;
+    border-color: var(--gold-300);
+    border-style: solid;
+    border-width: 0;
+    opacity: 0.85;
+    transition: opacity var(--dur-base) var(--ease-ornate);
+  }
+
+  .ornate-frame::before {
+    top: -1px;
+    left: -1px;
+    border-top-width: 2px;
+    border-left-width: 2px;
+  }
+
+  .ornate-frame::after {
+    bottom: -1px;
+    right: -1px;
+    border-bottom-width: 2px;
+    border-right-width: 2px;
+  }
+
+  .ornate-frame:hover::before,
+  .ornate-frame:hover::after {
+    opacity: 1;
+    width: 18px;
+    height: 18px;
+  }
+
+  /* Tooltip card — narrow form of ornate frame with rarity bar. */
+  .tooltip-card {
+    background:
+      linear-gradient(180deg, rgba(7, 6, 10, 0.96) 0%, rgba(13, 12, 20, 0.96) 100%);
+    border: 1px solid rgba(240, 185, 11, 0.35);
+    box-shadow: var(--shadow-tooltip);
+    border-radius: var(--radius-sharp);
+    backdrop-filter: blur(6px);
+  }
+
+  /* Rarity header bar — colored strip at top of item cards */
+  .rarity-bar {
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 2px;
+    background: currentColor;
+    box-shadow: 0 0 8px -1px currentColor;
+  }
+
+  /* Gold call-to-action button */
+  .btn-gold {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 0.95rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--bg-void);
+    background: linear-gradient(180deg, var(--gold-200) 0%, var(--gold-400) 100%);
+    border: 1px solid var(--gold-500);
+    border-radius: var(--radius-sharp);
+    box-shadow:
+      0 2px 0 0 var(--gold-700),
+      0 0 0 1px rgba(0, 0, 0, 0.4),
+      var(--shadow-gold-glow);
+    transition:
+      transform var(--dur-fast) var(--ease-bounce),
+      box-shadow var(--dur-base) var(--ease-standard),
+      filter var(--dur-base) var(--ease-standard);
+    cursor: pointer;
+    overflow: hidden;
+    isolation: isolate;
+  }
+
+  .btn-gold::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -50%;
+    width: 50%;
+    height: 100%;
+    background: linear-gradient(
+      120deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.25) 50%,
+      transparent 100%
+    );
+    transform: skewX(-20deg);
+    z-index: -1;
+    transition: left 0.6s var(--ease-ornate);
+  }
+
+  .btn-gold:hover::before {
+    left: 150%;
+  }
+
+  .btn-gold:hover {
+    transform: translateY(-1px);
+    box-shadow:
+      0 3px 0 0 var(--gold-700),
+      0 0 0 1px rgba(0, 0, 0, 0.4),
+      var(--shadow-gold-glow-strong);
+    filter: brightness(1.05);
+  }
+
+  .btn-gold:active {
+    transform: translateY(1px);
+    box-shadow:
+      0 0 0 0 var(--gold-700),
+      0 0 0 1px rgba(0, 0, 0, 0.4),
+      var(--shadow-gold-glow);
+  }
+
+  /* Ghost button — quieter CTA */
+  .btn-ghost {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.65rem 1.25rem;
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: 0.9rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--ink-300);
+    background: transparent;
+    border: 1px solid rgba(240, 185, 11, 0.3);
+    border-radius: var(--radius-sharp);
+    transition: all var(--dur-base) var(--ease-standard);
+    cursor: pointer;
+  }
+
+  .btn-ghost:hover {
+    color: var(--gold-200);
+    border-color: var(--gold-400);
+    background: rgba(240, 185, 11, 0.06);
+    box-shadow: var(--shadow-gold-glow);
+  }
+
+  /* Small caps section label, prefixed with a rune mark */
+  .section-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-family: var(--font-display);
+    font-size: 0.78rem;
+    font-weight: 500;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--gold-300);
+  }
+
+  .section-eyebrow::before {
+    content: "";
+    display: inline-block;
+    width: 28px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold-400));
+  }
+
+  /* Stack badge — tech / skill tag */
+  .stack-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.2rem 0.55rem;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    color: var(--ink-300);
+    background: rgba(240, 185, 11, 0.05);
+    border: 1px solid rgba(240, 185, 11, 0.2);
+    border-radius: var(--radius-sharp);
+    transition: all var(--dur-fast) var(--ease-standard);
+  }
+
+  .stack-badge:hover {
+    color: var(--gold-200);
+    border-color: var(--gold-400);
+    background: rgba(240, 185, 11, 0.1);
+  }
+
+  /* Reveal-on-scroll helper — pair with IntersectionObserver */
+  .reveal {
+    opacity: 0;
+    transform: translateY(24px);
+    transition:
+      opacity 0.45s var(--ease-ornate),
+      transform 0.45s var(--ease-ornate);
+  }
+
+  .reveal.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ---------------------------------------------------------------
+   astro view transitions — page morph animation
+   --------------------------------------------------------------- */
+@layer utilities {
+  ::view-transition-old(root) {
+    animation: page-out 0.3s var(--ease-ornate) both;
+  }
+
+  ::view-transition-new(root) {
+    animation: page-in 0.5s var(--ease-ornate) both;
+  }
+
+  @keyframes page-out {
+    to {
+      opacity: 0;
+      filter: brightness(1.2);
+      transform: scale(0.98);
+    }
+  }
+
+  @keyframes page-in {
+    from {
+      opacity: 0;
+      filter: brightness(0.6);
+      transform: scale(1.02);
+    }
+  }
+}
+
+/* ---------------------------------------------------------------
+   shared keyframes
+   --------------------------------------------------------------- */
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(28px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes rune-rotate {
+  to { transform: rotate(360deg); }
+}

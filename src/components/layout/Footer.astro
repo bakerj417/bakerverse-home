@@ -1,0 +1,197 @@
+---
+import { site, socials, nav } from '@/data/site';
+const year = new Date().getFullYear();
+---
+
+<footer class="footer-root">
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <div class="footer-sigil" aria-hidden="true">
+        <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
+          <circle cx="24" cy="24" r="22" stroke="currentColor" stroke-width="1" opacity="0.4" />
+          <circle cx="24" cy="24" r="14" stroke="currentColor" stroke-width="1" opacity="0.7" />
+          <path
+            d="M18 16 L24 10 L30 16 L30 32 L24 38 L18 32 Z"
+            stroke="currentColor"
+            stroke-width="1.5"
+            fill="none"
+          />
+          <text
+            x="24"
+            y="28"
+            text-anchor="middle"
+            font-family="Cinzel, serif"
+            font-size="10"
+            font-weight="700"
+            fill="currentColor"
+          >JB</text>
+        </svg>
+      </div>
+      <div>
+        <p class="footer-tagline">
+          "Engineering the Bakerverse — one tool, one service, one subdomain at a time."
+        </p>
+        <p class="footer-location">{site.location}</p>
+      </div>
+    </div>
+
+    <div class="footer-columns">
+      <div class="footer-col">
+        <h3 class="footer-heading">Map</h3>
+        <ul>
+          {nav.map((item) => (
+            <li><a href={item.href}>{item.label}</a></li>
+          ))}
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h3 class="footer-heading">Elsewhere</h3>
+        <ul>
+          {socials.map((s) => (
+            <li>
+              <a href={s.href} target="_blank" rel="noopener noreferrer">
+                {s.label} <span class="footer-handle">{s.handle}</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h3 class="footer-heading">Hire me</h3>
+        <p class="footer-business">
+          Freelance and side engagements go through<br />
+          <strong>{site.business.name}</strong>.
+        </p>
+        <a href="/contact" class="btn-ghost footer-cta">Start a conversation</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-bottom">
+    <span>© {year} {site.name} · {site.business.name}</span>
+    <span class="footer-built">
+      Built with Astro + Tailwind · Gamified in spirit, recruiter-safe in practice.
+    </span>
+  </div>
+</footer>
+
+<style>
+  .footer-root {
+    margin-top: 6rem;
+    background:
+      linear-gradient(180deg, transparent 0%, rgba(7, 6, 10, 0.8) 30%, rgba(7, 6, 10, 1) 100%);
+    border-top: 1px solid rgba(240, 185, 11, 0.12);
+    color: var(--ink-300);
+  }
+
+  .footer-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 4rem 2rem 2rem;
+    display: grid;
+    gap: 3rem;
+  }
+
+  @media (min-width: 900px) {
+    .footer-inner {
+      grid-template-columns: 1fr 1.3fr;
+    }
+  }
+
+  .footer-brand {
+    display: flex;
+    gap: 1.25rem;
+    align-items: flex-start;
+  }
+
+  .footer-sigil {
+    color: var(--gold-400);
+    animation: rune-rotate 60s linear infinite;
+    flex-shrink: 0;
+  }
+
+  .footer-tagline {
+    font-family: var(--font-display);
+    font-size: 1.05rem;
+    color: var(--ink-300);
+    font-style: italic;
+    line-height: 1.5;
+    margin: 0 0 0.5rem;
+  }
+
+  .footer-location {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--ink-500);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin: 0;
+  }
+
+  .footer-columns {
+    display: grid;
+    gap: 2rem;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  }
+
+  .footer-heading {
+    font-family: var(--font-display);
+    font-size: 0.85rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--gold-300);
+    margin: 0 0 0.75rem;
+  }
+
+  .footer-col ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+
+  .footer-col li a {
+    color: var(--ink-300);
+    font-size: 0.9rem;
+  }
+
+  .footer-col li a:hover {
+    color: var(--gold-200);
+  }
+
+  .footer-handle {
+    color: var(--ink-500);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    margin-left: 0.35rem;
+  }
+
+  .footer-business {
+    font-size: 0.9rem;
+    margin: 0 0 1rem;
+    line-height: 1.5;
+  }
+
+  .footer-cta {
+    font-size: 0.78rem;
+  }
+
+  .footer-bottom {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 1.5rem 2rem;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 1rem;
+    border-top: 1px solid rgba(240, 185, 11, 0.08);
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--ink-500);
+    letter-spacing: 0.05em;
+  }
+</style>

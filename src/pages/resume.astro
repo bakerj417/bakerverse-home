@@ -1,0 +1,403 @@
+---
+import { resume } from '@/data/resume';
+
+function formatMonthYear(ym: string): string {
+  const [year, month] = ym.split('-');
+  const months = [
+    'Jan',
+    'Feb',
+    'Mar',
+    'Apr',
+    'May',
+    'Jun',
+    'Jul',
+    'Aug',
+    'Sep',
+    'Oct',
+    'Nov',
+    'Dec',
+  ];
+  const monthIndex = Number.parseInt(month, 10) - 1;
+  return `${months[monthIndex]} ${year}`;
+}
+
+function formatRange(start: string, end?: string): string {
+  return `${formatMonthYear(start)} \u2013 ${end ? formatMonthYear(end) : 'Present'}`;
+}
+---
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{resume.name} — Resume</title>
+    <meta name="robots" content="noindex, nofollow" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <main class="page">
+      <header class="resume-header">
+        <div class="resume-identity">
+          <h1 class="resume-name">{resume.name}</h1>
+          <p class="resume-title">{resume.title}</p>
+        </div>
+        <div class="resume-contact">
+          <span>{resume.location}</span>
+          <a href={`mailto:${resume.email}`}>{resume.email}</a>
+          {
+            resume.links.map((link) => (
+              <a href={link.href} rel="noopener">
+                {link.label}
+              </a>
+            ))
+          }
+        </div>
+      </header>
+
+      <section class="resume-summary">
+        <p>{resume.summary}</p>
+      </section>
+
+      <section class="resume-section">
+        <h2>Experience</h2>
+        {
+          resume.experience.map((job) => (
+            <article class="resume-job">
+              <div class="resume-job-head">
+                <div class="resume-job-head-main">
+                  <p class="resume-job-title">
+                    {job.title}
+                    {job.concurrent && (
+                      <span class="resume-job-tag">Concurrent</span>
+                    )}
+                  </p>
+                  <p class="resume-job-company">{job.company}</p>
+                </div>
+                <p class="resume-job-dates">
+                  {formatRange(job.startDate, job.endDate)}
+                </p>
+              </div>
+              <ul class="resume-job-bullets">
+                {job.bullets.map((b) => (
+                  <li>{b}</li>
+                ))}
+              </ul>
+            </article>
+          ))
+        }
+      </section>
+
+      <section class="resume-section">
+        <h2>Skills</h2>
+        <dl class="resume-skills">
+          {
+            resume.skills.map((group) => (
+              <div class="resume-skills-row">
+                <dt>{group.label}</dt>
+                <dd>{group.items.join(' \u00b7 ')}</dd>
+              </div>
+            ))
+          }
+        </dl>
+      </section>
+
+      <section class="resume-section">
+        <h2>Education</h2>
+        {
+          resume.education.map((ed) => (
+            <div class="resume-edu">
+              <div>
+                <p class="resume-edu-institution">{ed.institution}</p>
+                <p class="resume-edu-degree">{ed.focus ? `${ed.degree}, ${ed.focus}` : ed.degree}</p>
+              </div>
+              <p class="resume-edu-meta">
+                {ed.location} · {ed.startYear} – {ed.endYear}
+              </p>
+            </div>
+          ))
+        }
+      </section>
+    </main>
+  </body>
+</html>
+
+<style is:global>
+  @page {
+    size: letter;
+    margin: 0.5in 0.6in;
+  }
+
+  html,
+  body {
+    margin: 0;
+    padding: 0;
+    font-family:
+      'Inter',
+      -apple-system,
+      BlinkMacSystemFont,
+      'Segoe UI',
+      system-ui,
+      sans-serif;
+    background: #efefef;
+    color: #1a1a1a;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    padding: 2rem 1rem;
+  }
+
+  .page {
+    max-width: 7.3in;
+    margin: 0 auto;
+    background: #ffffff;
+    color: #1a1a1a;
+    padding: 0.5in 0.6in;
+    font-size: 10.5pt;
+    line-height: 1.45;
+    box-shadow: 0 1px 6px rgba(0, 0, 0, 0.08);
+    min-height: 11in;
+  }
+
+  @media print {
+    html,
+    body {
+      background: #ffffff;
+    }
+
+    body {
+      padding: 0;
+    }
+
+    .page {
+      padding: 0;
+      max-width: none;
+      box-shadow: none;
+      min-height: 0;
+    }
+  }
+
+  /* ----- HEADER ----- */
+  .resume-header {
+    margin-bottom: 0.7rem;
+    padding-bottom: 0.55rem;
+    border-bottom: 1px solid #d6d6d6;
+  }
+
+  .resume-name {
+    font-size: 22pt;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    margin: 0;
+    line-height: 1.1;
+    color: #111;
+  }
+
+  .resume-title {
+    font-size: 11pt;
+    color: #555;
+    margin: 0.15rem 0 0.55rem;
+    font-weight: 500;
+  }
+
+  .resume-contact {
+    font-size: 9pt;
+    color: #444;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    column-gap: 0.85rem;
+    row-gap: 0.15rem;
+  }
+
+  .resume-contact > *:not(:first-child)::before {
+    content: '·';
+    margin-right: 0.85rem;
+    color: #9a9a9a;
+  }
+
+  .resume-contact a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .resume-contact a:hover {
+    text-decoration: underline;
+  }
+
+  /* ----- SUMMARY ----- */
+  .resume-summary {
+    margin-bottom: 0.85rem;
+  }
+
+  .resume-summary p {
+    margin: 0;
+    font-size: 10.5pt;
+    line-height: 1.5;
+    color: #2b2b2b;
+  }
+
+  /* ----- SECTIONS ----- */
+  .resume-section {
+    margin-bottom: 0.85rem;
+  }
+
+  .resume-section h2 {
+    font-size: 9.5pt;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #111;
+    margin: 0 0 0.4rem;
+    padding-bottom: 0.2rem;
+    border-bottom: 1px solid #d6d6d6;
+    break-after: avoid;
+    page-break-after: avoid;
+  }
+
+  /* ----- JOBS ----- */
+  .resume-job {
+    margin-bottom: 0.55rem;
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+
+  .resume-job:last-child {
+    margin-bottom: 0;
+  }
+
+  .resume-job-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 1rem;
+    margin-bottom: 0.25rem;
+  }
+
+  .resume-job-head-main {
+    display: flex;
+    flex-direction: column;
+    gap: 0.05rem;
+  }
+
+  .resume-job-title {
+    font-size: 10.5pt;
+    font-weight: 600;
+    margin: 0;
+    color: #111;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .resume-job-tag {
+    display: inline-block;
+    font-size: 7.5pt;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #666;
+    border: 1px solid #cfcfcf;
+    padding: 0.08rem 0.45rem;
+    border-radius: 2px;
+    line-height: 1.3;
+  }
+
+  .resume-job-company {
+    font-size: 10pt;
+    color: #555;
+    margin: 0;
+    font-weight: 500;
+  }
+
+  .resume-job-dates {
+    font-size: 9.5pt;
+    color: #666;
+    margin: 0;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+
+  .resume-job-bullets {
+    margin: 0.2rem 0 0;
+    padding-left: 1.1rem;
+    list-style: disc;
+  }
+
+  .resume-job-bullets li {
+    margin-bottom: 0.12rem;
+    line-height: 1.45;
+    color: #2b2b2b;
+  }
+
+  .resume-job-bullets li::marker {
+    color: #9a9a9a;
+    font-size: 0.8em;
+  }
+
+  /* ----- SKILLS ----- */
+  .resume-skills {
+    margin: 0;
+    display: grid;
+    gap: 0.3rem;
+  }
+
+  .resume-skills-row {
+    display: grid;
+    grid-template-columns: 10.5em 1fr;
+    gap: 0.85rem;
+    align-items: baseline;
+  }
+
+  .resume-skills dt {
+    font-size: 9pt;
+    font-weight: 600;
+    color: #111;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  .resume-skills dd {
+    margin: 0;
+    font-size: 10pt;
+    color: #2b2b2b;
+    line-height: 1.5;
+  }
+
+  /* ----- EDUCATION ----- */
+  .resume-edu {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 1rem;
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+
+  .resume-edu-institution {
+    font-size: 10.5pt;
+    font-weight: 600;
+    margin: 0;
+    color: #111;
+  }
+
+  .resume-edu-degree {
+    font-size: 10pt;
+    color: #555;
+    margin: 0;
+  }
+
+  .resume-edu-meta {
+    font-size: 9.5pt;
+    color: #666;
+    margin: 0;
+    white-space: nowrap;
+  }
+</style>

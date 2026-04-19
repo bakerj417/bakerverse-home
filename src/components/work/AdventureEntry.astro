@@ -1,0 +1,507 @@
+---
+import StackBadge from '@/components/ui/StackBadge.astro';
+import type { CollectionEntry } from 'astro:content';
+
+interface Props {
+  role: CollectionEntry<'work'>;
+  variant?: 'current' | 'past';
+}
+
+const { role, variant = 'past' } = Astro.props;
+
+const MONTHS = [
+  'Jan',
+  'Feb',
+  'Mar',
+  'Apr',
+  'May',
+  'Jun',
+  'Jul',
+  'Aug',
+  'Sep',
+  'Oct',
+  'Nov',
+  'Dec',
+];
+
+function formatMonthYear(ym: string): string {
+  const [year, month] = ym.split('-');
+  const i = Number.parseInt(month, 10) - 1;
+  return `${MONTHS[i]} ${year}`;
+}
+
+function formatRange(start: string, end?: string): string {
+  return `${formatMonthYear(start)} — ${end ? formatMonthYear(end) : 'Present'}`;
+}
+
+const bodyId = `adventure-body-${role.id.replace(/[^a-z0-9]+/gi, '-')}`;
+---
+
+<article
+  class:list={[
+    'adventure-entry',
+    `adventure-entry--${variant}`,
+    role.data.active && 'is-active',
+    role.data.concurrent && 'is-concurrent',
+  ]}
+>
+  <div class="adventure-rail" aria-hidden="true">
+    <span class="adventure-node"></span>
+    <span class="adventure-line"></span>
+  </div>
+
+  <div class="adventure-card ornate-frame">
+    <button
+      class="adventure-toggle"
+      type="button"
+      aria-expanded="false"
+      aria-controls={bodyId}
+    >
+      <span class="adventure-toggle-main">
+        <span class="adventure-meta">
+          <span class="adventure-range">
+            {formatRange(role.data.start, role.data.end)}
+          </span>
+          {
+            role.data.active && (
+              <span class="adventure-badge adventure-badge--active">
+                <span class="pulse-dot" aria-hidden="true" />
+                Current Adventure
+              </span>
+            )
+          }
+          {
+            role.data.concurrent && !role.data.active && (
+              <span class="adventure-badge adventure-badge--concurrent">
+                Concurrent
+              </span>
+            )
+          }
+        </span>
+        <span class="adventure-role">
+          {role.data.role}
+          <span class="adventure-at">at</span>
+          {
+            role.data.companyUrl ? (
+              <a
+                href={role.data.companyUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="adventure-company"
+                onclick="event.stopPropagation()"
+              >
+                {role.data.company}
+              </a>
+            ) : (
+              <span class="adventure-company">{role.data.company}</span>
+            )
+          }
+        </span>
+        <span class="adventure-teaser">{role.data.teaser}</span>
+      </span>
+
+      <span class="adventure-chevron" aria-hidden="true">▾</span>
+    </button>
+
+    <div id={bodyId} class="adventure-body">
+      <div class="adventure-body-inner">
+        {
+          role.data.location && (
+            <p class="adventure-location">{role.data.location}</p>
+          )
+        }
+
+        {
+          role.data.stack.length > 0 && (
+            <section class="adventure-body-section">
+              <h3>Tools of the trade</h3>
+              <div class="adventure-stack">
+                {role.data.stack.map((tech) => (
+                  <StackBadge label={tech} />
+                ))}
+              </div>
+            </section>
+          )
+        }
+
+        {
+          role.data.outcomes.length > 0 && (
+            <section class="adventure-body-section">
+              <h3>Notable deeds</h3>
+              <ul class="adventure-outcomes">
+                {role.data.outcomes.map((outcome) => (
+                  <li>{outcome}</li>
+                ))}
+              </ul>
+            </section>
+          )
+        }
+      </div>
+    </div>
+  </div>
+</article>
+
+<script>
+  function wireAdventureToggles() {
+    const toggles = document.querySelectorAll<HTMLButtonElement>(
+      '.adventure-toggle',
+    );
+    toggles.forEach((btn) => {
+      if (btn.dataset.wired === '1') return;
+      btn.dataset.wired = '1';
+      btn.addEventListener('click', () => {
+        const entry = btn.closest('.adventure-entry');
+        if (!entry) return;
+        const open = btn.getAttribute('aria-expanded') === 'true';
+        btn.setAttribute('aria-expanded', String(!open));
+        entry.classList.toggle('is-open', !open);
+      });
+    });
+  }
+
+  wireAdventureToggles();
+  document.addEventListener('astro:page-load', wireAdventureToggles);
+</script>
+
+<style>
+  .adventure-entry {
+    display: grid;
+    grid-template-columns: 40px 1fr;
+    gap: 1rem;
+    position: relative;
+  }
+
+  @media (min-width: 768px) {
+    .adventure-entry {
+      grid-template-columns: 56px 1fr;
+      gap: 1.25rem;
+    }
+  }
+
+  /* ---- Rail ---- */
+  .adventure-rail {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 1.25rem;
+  }
+
+  .adventure-node {
+    width: 14px;
+    height: 14px;
+    background: var(--bg-night);
+    border: 2px solid var(--gold-400);
+    transform: rotate(45deg);
+    flex-shrink: 0;
+    box-shadow: 0 0 12px -2px rgba(240, 185, 11, 0.5);
+    position: relative;
+    z-index: 2;
+    transition: all var(--dur-base) var(--ease-ornate);
+  }
+
+  .adventure-entry.is-active .adventure-node {
+    background: var(--gold-300);
+    box-shadow: 0 0 16px 2px rgba(240, 185, 11, 0.6);
+    animation: pulse-gold 2s ease-in-out infinite;
+  }
+
+  .adventure-line {
+    width: 1px;
+    flex: 1;
+    margin-top: 0.5rem;
+    background: linear-gradient(
+      180deg,
+      var(--gold-500) 0%,
+      transparent 100%
+    );
+  }
+
+  .adventure-entry:last-child .adventure-line {
+    display: none;
+  }
+
+  .adventure-entry--current .adventure-node {
+    width: 18px;
+    height: 18px;
+  }
+
+  /* ---- Card ---- */
+  .adventure-card {
+    padding: 0 !important;
+    overflow: hidden;
+    transition:
+      border-color var(--dur-base) var(--ease-ornate),
+      box-shadow var(--dur-base) var(--ease-ornate);
+  }
+
+  .adventure-entry.is-active .adventure-card {
+    border-color: rgba(240, 185, 11, 0.5);
+    box-shadow:
+      inset 0 0 0 1px rgba(240, 185, 11, 0.4),
+      inset 0 0 40px -12px rgba(240, 185, 11, 0.2),
+      0 0 40px -8px rgba(240, 185, 11, 0.2);
+  }
+
+  .adventure-entry.is-open .adventure-card {
+    border-color: rgba(240, 185, 11, 0.45);
+  }
+
+  /* ---- Toggle (header button) ---- */
+  .adventure-toggle {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 1rem;
+    align-items: start;
+    width: 100%;
+    padding: 1.25rem 1.5rem;
+    background: transparent;
+    border: none;
+    color: inherit;
+    text-align: left;
+    cursor: pointer;
+    font: inherit;
+  }
+
+  @media (min-width: 768px) {
+    .adventure-toggle {
+      padding: 1.5rem 2rem;
+    }
+  }
+
+  .adventure-toggle:focus-visible {
+    outline: 2px solid var(--gold-300);
+    outline-offset: -2px;
+  }
+
+  .adventure-toggle-main {
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+    min-width: 0;
+  }
+
+  .adventure-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    align-items: center;
+  }
+
+  .adventure-range {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--ink-500);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .adventure-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.15rem 0.55rem;
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    border-radius: 2px;
+  }
+
+  .adventure-badge--active {
+    color: var(--rarity-uncommon);
+    background: rgba(30, 255, 0, 0.08);
+    border: 1px solid rgba(30, 255, 0, 0.3);
+  }
+
+  .adventure-badge--concurrent {
+    color: var(--ink-300);
+    background: rgba(91, 140, 255, 0.08);
+    border: 1px solid rgba(91, 140, 255, 0.25);
+  }
+
+  .pulse-dot {
+    width: 6px;
+    height: 6px;
+    background: var(--rarity-uncommon);
+    border-radius: 50%;
+    box-shadow: 0 0 6px rgba(30, 255, 0, 0.8);
+    animation: pulse-gold 1.4s ease-in-out infinite;
+  }
+
+  .adventure-role {
+    font-family: var(--font-display);
+    font-size: clamp(1.1rem, 1.8vw, 1.35rem);
+    line-height: 1.3;
+    color: var(--ink-100);
+    font-weight: 600;
+    display: block;
+  }
+
+  .adventure-entry--current .adventure-role {
+    font-size: clamp(1.3rem, 2.2vw, 1.7rem);
+  }
+
+  .adventure-at {
+    color: var(--ink-500);
+    font-weight: 400;
+    font-size: 0.8em;
+    margin: 0 0.35em;
+  }
+
+  .adventure-company {
+    color: var(--gold-300);
+  }
+
+  a.adventure-company {
+    text-decoration: none;
+  }
+
+  a.adventure-company:hover {
+    color: var(--gold-200);
+    text-decoration: underline;
+  }
+
+  .adventure-teaser {
+    display: block;
+    color: var(--ink-300);
+    font-size: 0.95rem;
+    line-height: 1.55;
+    max-width: 58ch;
+  }
+
+  /* ---- Chevron ---- */
+  .adventure-chevron {
+    font-size: 1rem;
+    color: var(--gold-400);
+    line-height: 1;
+    padding-top: 0.25rem;
+    transition: transform var(--dur-base) var(--ease-ornate);
+    transform-origin: center;
+  }
+
+  .adventure-entry.is-open .adventure-chevron {
+    transform: rotate(-180deg);
+  }
+
+  /* ---- Body (collapsible via grid-row) ---- */
+  .adventure-body {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 350ms var(--ease-ornate);
+  }
+
+  .adventure-entry.is-open .adventure-body {
+    grid-template-rows: 1fr;
+  }
+
+  .adventure-body-inner {
+    overflow: hidden;
+    min-height: 0;
+  }
+
+  .adventure-body-padding {
+    display: block;
+  }
+
+  /* padding is on a wrapper that lives inside body-inner so the grid animation
+     keeps content clipped cleanly while still giving content breathing room. */
+  .adventure-body-inner > * {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+
+  @media (min-width: 768px) {
+    .adventure-body-inner > * {
+      padding-left: 2rem;
+      padding-right: 2rem;
+    }
+  }
+
+  .adventure-body-inner > *:first-child {
+    padding-top: 1.5rem;
+    border-top: 1px solid rgba(240, 185, 11, 0.15);
+  }
+
+  .adventure-body-inner > *:last-child {
+    padding-bottom: 1.5rem;
+  }
+
+  @media (min-width: 768px) {
+    .adventure-body-inner > *:first-child {
+      padding-top: 1.75rem;
+    }
+
+    .adventure-body-inner > *:last-child {
+      padding-bottom: 1.75rem;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .adventure-body,
+    .adventure-chevron,
+    .adventure-card,
+    .adventure-node {
+      transition: none;
+    }
+  }
+
+  /* ---- Body content ---- */
+  .adventure-location {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--ink-500);
+    margin: 0;
+    padding-bottom: 1rem;
+  }
+
+  .adventure-body-section {
+    margin: 0;
+    padding-top: 1.25rem;
+    padding-bottom: 1.25rem;
+  }
+
+  .adventure-body-section + .adventure-body-section {
+    border-top: 1px solid rgba(240, 185, 11, 0.08);
+  }
+
+  .adventure-body-section h3 {
+    font-family: var(--font-display);
+    font-size: 0.72rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--gold-300);
+    margin: 0 0 0.85rem;
+  }
+
+  .adventure-stack {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+  }
+
+  .adventure-outcomes {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    gap: 0.7rem;
+  }
+
+  .adventure-outcomes li {
+    position: relative;
+    padding-left: 1.5rem;
+    color: var(--ink-300);
+    line-height: 1.6;
+    font-size: 0.97rem;
+  }
+
+  .adventure-outcomes li::before {
+    content: '✦';
+    position: absolute;
+    left: 0;
+    top: 0.1rem;
+    color: var(--gold-400);
+    font-size: 0.75rem;
+  }
+</style>

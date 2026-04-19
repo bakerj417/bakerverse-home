@@ -1,0 +1,94 @@
+---
+import '@/styles/global.css';
+import Navbar from '@/components/layout/Navbar.astro';
+import Footer from '@/components/layout/Footer.astro';
+import SEO from '@/components/ui/SEO.astro';
+import { ViewTransitions } from 'astro:transitions';
+
+interface Props {
+  title?: string;
+  description?: string;
+  image?: string;
+  noindex?: boolean;
+  bodyClass?: string;
+}
+
+const {
+  title,
+  description,
+  image,
+  noindex = false,
+  bodyClass = '',
+} = Astro.props;
+---
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <SEO
+      title={title}
+      description={description}
+      image={image}
+      noindex={noindex}
+    />
+    <ViewTransitions />
+  </head>
+  <body class={bodyClass}>
+    <a href="#main" class="skip-link">Skip to content</a>
+    <Navbar />
+    <main id="main">
+      <slot />
+    </main>
+    <Footer />
+  </body>
+</html>
+
+<style is:global>
+  .skip-link {
+    position: absolute;
+    top: -80px;
+    left: 1rem;
+    z-index: 1000;
+    padding: 0.6rem 1rem;
+    background: var(--gold-300);
+    color: var(--bg-void);
+    font-family: var(--font-display);
+    font-weight: 600;
+    border-radius: 2px;
+    transition: top var(--dur-base) var(--ease-standard);
+  }
+
+  .skip-link:focus {
+    top: 1rem;
+  }
+
+  main {
+    min-height: calc(100vh - 100px);
+  }
+
+  .section {
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+
+  @media (min-width: 768px) {
+    .section {
+      padding-left: 2.5rem;
+      padding-right: 2.5rem;
+    }
+  }
+
+  .section-y-lg {
+    padding-top: 6rem;
+    padding-bottom: 6rem;
+  }
+
+  .section-y-md {
+    padding-top: 4rem;
+    padding-bottom: 4rem;
+  }
+</style>

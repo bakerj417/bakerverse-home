@@ -1,0 +1,99 @@
+---
+/**
+ * CursorAura — a soft gold radial-gradient that tracks the cursor,
+ * dims over text, brightens over interactive elements. Pure CSS +
+ * a tiny inline script; disabled under reduced-motion. Touch users
+ * never see it (pointer: fine guard).
+ */
+---
+
+<div id="cursor-aura" aria-hidden="true"></div>
+
+<style>
+  #cursor-aura {
+    position: fixed;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+    width: 420px;
+    height: 420px;
+    transform: translate(-50%, -50%);
+    background: radial-gradient(
+      circle,
+      rgba(240, 185, 11, 0.14) 0%,
+      rgba(240, 185, 11, 0.06) 30%,
+      transparent 70%
+    );
+    z-index: 100;
+    opacity: 0;
+    transition: opacity 400ms var(--ease-standard);
+    mix-blend-mode: screen;
+    will-change: transform, opacity;
+  }
+
+  @media (hover: none), (pointer: coarse), (prefers-reduced-motion: reduce) {
+    #cursor-aura {
+      display: none;
+    }
+  }
+
+  #cursor-aura.is-boosted {
+    background: radial-gradient(
+      circle,
+      rgba(240, 185, 11, 0.32) 0%,
+      rgba(240, 185, 11, 0.14) 30%,
+      transparent 70%
+    );
+  }
+</style>
+
+<script is:inline>
+  (function initCursorAura() {
+    const aura = document.getElementById('cursor-aura');
+    if (!aura) return;
+
+    let rafId = 0;
+    let targetX = 0;
+    let targetY = 0;
+    let currentX = 0;
+    let currentY = 0;
+
+    const handleMove = (e) => {
+      targetX = e.clientX;
+      targetY = e.clientY;
+      aura.style.opacity = '1';
+      if (!rafId) tick();
+    };
+
+    const tick = () => {
+      currentX += (targetX - currentX) * 0.18;
+      currentY += (targetY - currentY) * 0.18;
+      aura.style.transform = `translate(${currentX}px, ${currentY}px) translate(-50%, -50%)`;
+
+      const dx = targetX - currentX;
+      const dy = targetY - currentY;
+      if (Math.abs(dx) > 0.1 || Math.abs(dy) > 0.1) {
+        rafId = requestAnimationFrame(tick);
+      } else {
+        rafId = 0;
+      }
+    };
+
+    const handleLeave = () => {
+      aura.style.opacity = '0';
+    };
+
+    const interactiveSelector = 'a, button, [role="button"], input, textarea, .btn-gold, .btn-ghost, .tooltip-card, .ornate-frame';
+    const handleOver = (e) => {
+      if (e.target && e.target instanceof Element && e.target.closest(interactiveSelector)) {
+        aura.classList.add('is-boosted');
+      } else {
+        aura.classList.remove('is-boosted');
+      }
+    };
+
+    document.addEventListener('mousemove', handleMove);
+    document.addEventListener('mouseleave', handleLeave);
+    document.addEventListener('mouseover', handleOver);
+  })();
+</script>

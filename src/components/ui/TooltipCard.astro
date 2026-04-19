@@ -1,0 +1,69 @@
+---
+type Rarity = 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary' | 'artifact';
+
+interface Props {
+  rarity?: Rarity;
+  class?: string;
+  as?: string;
+  padded?: boolean;
+  href?: string;
+}
+
+const {
+  rarity = 'rare',
+  class: className = '',
+  as: Tag = 'div',
+  padded = true,
+  href,
+} = Astro.props;
+
+const rarityColorMap: Record<Rarity, string> = {
+  common:    'var(--rarity-common)',
+  uncommon:  'var(--rarity-uncommon)',
+  rare:      'var(--rarity-rare)',
+  epic:      'var(--rarity-epic)',
+  legendary: 'var(--rarity-legendary)',
+  artifact:  'var(--rarity-artifact)',
+};
+
+const Element = href ? 'a' : Tag;
+const color = rarityColorMap[rarity];
+const classes = [
+  'tooltip-card',
+  'relative',
+  'block',
+  padded && 'p-5',
+  'transition',
+  'duration-300',
+  'ease-[cubic-bezier(0.19,1,0.22,1)]',
+  'hover:-translate-y-0.5',
+  'hover:shadow-tooltip',
+  'group',
+  className,
+]
+  .filter(Boolean)
+  .join(' ');
+---
+
+<Element
+  class={classes}
+  {...(href ? { href } : {})}
+  style={`--rarity-color: ${color};`}
+  data-rarity={rarity}
+>
+  <span
+    class="rarity-bar"
+    style={`color: ${color};`}
+    aria-hidden="true"
+  ></span>
+  <slot />
+</Element>
+
+<style>
+  :global(.tooltip-card) {
+    position: relative;
+  }
+  :global(.tooltip-card[data-rarity]:hover) {
+    border-color: var(--rarity-color);
+  }
+</style>
