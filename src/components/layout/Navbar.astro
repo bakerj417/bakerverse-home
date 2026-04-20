@@ -1,7 +1,21 @@
 ---
 import { nav, site } from '@/data/site';
+import { listThemes } from '@/lib/theme/registry';
 const { pathname } = Astro.url;
+const themes = listThemes();
 ---
+
+<!--
+  aria-live region: screen readers announce the theme name when it changes.
+  Positioned off-screen so it is invisible but always in the DOM.
+-->
+<div
+  id="theme-live"
+  role="status"
+  aria-live="polite"
+  aria-atomic="true"
+  class="sr-only"
+></div>
 
 <header class="nav-root" data-nav-root>
   <a href="/" class="nav-brand" aria-label="Joseph Baker — home">
@@ -45,6 +59,36 @@ const { pathname } = Astro.url;
         </a>
       );
     })}
+
+    <!-- Mobile-only Theme section in the nav panel -->
+    <div class="theme-panel-section" aria-label="Theme" role="group">
+      <span class="theme-panel-label" aria-hidden="true">⬡ Theme</span>
+      <div class="theme-panel-grid" role="listbox" aria-label="Choose theme" data-theme-grid="mobile">
+        {themes.map((t) => (
+          <button
+            type="button"
+            role="option"
+            class="theme-swatch-btn"
+            data-theme-id={t.meta.id}
+            aria-label={`${t.meta.name} — ${t.meta.mood}`}
+            aria-selected="false"
+            data-theme-btn
+          >
+            <img
+              src={`/themes/${t.meta.id}.svg`}
+              alt=""
+              aria-hidden="true"
+              class="theme-swatch-img"
+              width="80"
+              height="45"
+              loading="lazy"
+            />
+            <span class="theme-swatch-name">{t.meta.name}</span>
+          </button>
+        ))}
+      </div>
+    </div>
+
     <a
       href={site.resumeUrl}
       target="_blank"
@@ -55,6 +99,56 @@ const { pathname } = Astro.url;
       <span aria-hidden="true">⤓</span>
     </a>
   </nav>
+
+  <!-- Desktop theme picker button + popover -->
+  <div class="theme-picker" data-theme-picker>
+    <button
+      type="button"
+      class="theme-picker-btn"
+      aria-label="Change theme"
+      aria-haspopup="listbox"
+      aria-expanded="false"
+      aria-controls="theme-picker-popover"
+      data-theme-picker-toggle
+    >
+      <span class="theme-picker-icon" aria-hidden="true">⬡</span>
+    </button>
+
+    <div
+      id="theme-picker-popover"
+      class="theme-picker-popover tooltip-card"
+      role="listbox"
+      aria-label="Choose theme"
+      hidden
+      data-theme-picker-popover
+    >
+      <p class="theme-picker-heading">Theme</p>
+      <div class="theme-picker-grid" data-theme-grid="desktop">
+        {themes.map((t) => (
+          <button
+            type="button"
+            role="option"
+            class="theme-swatch-btn"
+            data-theme-id={t.meta.id}
+            aria-label={`${t.meta.name} — ${t.meta.mood}`}
+            aria-selected="false"
+            data-theme-btn
+          >
+            <img
+              src={`/themes/${t.meta.id}.svg`}
+              alt=""
+              aria-hidden="true"
+              class="theme-swatch-img"
+              width="96"
+              height="54"
+              loading="lazy"
+            />
+            <span class="theme-swatch-name">{t.meta.name}</span>
+          </button>
+        ))}
+      </div>
+    </div>
+  </div>
 
   <a
     href={site.resumeUrl}
@@ -68,20 +162,167 @@ const { pathname } = Astro.url;
 </header>
 
 <script>
-  // Re-bound on each astro:page-load (fires on first paint AND after
-  // every ViewTransition), so the hamburger keeps working after
-  // client-side route changes.
+  // -------------------------------------------------------------------------
+  // Theme switcher — vanilla, framework-free
+  // Re-bound on astro:page-load like the nav hamburger.
+  // -------------------------------------------------------------------------
 
-  // NOTE on scroll locking: we intentionally do NOT freeze the body
-  // here. `body { overflow: hidden }` mid-scroll causes mobile
-  // browsers to snap scroll back to 0 (which looks to the user
-  // like the sticky header "disappeared"), and swapping to
-  // `position: fixed; top: -scrollY` shifts the whole document
-  // so far up that the sticky header no longer coincides with
-  // the viewport top. Since the panel is an absolute dropdown
-  // anchored inside the sticky header — not a full-screen modal —
-  // letting the background stay scrollable is the correct UX:
-  // the header stays pinned and the panel stays under it.
+  import { getThemeId, setThemeId } from '@/lib/theme/store';
+  import { applyTheme } from '@/lib/theme/apply';
+  import { listThemes } from '@/lib/theme/registry';
+
+  const THEME_IDS = listThemes().map((t) => t.meta.id);
+
+  // ---- Sync all swatch buttons to the active theme ----
+  function syncSwatches(activeId: string): void {
+    document.querySelectorAll<HTMLButtonElement>('[data-theme-btn]').forEach((btn) => {
+      const isActive = btn.dataset.themeId === activeId;
+      btn.setAttribute('aria-selected', String(isActive));
+      btn.classList.toggle('is-active', isActive);
+    });
+  }
+
+  // ---- Announce theme change to screen readers ----
+  function announceTheme(id: string): void {
+    const theme = listThemes().find((t) => t.meta.id === id);
+    if (!theme) return;
+    const live = document.getElementById('theme-live');
+    if (!live) return;
+    live.textContent = ''; // clear first so same-name re-announces
+    requestAnimationFrame(() => {
+      live.textContent = `Theme changed to ${theme.meta.name}: ${theme.meta.mood}`;
+    });
+  }
+
+  // ---- Apply + announce a theme ----
+  function selectTheme(id: string): void {
+    setThemeId(id);
+    applyTheme(id);
+    syncSwatches(id);
+    announceTheme(id);
+  }
+
+  // ---- Desktop popover open/close ----
+  function openPicker(): void {
+    const picker = document.querySelector<HTMLElement>('[data-theme-picker]');
+    const toggle = document.querySelector<HTMLButtonElement>('[data-theme-picker-toggle]');
+    const popover = document.querySelector<HTMLElement>('[data-theme-picker-popover]');
+    if (!picker || !toggle || !popover) return;
+    popover.removeAttribute('hidden');
+    toggle.setAttribute('aria-expanded', 'true');
+    // Focus first swatch in the popover for keyboard users
+    const first = popover.querySelector<HTMLButtonElement>('[data-theme-btn]');
+    first?.focus();
+  }
+
+  function closePicker(returnFocus = true): void {
+    const toggle = document.querySelector<HTMLButtonElement>('[data-theme-picker-toggle]');
+    const popover = document.querySelector<HTMLElement>('[data-theme-picker-popover]');
+    if (!toggle || !popover) return;
+    popover.setAttribute('hidden', '');
+    toggle.setAttribute('aria-expanded', 'false');
+    if (returnFocus) toggle.focus();
+  }
+
+  function pickerIsOpen(): boolean {
+    const popover = document.querySelector<HTMLElement>('[data-theme-picker-popover]');
+    return popover !== null && !popover.hasAttribute('hidden');
+  }
+
+  // ---- Keyboard navigation within a swatch grid ----
+  function gridKeydown(e: KeyboardEvent, container: HTMLElement): void {
+    const btns = Array.from(container.querySelectorAll<HTMLButtonElement>('[data-theme-btn]'));
+    const idx = btns.indexOf(document.activeElement as HTMLButtonElement);
+    if (idx === -1) return;
+
+    let next = idx;
+    switch (e.key) {
+      case 'ArrowRight':
+      case 'ArrowDown':
+        e.preventDefault();
+        next = (idx + 1) % btns.length;
+        break;
+      case 'ArrowLeft':
+      case 'ArrowUp':
+        e.preventDefault();
+        next = (idx - 1 + btns.length) % btns.length;
+        break;
+      case 'Home':
+        e.preventDefault();
+        next = 0;
+        break;
+      case 'End':
+        e.preventDefault();
+        next = btns.length - 1;
+        break;
+      default:
+        return;
+    }
+    btns[next]?.focus();
+  }
+
+  // ---- Wire everything up (called on each astro:page-load) ----
+  function initThemeSwitcher(): void {
+    // Sync swatches to current theme
+    syncSwatches(getThemeId());
+
+    // --- Desktop picker toggle ---
+    const pickerToggle = document.querySelector<HTMLButtonElement>('[data-theme-picker-toggle]');
+    if (pickerToggle && !(pickerToggle as HTMLButtonElement & { _pickerBound?: boolean })._pickerBound) {
+      (pickerToggle as HTMLButtonElement & { _pickerBound?: boolean })._pickerBound = true;
+
+      pickerToggle.addEventListener('click', () => {
+        if (pickerIsOpen()) closePicker();
+        else openPicker();
+      });
+    }
+
+    // --- Swatch buttons (desktop + mobile, both grids) ---
+    document.querySelectorAll<HTMLButtonElement>('[data-theme-btn]').forEach((btn) => {
+      if ((btn as HTMLButtonElement & { _swatchBound?: boolean })._swatchBound) return;
+      (btn as HTMLButtonElement & { _swatchBound?: boolean })._swatchBound = true;
+
+      btn.addEventListener('click', () => {
+        const id = btn.dataset.themeId;
+        if (id) selectTheme(id);
+        // Close desktop popover after selection
+        if (pickerIsOpen()) closePicker(false);
+      });
+    });
+
+    // --- Keyboard nav inside desktop popover grid ---
+    const desktopGrid = document.querySelector<HTMLElement>('[data-theme-grid="desktop"]');
+    if (desktopGrid && !(desktopGrid as HTMLElement & { _kbBound?: boolean })._kbBound) {
+      (desktopGrid as HTMLElement & { _kbBound?: boolean })._kbBound = true;
+      desktopGrid.addEventListener('keydown', (e) => gridKeydown(e, desktopGrid));
+    }
+
+    // --- Keyboard nav inside mobile panel grid ---
+    const mobileGrid = document.querySelector<HTMLElement>('[data-theme-grid="mobile"]');
+    if (mobileGrid && !(mobileGrid as HTMLElement & { _kbBound?: boolean })._kbBound) {
+      (mobileGrid as HTMLElement & { _kbBound?: boolean })._kbBound = true;
+      mobileGrid.addEventListener('keydown', (e) => gridKeydown(e, mobileGrid));
+    }
+  }
+
+  document.addEventListener('astro:page-load', initThemeSwitcher);
+
+  // --- Close desktop picker on outside click ---
+  document.addEventListener('click', (e: MouseEvent) => {
+    if (!pickerIsOpen()) return;
+    const picker = document.querySelector<HTMLElement>('[data-theme-picker]');
+    if (picker && !picker.contains(e.target as Node)) closePicker(false);
+  });
+
+  // --- Close desktop picker on Escape ---
+  document.addEventListener('keydown', (e: KeyboardEvent) => {
+    if (e.key === 'Escape' && pickerIsOpen()) closePicker();
+  });
+
+  // -------------------------------------------------------------------------
+  // Original nav hamburger logic (unchanged from before)
+  // -------------------------------------------------------------------------
+
   function closeNav() {
     const root = document.querySelector<HTMLElement>('[data-nav-root]');
     const toggle = document.querySelector<HTMLButtonElement>('[data-nav-toggle]');
@@ -107,9 +348,6 @@ const { pathname } = Astro.url;
     const panel = document.querySelector<HTMLElement>('[data-nav-panel]');
     if (!root || !toggle || !panel) return;
 
-    // Every ViewTransition yields fresh DOM nodes, so the guard check
-    // is per-node (not module-scoped). Prevents double-binding if this
-    // ever fires twice on the same DOM.
     if (toggle.dataset.navBound === '1') return;
     toggle.dataset.navBound = '1';
 
@@ -125,9 +363,6 @@ const { pathname } = Astro.url;
 
   document.addEventListener('astro:page-load', initNav);
 
-  // Document/window-level listeners survive page transitions; the
-  // handlers re-query the current DOM so they keep working after a
-  // route change without re-binding.
   document.addEventListener('keydown', (e) => {
     if (e.key !== 'Escape') return;
     const root = document.querySelector<HTMLElement>('[data-nav-root]');
@@ -143,12 +378,6 @@ const { pathname } = Astro.url;
     }
   });
 
-  // Hide-on-scroll-down / show-on-scroll-up — mobile only. rAF-gated
-  // to avoid per-event layout reads. Thresholds are asymmetric: any
-  // small upward scroll reveals the header so the user can reach
-  // it quickly, but a committed downward push is required to hide.
-  // A touchmove listener provides an instant-reveal path for
-  // up-swipes so iOS coalesced scroll events never delay a reveal.
   const HIDE_AFTER = 80;
   const SHOW_DELTA = 2;
   const HIDE_DELTA = 10;
@@ -192,9 +421,6 @@ const { pathname } = Astro.url;
 
   window.addEventListener('scroll', onScroll, { passive: true });
 
-  // iOS can coalesce scroll events during a fast flick. We also watch
-  // the touch itself: if the finger moves DOWN the screen (i.e. the
-  // page scrolls UP), reveal the header immediately.
   let touchStartY: number | null = null;
   window.addEventListener('touchstart', (e) => {
     if (desktopMq.matches) return;
@@ -218,6 +444,24 @@ const { pathname } = Astro.url;
 </script>
 
 <style>
+  /* =====================================================================
+     SR-ONLY utility (keeps aria-live region accessible but invisible)
+  ====================================================================== */
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+  }
+
+  /* =====================================================================
+     NAV ROOT
+  ====================================================================== */
   .nav-root {
     position: sticky;
     top: 0;
@@ -254,6 +498,9 @@ const { pathname } = Astro.url;
     }
   }
 
+  /* =====================================================================
+     BRAND
+  ====================================================================== */
   .nav-brand {
     display: inline-flex;
     align-items: center;
@@ -310,7 +557,9 @@ const { pathname } = Astro.url;
     white-space: nowrap;
   }
 
-  /* -------- HAMBURGER TOGGLE (mobile only) -------- */
+  /* =====================================================================
+     HAMBURGER TOGGLE (mobile only)
+  ====================================================================== */
   .nav-toggle {
     position: relative;
     display: inline-flex;
@@ -350,7 +599,6 @@ const { pathname } = Astro.url;
     }
   }
 
-  /* Toggle becomes an X when panel is open */
   .nav-root[data-nav-open] .nav-toggle-bar:nth-child(1) {
     transform: translateY(7px) rotate(45deg);
   }
@@ -361,15 +609,15 @@ const { pathname } = Astro.url;
     transform: translateY(-7px) rotate(-45deg);
   }
 
-  /* -------- NAV LINKS PANEL -------- */
+  /* =====================================================================
+     NAV LINKS PANEL
+  ====================================================================== */
   .nav-links {
     display: flex;
     align-items: center;
     gap: 0.25rem;
   }
 
-  /* Mobile: the panel lives under the header. Hidden by default via
-     visibility + scaleY, animated open/closed via transitions. */
   @media (max-width: 899px) {
     .nav-links {
       flex-direction: column;
@@ -389,7 +637,6 @@ const { pathname } = Astro.url;
       box-shadow: 0 24px 48px -24px rgba(0, 0, 0, 0.85);
       max-height: calc(100vh - 60px);
       overflow-y: auto;
-      /* closed state */
       visibility: hidden;
       opacity: 0;
       transform: scaleY(0.92) translateY(-6px);
@@ -412,8 +659,6 @@ const { pathname } = Astro.url;
         visibility 0s linear 0s;
     }
 
-    /* Gold rune seal — a hairline of gold that sweeps across the
-       top of the panel as it opens. */
     .nav-links::before {
       content: "";
       position: absolute;
@@ -440,8 +685,6 @@ const { pathname } = Astro.url;
       transform: scaleX(1);
     }
 
-    /* Cascade reveal: each nav link / the resume CTA slide in with a
-       tiny x-offset so the menu feels etched in, not dumped in. */
     .nav-link,
     .nav-resume--panel {
       opacity: 0;
@@ -457,17 +700,15 @@ const { pathname } = Astro.url;
       transform: translateX(0);
     }
 
-    /* Stagger — 6 nav items + resume button. Base 120ms + 45ms each. */
     .nav-root[data-nav-open] .nav-link:nth-child(1) { transition-delay: 120ms; }
     .nav-root[data-nav-open] .nav-link:nth-child(2) { transition-delay: 165ms; }
     .nav-root[data-nav-open] .nav-link:nth-child(3) { transition-delay: 210ms; }
     .nav-root[data-nav-open] .nav-link:nth-child(4) { transition-delay: 255ms; }
     .nav-root[data-nav-open] .nav-link:nth-child(5) { transition-delay: 300ms; }
     .nav-root[data-nav-open] .nav-link:nth-child(6) { transition-delay: 345ms; }
-    .nav-root[data-nav-open] .nav-resume--panel { transition-delay: 400ms; }
+    .nav-root[data-nav-open] .nav-resume--panel    { transition-delay: 400ms; }
   }
 
-  /* Desktop: strip the panel treatment; it's a plain inline flex row. */
   @media (min-width: 900px) {
     .nav-links {
       position: static;
@@ -501,6 +742,9 @@ const { pathname } = Astro.url;
     }
   }
 
+  /* =====================================================================
+     NAV LINKS
+  ====================================================================== */
   .nav-link {
     position: relative;
     display: inline-flex;
@@ -566,13 +810,14 @@ const { pathname } = Astro.url;
     opacity: 0.8;
   }
 
-  /* -------- RESUME BUTTON -------- */
+  /* =====================================================================
+     RESUME BUTTON
+  ====================================================================== */
   .nav-resume {
     font-size: 0.8rem;
     padding: 0.55rem 1.1rem;
   }
 
-  /* Desktop: show the inline resume button next to the nav. */
   .nav-resume--desktop {
     display: none;
   }
@@ -586,12 +831,196 @@ const { pathname } = Astro.url;
     }
   }
 
-  /* Mobile: resume button sits at the bottom of the open panel. */
   @media (max-width: 899px) {
     .nav-resume--panel {
       margin-top: 0.75rem;
       justify-content: center;
       width: 100%;
+    }
+  }
+
+  /* =====================================================================
+     DESKTOP THEME PICKER
+  ====================================================================== */
+  .theme-picker {
+    position: relative;
+    display: none; /* hidden on mobile — use the panel section instead */
+  }
+
+  @media (min-width: 900px) {
+    .theme-picker {
+      display: block;
+    }
+  }
+
+  .theme-picker-btn {
+    display: inline-grid;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    background: transparent;
+    border: 1px solid rgba(240, 185, 11, 0.22);
+    border-radius: 2px;
+    cursor: pointer;
+    color: var(--gold-300);
+    font-size: 1rem;
+    transition:
+      border-color var(--dur-fast) var(--ease-standard),
+      color var(--dur-fast) var(--ease-standard);
+  }
+
+  .theme-picker-btn:hover,
+  .theme-picker-btn[aria-expanded="true"] {
+    border-color: var(--gold-400);
+    color: var(--gold-200);
+  }
+
+  .theme-picker-icon {
+    line-height: 1;
+  }
+
+  /* Popover */
+  .theme-picker-popover {
+    position: absolute;
+    top: calc(100% + 10px);
+    right: 0;
+    width: 320px;
+    padding: 1rem;
+    background: var(--bg-dusk);
+    border: 1px solid rgba(240, 185, 11, 0.18);
+    border-radius: var(--radius-soft);
+    box-shadow: var(--shadow-tooltip);
+    z-index: 50;
+    /* animation */
+    transform-origin: top right;
+    animation: picker-open 180ms var(--ease-ornate) forwards;
+  }
+
+  .theme-picker-popover[hidden] {
+    display: none;
+  }
+
+  @keyframes picker-open {
+    from { opacity: 0; transform: scale(0.95) translateY(-4px); }
+    to   { opacity: 1; transform: scale(1) translateY(0); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .theme-picker-popover {
+      animation: none;
+    }
+  }
+
+  .theme-picker-heading {
+    margin: 0 0 0.75rem;
+    font-family: var(--font-display);
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-500);
+  }
+
+  .theme-picker-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.5rem;
+  }
+
+  /* =====================================================================
+     THEME SWATCH BUTTON (shared by desktop popover + mobile panel)
+  ====================================================================== */
+  .theme-swatch-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.35rem;
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: var(--radius-soft);
+    cursor: pointer;
+    transition:
+      border-color var(--dur-fast) var(--ease-standard),
+      background var(--dur-fast) var(--ease-standard);
+  }
+
+  .theme-swatch-btn:hover {
+    border-color: rgba(240, 185, 11, 0.3);
+    background: rgba(240, 185, 11, 0.05);
+  }
+
+  .theme-swatch-btn:focus-visible {
+    outline: 2px solid var(--gold-300);
+    outline-offset: 2px;
+    border-color: var(--gold-300);
+  }
+
+  .theme-swatch-btn.is-active {
+    border-color: var(--gold-400);
+    background: rgba(240, 185, 11, 0.08);
+  }
+
+  .theme-swatch-btn.is-active .theme-swatch-name {
+    color: var(--gold-300);
+  }
+
+  .theme-swatch-img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: 3px;
+    object-fit: cover;
+  }
+
+  .theme-swatch-name {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    letter-spacing: 0.08em;
+    color: var(--ink-300);
+    text-align: center;
+    white-space: nowrap;
+  }
+
+  /* =====================================================================
+     MOBILE THEME PANEL SECTION
+  ====================================================================== */
+  .theme-panel-section {
+    display: none; /* only visible in mobile nav panel */
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 0.75rem 0.5rem;
+    border-top: 1px solid rgba(240, 185, 11, 0.08);
+    border-bottom: 1px solid rgba(240, 185, 11, 0.08);
+    margin: 0.25rem 0;
+  }
+
+  @media (max-width: 899px) {
+    .theme-panel-section {
+      display: flex;
+    }
+  }
+
+  .theme-panel-label {
+    font-family: var(--font-display);
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-500);
+  }
+
+  .theme-panel-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 0.4rem;
+  }
+
+  /* On very small screens fall to 3 cols */
+  @media (max-width: 400px) {
+    .theme-panel-grid {
+      grid-template-columns: repeat(3, 1fr);
     }
   }
 </style>
