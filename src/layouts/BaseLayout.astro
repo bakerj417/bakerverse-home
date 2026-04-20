@@ -4,6 +4,7 @@ import Navbar from '@/components/layout/Navbar.astro';
 import Footer from '@/components/layout/Footer.astro';
 import SEO from '@/components/ui/SEO.astro';
 import { ViewTransitions } from 'astro:transitions';
+import { foucGuardScript, initialThemeStyle } from '@/lib/theme/ssr';
 
 interface Props {
   title?: string;
@@ -26,6 +27,22 @@ const {
 <html lang="en">
   <head>
     <meta charset="utf-8" />
+
+    <!--
+      FOUC guard: runs synchronously before first paint, reads
+      localStorage('bakerverse.theme'), and stamps data-theme on <html>.
+      Must be the FIRST script in <head> — before any stylesheet.
+    -->
+    <script set:html={foucGuardScript()} />
+
+    <!--
+      Server-rendered theme tokens. The client-side applyTheme() call will
+      replace this block on hydration if the user's stored theme differs.
+      The id lets applyTheme() find and reuse the element instead of
+      appending a new one.
+    -->
+    <style id="bakerverse-theme" set:html={initialThemeStyle()} />
+
     <SEO
       title={title}
       description={description}
@@ -41,6 +58,31 @@ const {
       <slot />
     </main>
     <Footer />
+
+    <!--
+      Re-apply the stored theme after every ViewTransition swap.
+      astro:after-swap fires once the new DOM is in place but before the
+      browser paints — the right moment to inject the <style> block so there
+      is no flash between route changes.
+
+      We do NOT import from the theme module here (Astro client scripts run in
+      a separate module scope), so we replicate the minimal logic inline.
+    -->
+    <script>
+      import { initStore, getThemeId } from '@/lib/theme/store';
+      import { applyTheme } from '@/lib/theme/apply';
+
+      function reapply(): void {
+        initStore();
+        applyTheme(getThemeId());
+      }
+
+      // Fire once on initial page load to hydrate from localStorage
+      reapply();
+
+      // Fire after every ViewTransition so the new page gets the right theme
+      document.addEventListener('astro:after-swap', reapply);
+    </script>
   </body>
 </html>
 
