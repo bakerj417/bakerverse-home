@@ -72,6 +72,16 @@ const { pathname } = Astro.url;
   // every ViewTransition), so the hamburger keeps working after
   // client-side route changes.
 
+  // NOTE on scroll locking: we intentionally do NOT freeze the body
+  // here. `body { overflow: hidden }` mid-scroll causes mobile
+  // browsers to snap scroll back to 0 (which looks to the user
+  // like the sticky header "disappeared"), and swapping to
+  // `position: fixed; top: -scrollY` shifts the whole document
+  // so far up that the sticky header no longer coincides with
+  // the viewport top. Since the panel is an absolute dropdown
+  // anchored inside the sticky header — not a full-screen modal —
+  // letting the background stay scrollable is the correct UX:
+  // the header stays pinned and the panel stays under it.
   function closeNav() {
     const root = document.querySelector<HTMLElement>('[data-nav-root]');
     const toggle = document.querySelector<HTMLButtonElement>('[data-nav-toggle]');
@@ -79,17 +89,16 @@ const { pathname } = Astro.url;
     root.removeAttribute('data-nav-open');
     toggle.setAttribute('aria-expanded', 'false');
     toggle.setAttribute('aria-label', 'Open menu');
-    document.body.style.overflow = '';
   }
 
   function openNav() {
     const root = document.querySelector<HTMLElement>('[data-nav-root]');
     const toggle = document.querySelector<HTMLButtonElement>('[data-nav-toggle]');
     if (!root || !toggle) return;
+    if (root.hasAttribute('data-nav-open')) return;
     root.setAttribute('data-nav-open', '');
     toggle.setAttribute('aria-expanded', 'true');
     toggle.setAttribute('aria-label', 'Close menu');
-    document.body.style.overflow = 'hidden';
   }
 
   function initNav() {
