@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="320" height="180" viewBox="0 0 320 180">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1c0e0e"/>
+      <stop offset="100%" stop-color="#110707"/>
+    </linearGradient>
+    <linearGradient id="bar" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#ffa726" stop-opacity="0.9"/>
+      <stop offset="100%" stop-color="#ef5350" stop-opacity="0.7"/>
+    </linearGradient>
+  </defs>
+  <!-- background -->
+  <rect width="320" height="180" fill="url(#bg)"/>
+  <!-- accent bar top -->
+  <rect width="320" height="3" fill="url(#bar)"/>
+  <!-- card area -->
+  <rect x="20" y="24" width="280" height="110" rx="4" fill="#2c1212" fill-opacity="0.7"/>
+  <!-- theme name -->
+  <text x="30" y="52" font-family="Georgia, serif" font-size="18" font-weight="700" fill="#ffb74d" letter-spacing="1">Infernal</text>
+  <!-- mood -->
+  <text x="30" y="70" font-family="system-ui, sans-serif" font-size="10" fill="#e8b0a0" letter-spacing="1.5" text-transform="uppercase">HELLFIRE EMBER</text>
+  <!-- swatch row -->
+  <circle cx="32"  cy="100" r="10" fill="#110707"/>
+  <circle cx="58"  cy="100" r="10" fill="#1c0e0e"/>
+  <circle cx="84"  cy="100" r="10" fill="#ffeaea"/>
+  <circle cx="110" cy="100" r="10" fill="#ffa726"/>
+  <circle cx="136" cy="100" r="10" fill="#ef5350"/>
+  <!-- swatch labels -->
+  <text x="32"  y="118" text-anchor="middle" font-family="monospace" font-size="7" fill="#e8b0a0">bg</text>
+  <text x="58"  y="118" text-anchor="middle" font-family="monospace" font-size="7" fill="#e8b0a0">dusk</text>
+  <text x="84"  y="118" text-anchor="middle" font-family="monospace" font-size="7" fill="#e8b0a0">ink</text>
+  <text x="110" y="118" text-anchor="middle" font-family="monospace" font-size="7" fill="#e8b0a0">pri</text>
+  <text x="136" y="118" text-anchor="middle" font-family="monospace" font-size="7" fill="#e8b0a0">sec</text>
+  <!-- bottom label bar -->
+  <rect x="20" y="138" width="280" height="22" rx="0 0 4 4" fill="#ffa726" fill-opacity="0.12"/>
+  <text x="30" y="153" font-family="monospace" font-size="9" fill="#ffa726" letter-spacing="0.5">bakerverse.theme = "infernal"</text>
+  <!-- border -->
+  <rect x="20" y="24" width="280" height="110" rx="4" fill="none" stroke="#ffa726" stroke-opacity="0.25" stroke-width="1"/>
+</svg>
