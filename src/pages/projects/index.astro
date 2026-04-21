@@ -3,6 +3,7 @@ import BaseLayout from '@/layouts/BaseLayout.astro';
 import TooltipCard from '@/components/ui/TooltipCard.astro';
 import StackBadge from '@/components/ui/StackBadge.astro';
 import RevealOnScroll from '@/components/islands/RevealOnScroll.tsx';
+import ThemeSwitcherMini from '@/components/islands/ThemeSwitcherMini.tsx';
 import { getCollection } from 'astro:content';
 
 type Rarity = 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary' | 'artifact';
@@ -120,6 +121,60 @@ const rarityCounts = rarityOrder.reduce<Record<Rarity, number>>(
       </div>
     </RevealOnScroll>
   </section>
+
+  <!-- ======================================================
+       THEME ENGINE HERO BENTO
+       Feature card for the Bakerverse Theme Engine project with
+       a live ThemeSwitcherMini island embedded in the tile.
+       ====================================================== -->
+  {(() => {
+    const themeEngineEntry = quests.find((q) => q.slug === 'theme-engine');
+    if (!themeEngineEntry) return null;
+    return (
+      <section class="section section-y-md quest-section" aria-label="Featured: Theme Engine">
+        <RevealOnScroll client:visible>
+          <div class="quest-group-head">
+            <p class="section-eyebrow">Spotlight</p>
+            <h2 class="quest-group-h2">Theme Engine</h2>
+          </div>
+        </RevealOnScroll>
+
+        <RevealOnScroll client:visible delayMs={80}>
+          <div class="bento-hero">
+            <div class="bento-hero__content">
+              <div class="bento-hero__head">
+                <span
+                  class="bento-hero__rarity"
+                  style="color: var(--rarity-epic);"
+                >
+                  Epic · {themeEngineEntry.data.year}
+                </span>
+                <span class="bento-hero__status">◆ Currently active</span>
+              </div>
+
+              <h3 class="bento-hero__title">{themeEngineEntry.data.title}</h3>
+              <p class="bento-hero__tagline">{themeEngineEntry.data.tagline}</p>
+              <p class="bento-hero__summary">{themeEngineEntry.data.summary}</p>
+
+              <div class="bento-hero__stack">
+                {themeEngineEntry.data.stack.map((tech: string) => (
+                  <StackBadge label={tech} />
+                ))}
+              </div>
+
+              <a href={`/projects/${themeEngineEntry.slug}`} class="bento-hero__cta">
+                Read the case study →
+              </a>
+            </div>
+
+            <div class="bento-hero__island">
+              <ThemeSwitcherMini client:visible />
+            </div>
+          </div>
+        </RevealOnScroll>
+      </section>
+    );
+  })()}
 
   <!-- ======================================================
        FEATURED QUESTS
@@ -517,5 +572,103 @@ const rarityCounts = rarityOrder.reduce<Record<Rarity, number>>(
     font-style: italic;
     text-align: center;
     padding: 2rem;
+  }
+
+  /* ── Theme Engine bento hero ──────────────────── */
+  .bento-hero {
+    display: grid;
+    gap: 1.5rem;
+    padding: 1.75rem;
+    border-radius: 0.5rem;
+    border: 1px solid rgba(163, 53, 238, 0.3);
+    background:
+      radial-gradient(ellipse at top right, rgba(163, 53, 238, 0.07), transparent 60%),
+      linear-gradient(180deg, rgba(29, 26, 38, 0.8) 0%, rgba(13, 12, 20, 0.95) 100%);
+    box-shadow:
+      0 0 0 1px rgba(163, 53, 238, 0.1) inset,
+      0 8px 32px rgba(0, 0, 0, 0.4);
+  }
+
+  @media (min-width: 900px) {
+    .bento-hero {
+      grid-template-columns: 1fr 340px;
+      align-items: start;
+    }
+  }
+
+  .bento-hero__head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 0.75rem;
+    font-family: var(--font-mono, ui-monospace, monospace);
+    font-size: 0.7rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  .bento-hero__rarity {
+    font-weight: 600;
+  }
+
+  .bento-hero__status {
+    color: var(--rarity-uncommon);
+  }
+
+  .bento-hero__title {
+    font-family: var(--font-display);
+    font-size: clamp(1.5rem, 3vw, 2.25rem);
+    line-height: 1.2;
+    color: var(--ink-100);
+    margin: 0 0 0.5rem;
+  }
+
+  .bento-hero__tagline {
+    color: var(--purple-300);
+    font-size: 1.05rem;
+    line-height: 1.5;
+    margin: 0 0 0.75rem;
+    font-style: italic;
+  }
+
+  .bento-hero__summary {
+    color: var(--ink-300);
+    line-height: 1.7;
+    font-size: 0.95rem;
+    margin: 0 0 1.25rem;
+    max-width: 54ch;
+  }
+
+  .bento-hero__stack {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .bento-hero__cta {
+    display: inline-block;
+    padding: 0.5rem 1.25rem;
+    border: 1px solid rgba(163, 53, 238, 0.6);
+    border-radius: 0.3rem;
+    color: var(--purple-300);
+    font-family: var(--font-display);
+    font-size: 0.85rem;
+    letter-spacing: 0.04em;
+    text-decoration: none;
+    transition: border-color 180ms ease, color 180ms ease, background 180ms ease;
+  }
+
+  .bento-hero__cta:hover {
+    border-color: var(--purple-400);
+    color: var(--purple-200);
+    background: rgba(163, 53, 238, 0.1);
+  }
+
+  .bento-hero__island {
+    padding: 1.25rem;
+    border-radius: 0.375rem;
+    background: rgba(13, 12, 20, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.06);
   }
 </style>
