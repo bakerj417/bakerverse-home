@@ -1,4 +1,9 @@
-@import "./tokens.css";
+/* Design tokens are emitted by the theme engine (src/lib/theme/toCss.ts)
+   into an inline <style id="bakerverse-theme"> block in BaseLayout.astro.
+   tokens.css used to own these vars; it was retired when Phase 1 of the
+   theme engine shipped. Re-importing it would break theme swapping
+   because its :root rules load after the inline block and override
+   every active theme's values. */
 
 /* Google Fonts fallback — self-host for production via
    @fontsource/* packages if we want zero-third-party fetches. */
