@@ -1,0 +1,154 @@
+---
+/**
+ * /playground/theme-editor
+ *
+ * Bakerverse Theme Editor — a live visual playground for creating and
+ * sharing custom themes for the design system.
+ *
+ * Architecture:
+ *   This is a thin Astro wrapper. All interactive logic lives in the
+ *   ThemeEditor React island (client:visible). The page renders a loading
+ *   shell server-side so there's no blank flash on hydration.
+ *
+ * URL hash behaviour:
+ *   The editor reads and writes #t=<base64url-encoded-JSON> via
+ *   history.replaceState. Share links are fully self-describing — no
+ *   backend storage required.
+ */
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import ThemeEditor from '@/components/islands/ThemeEditor.tsx';
+---
+
+<BaseLayout
+  title="Theme Editor — Bakerverse Playground"
+  description="Live visual editor for Bakerverse design-system themes. Tweak colours, typography, and contrast — then share your creation via a URL hash or download the TypeScript source."
+>
+  <main id="main-content" class="playground-page">
+    <header class="playground-header">
+      <div class="container">
+        <p class="section-eyebrow">Bakerverse · Playground</p>
+        <h1 class="playground-title">Theme Editor</h1>
+        <p class="playground-subtitle">
+          Tweak every design token. Preview live. Share via URL or export as
+          TypeScript — WCAG AA contrast validated in real time.
+        </p>
+      </div>
+    </header>
+
+    <div class="playground-body container">
+      {/* Loading skeleton shown until the island hydrates */}
+      <div class="editor-shell" aria-hidden="true" id="editor-loading-shell">
+        <div class="editor-shell__controls"></div>
+        <div class="editor-shell__preview"></div>
+      </div>
+
+      {/* The actual editor — replaces the skeleton on hydration */}
+      <div class="editor-wrapper" id="editor-wrapper">
+        <ThemeEditor client:visible />
+      </div>
+    </div>
+  </main>
+</BaseLayout>
+
+<style>
+  /* ── Page layout ──────────────────────────────── */
+  .playground-page {
+    min-height: calc(100dvh - var(--navbar-h, 4rem));
+    display: flex;
+    flex-direction: column;
+  }
+
+  .container {
+    max-width: 1400px;
+    margin-inline: auto;
+    padding-inline: var(--space-4, 1rem);
+  }
+
+  /* ── Header ───────────────────────────────────── */
+  .playground-header {
+    padding-block: var(--space-8, 2rem) var(--space-4, 1rem);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    background: var(--bg-dusk);
+  }
+
+  .playground-title {
+    font-family: var(--font-display);
+    font-size: clamp(1.75rem, 4vw, 2.5rem);
+    font-weight: 700;
+    color: var(--gold-400);
+    margin-block: var(--space-2, 0.5rem);
+    letter-spacing: 0.02em;
+  }
+
+  .playground-subtitle {
+    color: var(--ink-300);
+    font-size: 0.9375rem;
+    max-width: 56ch;
+    line-height: 1.6;
+  }
+
+  /* ── Editor area ──────────────────────────────── */
+  .playground-body {
+    flex: 1;
+    padding-block: var(--space-4, 1rem);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4, 1rem);
+  }
+
+  .editor-wrapper {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 600px;
+  }
+
+  /* Loading skeleton */
+  .editor-shell {
+    display: grid;
+    gap: 1rem;
+    animation: pulse 1.5s ease-in-out infinite;
+  }
+
+  @media (min-width: 1024px) {
+    .editor-shell {
+      grid-template-columns: 320px 1fr;
+    }
+  }
+
+  .editor-shell__controls,
+  .editor-shell__preview {
+    border-radius: 0.375rem;
+    background: var(--bg-ember);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    min-height: 480px;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 0.5; }
+    50% { opacity: 0.8; }
+  }
+
+  /* Hide skeleton once island mounts */
+  :global(.astro-island) + #editor-loading-shell,
+  #editor-wrapper:not(:empty) ~ #editor-loading-shell {
+    display: none;
+  }
+</style>
+
+<script>
+  // Hide the loading skeleton once the ThemeEditor island has hydrated
+  const shell = document.getElementById('editor-loading-shell');
+  const wrapper = document.getElementById('editor-wrapper');
+  if (shell && wrapper) {
+    const observer = new MutationObserver(() => {
+      if (wrapper.querySelector('[data-astro-island]') || wrapper.children.length > 0) {
+        shell.style.display = 'none';
+        observer.disconnect();
+      }
+    });
+    observer.observe(wrapper, { childList: true, subtree: true });
+    // Also hide after a brief timeout as fallback
+    setTimeout(() => { shell.style.display = 'none'; }, 3000);
+  }
+</script>
