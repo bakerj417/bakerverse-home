@@ -4,28 +4,21 @@ import TooltipCard from '@/components/ui/TooltipCard.astro';
 import StackBadge from '@/components/ui/StackBadge.astro';
 import RevealOnScroll from '@/components/islands/RevealOnScroll.tsx';
 import ThemeSwitcherMini from '@/components/islands/ThemeSwitcherMini.tsx';
-import { getCollection } from 'astro:content';
+import { getCollection, type CollectionEntry } from 'astro:content';
 
-type Rarity = 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary' | 'artifact';
+type Quest = CollectionEntry<'projects'>;
 
-const rarityRank: Record<Rarity, number> = {
-  artifact: 0,
-  legendary: 1,
-  epic: 2,
-  rare: 3,
-  uncommon: 4,
-  common: 5,
-};
+const quests = (await getCollection('projects')).sort(
+  (a, b) => a.data.order - b.data.order,
+);
 
-const quests = (await getCollection('projects')).sort((a, b) => {
-  const rA = rarityRank[a.data.rarity as Rarity];
-  const rB = rarityRank[b.data.rarity as Rarity];
-  if (rA !== rB) return rA - rB;
-  return a.data.order - b.data.order;
-});
-
-const featured = quests.filter((q) => q.data.featured);
-const rest = quests.filter((q) => !q.data.featured);
+const active = quests.filter(
+  (q) => q.data.status === 'active' || q.data.status === 'wip',
+);
+const completed = quests.filter((q) => q.data.status === 'shipped');
+// 'upcoming' is not a status in the schema yet — kept as an empty-state
+// slot the page can fill later when the schema / content gains it.
+const upcoming: Quest[] = [];
 
 const statusCopy: Record<string, string> = {
   active: '◆ Currently active',
@@ -34,27 +27,13 @@ const statusCopy: Record<string, string> = {
   archived: '✶ Archived',
 };
 
-const rarityOrder: Rarity[] = [
-  'artifact',
-  'legendary',
-  'epic',
-  'rare',
-  'uncommon',
-  'common',
-];
-
-const rarityCounts = rarityOrder.reduce<Record<Rarity, number>>(
-  (acc, r) => {
-    acc[r] = quests.filter((q) => q.data.rarity === r).length;
-    return acc;
-  },
-  {} as Record<Rarity, number>,
-);
+const themeEngineEntry = active.find((q) => q.slug === 'theme-engine');
+const otherActive = active.filter((q) => q.slug !== 'theme-engine');
 ---
 
 <BaseLayout
   title="Quest Log"
-  description="Every quest Joseph Baker has undertaken — shipped products, side builds, and the ongoing campaigns. Sorted by rarity."
+  description="Every quest Joseph Baker has undertaken — active campaigns, completed work, and upcoming adventures."
 >
   <!-- ======================================================
        INTRO — monument framing, matches /work
@@ -72,9 +51,9 @@ const rarityCounts = rarityOrder.reduce<Record<Rarity, number>>(
 
       <RevealOnScroll client:visible delayMs={200}>
         <p class="quest-sub">
-          Every build, every campaign, every side-quest. Sorted by
-          rarity — tap any entry to unroll the journal and read what
-          it cost, what it taught, and what it shipped.
+          Every build, every campaign, every side-quest. Tap any entry to
+          unroll the journal and read what it cost, what it taught, and
+          what it shipped.
         </p>
       </RevealOnScroll>
 
@@ -85,121 +64,62 @@ const rarityCounts = rarityOrder.reduce<Record<Rarity, number>>(
   </section>
 
   <!-- ======================================================
-       FILTER BAR — rarity chips, vanilla JS
+       ACTIVE QUEST — Theme Engine spotlight + any others
        ====================================================== -->
-  <section class="section section-y-sm">
+  <section class="section section-y-md quest-section" aria-label="Active quests">
     <RevealOnScroll client:visible>
-      <div
-        class="rarity-filter"
-        role="toolbar"
-        aria-label="Filter quests by rarity"
-      >
-        <button
-          type="button"
-          class="rarity-chip is-active"
-          data-rarity="all"
-          aria-pressed="true"
-        >
-          <span class="rarity-chip-label">All</span>
-          <span class="rarity-chip-count">{quests.length}</span>
-        </button>
-        {rarityOrder.map((r) =>
-          rarityCounts[r] > 0 ? (
-            <button
-              type="button"
-              class="rarity-chip"
-              data-rarity={r}
-              aria-pressed="false"
-              style={`--chip-color: var(--rarity-${r});`}
-            >
-              <span class="rarity-chip-dot" aria-hidden="true"></span>
-              <span class="rarity-chip-label">{r}</span>
-              <span class="rarity-chip-count">{rarityCounts[r]}</span>
-            </button>
-          ) : null
-        )}
+      <div class="quest-group-head">
+        <p class="section-eyebrow">Active Quest</p>
+        <h2 class="quest-group-h2">In the forge right now</h2>
       </div>
     </RevealOnScroll>
-  </section>
 
-  <!-- ======================================================
-       THEME ENGINE HERO BENTO
-       Feature card for the Bakerverse Theme Engine project with
-       a live ThemeSwitcherMini island embedded in the tile.
-       ====================================================== -->
-  {(() => {
-    const themeEngineEntry = quests.find((q) => q.slug === 'theme-engine');
-    if (!themeEngineEntry) return null;
-    return (
-      <section class="section section-y-md quest-section" aria-label="Featured: Theme Engine">
-        <RevealOnScroll client:visible>
-          <div class="quest-group-head">
-            <p class="section-eyebrow">Spotlight</p>
-            <h2 class="quest-group-h2">Theme Engine</h2>
-          </div>
-        </RevealOnScroll>
-
-        <RevealOnScroll client:visible delayMs={80}>
-          <div class="bento-hero">
-            <div class="bento-hero__content">
-              <div class="bento-hero__head">
-                <span
-                  class="bento-hero__rarity"
-                  style="color: var(--rarity-epic);"
-                >
-                  Epic · {themeEngineEntry.data.year}
-                </span>
-                <span class="bento-hero__status">◆ Currently active</span>
-              </div>
-
-              <h3 class="bento-hero__title">{themeEngineEntry.data.title}</h3>
-              <p class="bento-hero__tagline">{themeEngineEntry.data.tagline}</p>
-              <p class="bento-hero__summary">{themeEngineEntry.data.summary}</p>
-
-              <div class="bento-hero__stack">
-                {themeEngineEntry.data.stack.map((tech: string) => (
-                  <StackBadge label={tech} />
-                ))}
-              </div>
-
-              <a href={`/projects/${themeEngineEntry.slug}`} class="bento-hero__cta">
-                Read the case study →
-              </a>
+    {themeEngineEntry && (
+      <RevealOnScroll client:visible delayMs={80}>
+        <div class="bento-hero">
+          <div class="bento-hero__content">
+            <div class="bento-hero__head">
+              <span
+                class="bento-hero__rarity"
+                style={`color: var(--rarity-${themeEngineEntry.data.rarity});`}
+              >
+                {themeEngineEntry.data.rarity} · {themeEngineEntry.data.year}
+              </span>
+              <span class="bento-hero__status">◆ Currently active</span>
             </div>
 
-            <div class="bento-hero__island">
-              <ThemeSwitcherMini client:visible />
-            </div>
-          </div>
-        </RevealOnScroll>
-      </section>
-    );
-  })()}
+            <h3 class="bento-hero__title">{themeEngineEntry.data.title}</h3>
+            <p class="bento-hero__tagline">{themeEngineEntry.data.tagline}</p>
+            <p class="bento-hero__summary">{themeEngineEntry.data.summary}</p>
 
-  <!-- ======================================================
-       FEATURED QUESTS
-       ====================================================== -->
-  {featured.length > 0 && (
-    <section class="section section-y-md quest-section">
-      <RevealOnScroll client:visible>
-        <div class="quest-group-head">
-          <p class="section-eyebrow">Featured</p>
-          <h2 class="quest-group-h2">Marquee quests</h2>
+            <div class="bento-hero__stack">
+              {themeEngineEntry.data.stack.map((tech: string) => (
+                <StackBadge label={tech} />
+              ))}
+            </div>
+
+            <a href={`/projects/${themeEngineEntry.slug}`} class="bento-hero__cta">
+              Read the case study →
+            </a>
+          </div>
+
+          <div class="bento-hero__island">
+            <ThemeSwitcherMini client:visible />
+          </div>
         </div>
       </RevealOnScroll>
+    )}
 
-      <div class="quest-grid quest-grid--featured" data-quest-grid>
-        {featured.map((quest, index) => (
+    {otherActive.length > 0 && (
+      <div class="quest-grid quest-grid--featured" style="margin-top: 1.5rem;">
+        {otherActive.map((quest, index) => (
           <RevealOnScroll client:visible delayMs={index * 100}>
             <TooltipCard
               href={`/projects/${quest.slug}`}
               rarity={quest.data.rarity}
               class="quest-card"
             >
-              <article
-                data-quest-card
-                data-rarity={quest.data.rarity}
-              >
+              <article data-rarity={quest.data.rarity}>
                 <div class="quest-card-head">
                   <span class="quest-rarity">{quest.data.rarity}</span>
                   <span class="quest-year">{quest.data.year}</span>
@@ -222,37 +142,38 @@ const rarityCounts = rarityOrder.reduce<Record<Rarity, number>>(
           </RevealOnScroll>
         ))}
       </div>
-    </section>
-  )}
+    )}
+
+    {!themeEngineEntry && otherActive.length === 0 && (
+      <RevealOnScroll client:visible delayMs={80}>
+        <p class="quest-empty-state">
+          No active quests right now. The forge is quiet — for the moment.
+        </p>
+      </RevealOnScroll>
+    )}
+  </section>
 
   <!-- ======================================================
-       ALL QUESTS
+       COMPLETED QUESTS
        ====================================================== -->
-  {rest.length > 0 && (
-    <section class="section section-y-md quest-section">
-      <RevealOnScroll client:visible>
-        <div class="quest-group-head">
-          <p class="section-eyebrow">The Full Log</p>
-          <h2 class="quest-group-h2">Every quest on the books</h2>
-          <p class="quest-group-sub">
-            Sorted by rarity, then by order. Use the filter above to
-            narrow by tier.
-          </p>
-        </div>
-      </RevealOnScroll>
+  <section class="section section-y-md quest-section" aria-label="Completed quests">
+    <RevealOnScroll client:visible>
+      <div class="quest-group-head">
+        <p class="section-eyebrow">Completed</p>
+        <h2 class="quest-group-h2">Quests on the books</h2>
+      </div>
+    </RevealOnScroll>
 
-      <div class="quest-grid" data-quest-grid>
-        {rest.map((quest, index) => (
+    {completed.length > 0 ? (
+      <div class="quest-grid">
+        {completed.map((quest, index) => (
           <RevealOnScroll client:visible delayMs={index * 60}>
             <TooltipCard
               href={`/projects/${quest.slug}`}
               rarity={quest.data.rarity}
               class="quest-card"
             >
-              <article
-                data-quest-card
-                data-rarity={quest.data.rarity}
-              >
+              <article data-rarity={quest.data.rarity}>
                 <div class="quest-card-head">
                   <span class="quest-rarity">{quest.data.rarity}</span>
                   <span class="quest-year">{quest.data.year}</span>
@@ -275,43 +196,63 @@ const rarityCounts = rarityOrder.reduce<Record<Rarity, number>>(
           </RevealOnScroll>
         ))}
       </div>
+    ) : (
+      <RevealOnScroll client:visible delayMs={80}>
+        <p class="quest-empty-state">
+          No completed quests yet. The first will appear here the moment it
+          ships.
+        </p>
+      </RevealOnScroll>
+    )}
+  </section>
 
-      <p class="quest-empty" data-quest-empty hidden>
-        No quests at this rarity tier. Try another filter.
-      </p>
-    </section>
-  )}
+  <!-- ======================================================
+       UPCOMING QUESTS
+       ====================================================== -->
+  <section class="section section-y-md quest-section" aria-label="Upcoming quests">
+    <RevealOnScroll client:visible>
+      <div class="quest-group-head">
+        <p class="section-eyebrow">Upcoming</p>
+        <h2 class="quest-group-h2">Next on the campaign roll</h2>
+      </div>
+    </RevealOnScroll>
+
+    {upcoming.length > 0 ? (
+      <div class="quest-grid">
+        {upcoming.map((quest, index) => (
+          <RevealOnScroll client:visible delayMs={index * 60}>
+            <TooltipCard
+              href={`/projects/${quest.slug}`}
+              rarity={quest.data.rarity}
+              class="quest-card"
+            >
+              <article data-rarity={quest.data.rarity}>
+                <div class="quest-card-head">
+                  <span class="quest-rarity">{quest.data.rarity}</span>
+                  <span class="quest-year">{quest.data.year}</span>
+                </div>
+                <h3 class="quest-title">{quest.data.title}</h3>
+                <p class="quest-tagline">{quest.data.tagline}</p>
+                <div class="quest-stack">
+                  {quest.data.stack.slice(0, 4).map((tech) => (
+                    <StackBadge label={tech} />
+                  ))}
+                </div>
+              </article>
+            </TooltipCard>
+          </RevealOnScroll>
+        ))}
+      </div>
+    ) : (
+      <RevealOnScroll client:visible delayMs={80}>
+        <p class="quest-empty-state">
+          No current upcoming quests. The next adventure hasn't been
+          scrolled yet — check back soon.
+        </p>
+      </RevealOnScroll>
+    )}
+  </section>
 </BaseLayout>
-
-<script>
-  const chips = document.querySelectorAll<HTMLButtonElement>('.rarity-chip');
-  const cards = document.querySelectorAll<HTMLElement>('[data-quest-card]');
-  const empty = document.querySelector<HTMLElement>('[data-quest-empty]');
-
-  function applyFilter(rarity: string) {
-    let visible = 0;
-    cards.forEach((card) => {
-      const cardRarity = card.dataset.rarity ?? '';
-      const match = rarity === 'all' || cardRarity === rarity;
-      const wrapper = card.closest<HTMLElement>('.tooltip-card');
-      if (wrapper) wrapper.hidden = !match;
-      if (match) visible += 1;
-    });
-    if (empty) empty.hidden = visible > 0;
-  }
-
-  chips.forEach((chip) => {
-    chip.addEventListener('click', () => {
-      chips.forEach((c) => {
-        c.classList.remove('is-active');
-        c.setAttribute('aria-pressed', 'false');
-      });
-      chip.classList.add('is-active');
-      chip.setAttribute('aria-pressed', 'true');
-      applyFilter(chip.dataset.rarity ?? 'all');
-    });
-  });
-</script>
 
 <style>
   .quest-intro {
@@ -393,71 +334,6 @@ const rarityCounts = rarityOrder.reduce<Record<Rarity, number>>(
     opacity: 0.75;
   }
 
-  .rarity-filter {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-    max-width: 1100px;
-    margin: 0 auto;
-  }
-
-  .rarity-chip {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.5rem 0.9rem;
-    background: rgba(29, 26, 38, 0.6);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: var(--radius-pill);
-    color: var(--ink-300);
-    font-family: var(--font-mono, ui-monospace, monospace);
-    font-size: 0.75rem;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    cursor: pointer;
-    transition: border-color 180ms ease, color 180ms ease,
-      background 180ms ease, transform 180ms ease;
-  }
-
-  .rarity-chip:hover {
-    border-color: var(--chip-color, var(--gold-400));
-    color: var(--ink-100);
-    transform: translateY(-1px);
-  }
-
-  .rarity-chip:focus-visible {
-    outline: 2px solid var(--chip-color, var(--gold-400));
-    outline-offset: 2px;
-  }
-
-  .rarity-chip.is-active {
-    border-color: var(--chip-color, var(--gold-400));
-    color: var(--ink-100);
-    background: rgba(29, 26, 38, 0.95);
-    box-shadow: 0 0 0 1px var(--chip-color, var(--gold-400)) inset;
-  }
-
-  .rarity-chip-dot {
-    width: 0.5rem;
-    height: 0.5rem;
-    border-radius: 50%;
-    background: var(--chip-color, var(--gold-400));
-    box-shadow: 0 0 6px var(--chip-color, var(--gold-400));
-  }
-
-  .rarity-chip-count {
-    color: var(--ink-500);
-    font-size: 0.7rem;
-    padding: 0.1rem 0.4rem;
-    background: rgba(255, 255, 255, 0.04);
-    border-radius: var(--radius-pill);
-  }
-
-  .rarity-chip.is-active .rarity-chip-count {
-    color: var(--ink-300);
-    background: rgba(255, 255, 255, 0.08);
-  }
-
   .quest-section {
     max-width: 1100px;
     margin: 0 auto;
@@ -471,14 +347,6 @@ const rarityCounts = rarityOrder.reduce<Record<Rarity, number>>(
     font-size: clamp(1.75rem, 3.2vw, 2.5rem);
     margin: 0.5rem 0 0.75rem;
     line-height: 1.15;
-  }
-
-  .quest-group-sub {
-    color: var(--ink-500);
-    font-size: 0.97rem;
-    line-height: 1.6;
-    max-width: 42rem;
-    margin: 0;
   }
 
   .quest-grid {
@@ -567,11 +435,17 @@ const rarityCounts = rarityOrder.reduce<Record<Rarity, number>>(
     transform: translateX(2px);
   }
 
-  .quest-empty {
+  /* Empty-state copy for sections with no quests yet. */
+  .quest-empty-state {
     color: var(--ink-500);
     font-style: italic;
-    text-align: center;
-    padding: 2rem;
+    line-height: 1.6;
+    padding: 1.5rem 1.5rem;
+    max-width: 52ch;
+    border: 1px dashed rgba(255, 255, 255, 0.08);
+    border-radius: 0.375rem;
+    background: rgba(29, 26, 38, 0.35);
+    margin: 0;
   }
 
   /* ── Theme Engine bento hero ──────────────────── */
