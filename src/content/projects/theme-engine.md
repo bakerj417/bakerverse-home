@@ -3,7 +3,7 @@ title: "Bakerverse Theme Engine"
 tagline: "Runtime design-system theming: 5 themes, WCAG AA validated, zero flash."
 rarity: epic
 year: 2026
-status: active
+status: shipped
 stack:
   - TypeScript
   - Astro 4
