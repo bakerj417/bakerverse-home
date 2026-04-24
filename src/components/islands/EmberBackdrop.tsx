@@ -1,9 +1,29 @@
 import { useEffect, useRef } from 'react';
 
+function hexToRgb(hex: string): { r: number; g: number; b: number } | null {
+  const clean = hex.trim().replace('#', '');
+  if (clean.length === 6) {
+    return {
+      r: parseInt(clean.slice(0, 2), 16),
+      g: parseInt(clean.slice(2, 4), 16),
+      b: parseInt(clean.slice(4, 6), 16),
+    };
+  }
+  if (clean.length === 3) {
+    return {
+      r: parseInt(clean[0] + clean[0], 16),
+      g: parseInt(clean[1] + clean[1], 16),
+      b: parseInt(clean[2] + clean[2], 16),
+    };
+  }
+  return null;
+}
+
 /**
  * EmberBackdrop — pure canvas 2D background with gently rising
- * gold embers. Cheap on battery (no WebGL), obeys
- * prefers-reduced-motion, cleans up on route change.
+ * embers that inherit their color from --gold-400 (theme-aware).
+ * Cheap on battery (no WebGL), obeys prefers-reduced-motion,
+ * cleans up on route change.
  */
 export default function EmberBackdrop({
   density = 45,
@@ -40,6 +60,28 @@ export default function EmberBackdrop({
     resize();
     window.addEventListener('resize', resize);
 
+    // --- theme-aware accent color ---
+    let accent = { r: 240, g: 185, b: 11 }; // diablo gold fallback
+
+    const readAccent = () => {
+      const raw = getComputedStyle(document.documentElement)
+        .getPropertyValue('--gold-400')
+        .trim();
+      const parsed = hexToRgb(raw);
+      if (parsed) accent = parsed;
+    };
+
+    readAccent();
+
+    // Theme engine updates <style id="bakerverse-theme"> on every switch
+    const themeEl = document.getElementById('bakerverse-theme');
+    let observer: MutationObserver | null = null;
+    if (themeEl) {
+      observer = new MutationObserver(readAccent);
+      observer.observe(themeEl, { characterData: true, childList: true, subtree: true });
+    }
+
+    // --- ember state ---
     type Ember = {
       x: number;
       y: number;
@@ -77,6 +119,13 @@ export default function EmberBackdrop({
       ctx.clearRect(0, 0, width, height);
       ctx.globalCompositeOperation = 'lighter';
 
+      // Read live each frame so theme changes take effect immediately
+      const { r, g, b } = accent;
+      // Lightened version for the bright core dot
+      const lr = Math.min(255, Math.round(r + (255 - r) * 0.45));
+      const lg = Math.min(255, Math.round(g + (255 - g) * 0.45));
+      const lb = Math.min(255, Math.round(b + (255 - b) * 0.45));
+
       for (let i = 0; i < embers.length; i++) {
         const e = embers[i];
         e.x += e.vx;
@@ -100,15 +149,15 @@ export default function EmberBackdrop({
 
         ctx.beginPath();
         const gradient = ctx.createRadialGradient(e.x, e.y, 0, e.x, e.y, e.r * 4);
-        gradient.addColorStop(0, `rgba(255, 217, 104, ${alpha})`);
-        gradient.addColorStop(0.4, `rgba(240, 185, 11, ${alpha * 0.6})`);
-        gradient.addColorStop(1, 'rgba(240, 185, 11, 0)');
+        gradient.addColorStop(0, `rgba(${lr}, ${lg}, ${lb}, ${alpha})`);
+        gradient.addColorStop(0.4, `rgba(${r}, ${g}, ${b}, ${alpha * 0.6})`);
+        gradient.addColorStop(1, `rgba(${r}, ${g}, ${b}, 0)`);
         ctx.fillStyle = gradient;
         ctx.arc(e.x, e.y, e.r * 4, 0, Math.PI * 2);
         ctx.fill();
 
         ctx.beginPath();
-        ctx.fillStyle = `rgba(255, 237, 176, ${alpha})`;
+        ctx.fillStyle = `rgba(${lr}, ${lg}, ${lb}, ${alpha})`;
         ctx.arc(e.x, e.y, e.r, 0, Math.PI * 2);
         ctx.fill();
       }
@@ -121,6 +170,7 @@ export default function EmberBackdrop({
     return () => {
       cancelAnimationFrame(rafId);
       window.removeEventListener('resize', resize);
+      observer?.disconnect();
     };
   }, [density, opacity]);
 

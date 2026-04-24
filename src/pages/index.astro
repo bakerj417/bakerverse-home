@@ -29,8 +29,8 @@ const projects = (await getCollection('projects'))
         <svg viewBox="0 0 400 400" fill="none">
           <defs>
             <linearGradient id="goldGrad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stop-color="#ffd968" stop-opacity="0.9" />
-              <stop offset="100%" stop-color="#8a6208" stop-opacity="0.3" />
+              <stop offset="0%" style="stop-color: var(--gold-200)" stop-opacity="0.9" />
+              <stop offset="100%" style="stop-color: var(--gold-600)" stop-opacity="0.3" />
             </linearGradient>
           </defs>
           <!-- outer ring -->
@@ -236,7 +236,7 @@ const projects = (await getCollection('projects'))
     inset: 0;
     z-index: -1;
     background:
-      radial-gradient(ellipse at center, rgba(240, 185, 11, 0.1) 0%, transparent 50%),
+      radial-gradient(ellipse at center, color-mix(in srgb, var(--gold-400) 10%, transparent) 0%, transparent 50%),
       radial-gradient(ellipse at 80% 20%, rgba(164, 30, 34, 0.06) 0%, transparent 40%);
   }
 
@@ -289,7 +289,7 @@ const projects = (await getCollection('projects'))
     background-clip: text;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    filter: drop-shadow(0 0 24px rgba(240, 185, 11, 0.35));
+    filter: drop-shadow(0 0 24px color-mix(in srgb, var(--gold-400) 35%, transparent));
   }
 
   .hero-role {
@@ -529,12 +529,12 @@ const projects = (await getCollection('projects'))
     background: linear-gradient(
       90deg,
       transparent 0%,
-      rgba(240, 185, 11, 0.3) 15%,
-      rgba(255, 237, 176, 0.65) 50%,
-      rgba(240, 185, 11, 0.3) 85%,
+      color-mix(in srgb, var(--gold-400) 30%, transparent) 15%,
+      color-mix(in srgb, var(--gold-200) 65%, transparent) 50%,
+      color-mix(in srgb, var(--gold-400) 30%, transparent) 85%,
       transparent 100%
     );
-    box-shadow: 0 0 20px 6px rgba(240, 185, 11, 0.18);
+    box-shadow: 0 0 20px 6px color-mix(in srgb, var(--gold-400) 18%, transparent);
   }
 
   .hero-forge-floor::after {
@@ -546,8 +546,8 @@ const projects = (await getCollection('projects'))
     height: 140px;
     background: radial-gradient(
       ellipse at 50% 100%,
-      rgba(240, 185, 11, 0.09) 0%,
-      rgba(240, 185, 11, 0.03) 50%,
+      color-mix(in srgb, var(--gold-400) 9%, transparent) 0%,
+      color-mix(in srgb, var(--gold-400) 3%, transparent) 50%,
       transparent 70%
     );
   }

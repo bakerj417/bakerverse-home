@@ -40,7 +40,7 @@
     min-height: 100vh;
     overflow-x: clip;
     background:
-      radial-gradient(ellipse at top, rgba(240, 185, 11, 0.06) 0%, transparent 55%),
+      radial-gradient(ellipse at top, color-mix(in srgb, var(--gold-400) 6%, transparent) 0%, transparent 55%),
       radial-gradient(ellipse at bottom, rgba(164, 30, 34, 0.04) 0%, transparent 60%),
       var(--bg-night);
     background-attachment: fixed;
