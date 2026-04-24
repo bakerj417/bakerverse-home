@@ -19,43 +19,47 @@ import { characterSheet, site } from '@/data/site';
         <span class="monument-rune">✦</span>
       </div>
 
-      <RevealOnScroll client:visible>
-        <p class="section-eyebrow">Codex · Who</p>
-        <h1 class="about-h1 about-h1--carved">The story so far</h1>
-      </RevealOnScroll>
+      <div class="about-body">
+        <RevealOnScroll client:visible>
+          <div class="about-heading-col">
+            <p class="section-eyebrow">Codex · Who</p>
+            <h1 class="about-h1 about-h1--carved">The story so far</h1>
+          </div>
+        </RevealOnScroll>
 
-      <RevealOnScroll client:visible delayMs={200}>
-        <div class="about-narrative">
-          <p>
-            I'm Joseph — though most of the internet knows me as JB. Full-stack
-            engineer, fifteen years into the craft, currently writing React
-            Native and Expo for a living and weaving a personal ecosystem of
-            tools and services I've started calling <em>the Bakerverse</em>.
-          </p>
-          <p>
-            I build because it's the part of software that doesn't stop
-            being fun. The stuff I love most is what makes life a little
-            lighter for the people around me — a small service that lets
-            friends request what they need from me instead of texting, a
-            cron job that turns a recurring chore into something I never
-            have to think about, a setup at home that quietly runs small
-            utilities for family and friends.
-          </p>
-          <p>
-            Teaching is the other half of why I do this. I'd rather leave
-            a code review that makes the author a better engineer, write
-            documentation the next person can actually use, and have
-            one-on-ones where the other person walks out feeling more sure
-            of their work, not less.
-          </p>
-          <p>
-            Off the clock I'm usually heads-down on a side project,
-            raiding and running mythic+ in the current WoW season,
-            clearing a Diablo season, or 3D printing something on my
-            Bambu P2S. Based in Waxhaw, North Carolina.
-          </p>
-        </div>
-      </RevealOnScroll>
+        <RevealOnScroll client:visible delayMs={200}>
+          <div class="about-narrative">
+            <p>
+              I'm Joseph — though most of the internet knows me as JB. Full-stack
+              engineer, fifteen years into the craft, currently writing React
+              Native and Expo for a living and weaving a personal ecosystem of
+              tools and services I've started calling <em>the Bakerverse</em>.
+            </p>
+            <p>
+              I build because it's the part of software that doesn't stop
+              being fun. The stuff I love most is what makes life a little
+              lighter for the people around me — a small service that lets
+              friends request what they need from me instead of texting, a
+              cron job that turns a recurring chore into something I never
+              have to think about, a setup at home that quietly runs small
+              utilities for family and friends.
+            </p>
+            <p>
+              Teaching is the other half of why I do this. I'd rather leave
+              a code review that makes the author a better engineer, write
+              documentation the next person can actually use, and have
+              one-on-ones where the other person walks out feeling more sure
+              of their work, not less.
+            </p>
+            <p>
+              Off the clock I'm usually heads-down on a side project,
+              raiding and running mythic+ in the current WoW season,
+              clearing a Diablo season, or 3D printing something on my
+              Bambu P2S. Based in Waxhaw, North Carolina.
+            </p>
+          </div>
+        </RevealOnScroll>
+      </div>
 
       <div class="monument-frieze monument-frieze--bottom" aria-hidden="true">
         <span class="monument-rune">✦</span>
@@ -240,10 +244,35 @@ import { characterSheet, site } from '@/data/site';
 <style>
   .about-intro {}
 
+  /* Single column on mobile, two-column editorial grid on desktop */
+  .about-body {
+    display: grid;
+    gap: 2rem;
+  }
+
+  @media (min-width: 1024px) {
+    .about-body {
+      grid-template-columns: 1fr 1.15fr;
+      gap: 4rem;
+      align-items: start;
+    }
+
+    .about-heading-col {
+      position: sticky;
+      top: 6rem;
+    }
+  }
+
   .about-h1 {
     font-size: clamp(2.5rem, 6vw, 4.5rem);
     line-height: 1.05;
-    margin: 1rem 0 2rem;
+    margin: 1rem 0 0;
+  }
+
+  @media (min-width: 1024px) {
+    .about-h1 {
+      font-size: clamp(3rem, 4.5vw, 5.5rem);
+    }
   }
 
   /* -------- MONUMENT (stone-relief framing for intro) -------- */
@@ -316,7 +345,6 @@ import { characterSheet, site } from '@/data/site';
     font-size: 1.05rem;
     line-height: 1.8;
     color: var(--ink-300);
-    max-width: 42rem;
   }
 
   .about-narrative em {

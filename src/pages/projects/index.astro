@@ -75,7 +75,10 @@ const otherActive = active.slice(1);
 
     {featuredActive && (
       <RevealOnScroll client:visible delayMs={80}>
-        <div class={`bento-hero${featuredActive.slug !== 'theme-engine' ? ' bento-hero--no-island' : ''}`}>
+        <div
+          class={`bento-hero${featuredActive.slug !== 'theme-engine' ? ' bento-hero--no-island' : ''}`}
+          style={`--bento-color: var(--rarity-${featuredActive.data.rarity});`}
+        >
           <div class="bento-hero__content">
             <div class="bento-hero__head">
               <span
@@ -450,12 +453,12 @@ const otherActive = active.slice(1);
     gap: 1.5rem;
     padding: 1.75rem;
     border-radius: 0.5rem;
-    border: 1px solid rgba(163, 53, 238, 0.3);
+    border: 1px solid color-mix(in srgb, var(--bento-color) 30%, transparent);
     background:
-      radial-gradient(ellipse at top right, rgba(163, 53, 238, 0.07), transparent 60%),
+      radial-gradient(ellipse at top right, color-mix(in srgb, var(--bento-color) 7%, transparent), transparent 60%),
       linear-gradient(180deg, rgba(29, 26, 38, 0.8) 0%, rgba(13, 12, 20, 0.95) 100%);
     box-shadow:
-      0 0 0 1px rgba(163, 53, 238, 0.1) inset,
+      0 0 0 1px color-mix(in srgb, var(--bento-color) 10%, transparent) inset,
       0 8px 32px rgba(0, 0, 0, 0.4);
   }
 
@@ -498,7 +501,7 @@ const otherActive = active.slice(1);
   }
 
   .bento-hero__tagline {
-    color: var(--purple-300);
+    color: color-mix(in srgb, var(--bento-color) 80%, white);
     font-size: 1.05rem;
     line-height: 1.5;
     margin: 0 0 0.75rem;
@@ -523,9 +526,9 @@ const otherActive = active.slice(1);
   .bento-hero__cta {
     display: inline-block;
     padding: 0.5rem 1.25rem;
-    border: 1px solid rgba(163, 53, 238, 0.6);
+    border: 1px solid color-mix(in srgb, var(--bento-color) 60%, transparent);
     border-radius: 0.3rem;
-    color: var(--purple-300);
+    color: color-mix(in srgb, var(--bento-color) 80%, white);
     font-family: var(--font-display);
     font-size: 0.85rem;
     letter-spacing: 0.04em;
@@ -534,9 +537,9 @@ const otherActive = active.slice(1);
   }
 
   .bento-hero__cta:hover {
-    border-color: var(--purple-400);
-    color: var(--purple-200);
-    background: rgba(163, 53, 238, 0.1);
+    border-color: var(--bento-color);
+    color: color-mix(in srgb, var(--bento-color) 60%, white);
+    background: color-mix(in srgb, var(--bento-color) 10%, transparent);
   }
 
   .bento-hero__island {
