@@ -1,7 +1,7 @@
 ---
 title: "Hopp App — Demo Restoration"
 tagline: "Bringing a shipped, App Store–live rewards platform back as a fully interactive demo."
-rarity: epic
+rarity: legendary
 year: 2026
 status: upcoming
 stack:
