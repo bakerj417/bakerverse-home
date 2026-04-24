@@ -1,23 +1,20 @@
 ---
-import BaseLayout from '@/layouts/BaseLayout.astro';
-import TooltipCard from '@/components/ui/TooltipCard.astro';
-import StackBadge from '@/components/ui/StackBadge.astro';
-import EmberBackdrop from '@/components/islands/EmberBackdrop.tsx';
-import MagneticButton from '@/components/islands/MagneticButton.tsx';
-import RevealOnScroll from '@/components/islands/RevealOnScroll.tsx';
-import { characterSheet, site } from '@/data/site';
-import { getCollection } from 'astro:content';
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import TooltipCard from "@/components/ui/TooltipCard.astro";
+import StackBadge from "@/components/ui/StackBadge.astro";
+import EmberBackdrop from "@/components/islands/EmberBackdrop.tsx";
+import MagneticButton from "@/components/islands/MagneticButton.tsx";
+import RevealOnScroll from "@/components/islands/RevealOnScroll.tsx";
+import { characterSheet, site } from "@/data/site";
+import { getCollection } from "astro:content";
 
-const projects = (await getCollection('projects'))
+const projects = (await getCollection("projects"))
   .filter((p) => p.data.featured)
   .sort((a, b) => a.data.order - b.data.order)
   .slice(0, 3);
 ---
 
-<BaseLayout
-  title="Home"
-  description={site.description}
->
+<BaseLayout title="Home" description={site.description}>
   <!-- ======================================================
        HERO — the character-select entry
        ====================================================== -->
@@ -29,41 +26,70 @@ const projects = (await getCollection('projects'))
         <svg viewBox="0 0 400 400" fill="none">
           <defs>
             <linearGradient id="goldGrad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" style="stop-color: var(--gold-200)" stop-opacity="0.9" />
-              <stop offset="100%" style="stop-color: var(--gold-600)" stop-opacity="0.3" />
+              <stop
+                offset="0%"
+                style="stop-color: var(--gold-200)"
+                stop-opacity="0.9"></stop>
+              <stop
+                offset="100%"
+                style="stop-color: var(--gold-600)"
+                stop-opacity="0.3"></stop>
             </linearGradient>
           </defs>
           <!-- outer ring -->
-          <circle cx="200" cy="200" r="180" stroke="url(#goldGrad)" stroke-width="1" opacity="0.35" />
+          <circle
+            cx="200"
+            cy="200"
+            r="180"
+            stroke="url(#goldGrad)"
+            stroke-width="1"
+            opacity="0.35"></circle>
           <!-- middle ring with dashes -->
           <circle
-            cx="200" cy="200" r="150"
+            cx="200"
+            cy="200"
+            r="150"
             stroke="url(#goldGrad)"
             stroke-width="1"
             stroke-dasharray="2 8"
-            opacity="0.6"
-          />
+            opacity="0.6"></circle>
           <!-- inner hex -->
           <path
             d="M200 80 L290 130 L290 230 L200 280 L110 230 L110 130 Z"
             stroke="url(#goldGrad)"
             stroke-width="1.5"
             fill="none"
-            opacity="0.7"
-          />
+            opacity="0.7"></path>
           <!-- center monogram -->
           <text
-            x="200" y="220"
+            x="200"
+            y="220"
             text-anchor="middle"
             font-family="Cinzel, serif"
             font-size="82"
             font-weight="700"
             fill="url(#goldGrad)"
-            opacity="0.85"
-          >JB</text>
+            opacity="0.85">JB</text
+          >
           <!-- runic marks -->
-          <text x="200" y="50" text-anchor="middle" fill="url(#goldGrad)" font-family="Cinzel" font-size="12" letter-spacing="6">BAKERVERSE</text>
-          <text x="200" y="370" text-anchor="middle" fill="url(#goldGrad)" font-family="Cinzel" font-size="10" letter-spacing="5">EST · MMXXVI</text>
+          <text
+            x="200"
+            y="50"
+            text-anchor="middle"
+            fill="url(#goldGrad)"
+            font-family="Cinzel"
+            font-size="12"
+            letter-spacing="6">BAKERVERSE</text
+          >
+          <text
+            x="200"
+            y="370"
+            text-anchor="middle"
+            fill="url(#goldGrad)"
+            font-family="Cinzel"
+            font-size="10"
+            letter-spacing="5">EST · MMXXVI</text
+          >
         </svg>
       </div>
     </div>
@@ -77,9 +103,9 @@ const projects = (await getCollection('projects'))
         Full-stack engineer · 15 years in the craft · Builder of the Bakerverse.
       </p>
       <p class="hero-pitch">
-        I build React Native apps, design systems, and automation tools
-        — and I'm weaving them all into a personal ecosystem of
-        services I call the Bakerverse. Based in Waxhaw, North Carolina.
+        I build React Native apps, design systems, and automation tools — and
+        I'm weaving them all into a personal ecosystem of services I call the
+        Bakerverse. Based in Waxhaw, North Carolina.
       </p>
 
       <div class="hero-ctas">
@@ -104,12 +130,14 @@ const projects = (await getCollection('projects'))
 
       <!-- Compact stat block, live in the hero -->
       <div class="hero-stats">
-        {characterSheet.stats.map((stat) => (
-          <div class="hero-stat">
-            <dt>{stat.label}</dt>
-            <dd>{stat.value}</dd>
-          </div>
-        ))}
+        {
+          characterSheet.stats.map((stat) => (
+            <div class="hero-stat">
+              <dt>{stat.label}</dt>
+              <dd>{stat.value}</dd>
+            </div>
+          ))
+        }
       </div>
 
       <div class="hero-scroll-hint" aria-hidden="true">
@@ -142,35 +170,40 @@ const projects = (await getCollection('projects'))
     </RevealOnScroll>
 
     <div class="project-grid">
-      {projects.map((project, index) => (
-        <RevealOnScroll client:visible delayMs={index * 120}>
-          <TooltipCard
-            href={`/projects/${project.slug}`}
-            rarity={project.data.rarity}
-          >
-            <div class="project-card-head">
-              <span class="project-rarity">{project.data.rarity}</span>
-              <span class="project-year">{project.data.year}</span>
-            </div>
-            <h3 class="project-title">{project.data.title}</h3>
-            <p class="project-tagline">{project.data.tagline}</p>
-            <div class="project-stack">
-              {project.data.stack.slice(0, 4).map((tech) => (
-                <StackBadge label={tech} />
-              ))}
-            </div>
-            <div class="project-footer">
-              <span class="project-status" data-status={project.data.status}>
-                {project.data.status === 'active' ? '◆ Currently active' :
-                 project.data.status === 'shipped' ? '✔ Shipped' :
-                 project.data.status === 'wip' ? '⚒ In the forge' :
-                 '✶ Archived'}
-              </span>
-              <span class="project-cta">Open →</span>
-            </div>
-          </TooltipCard>
-        </RevealOnScroll>
-      ))}
+      {
+        projects.map((project, index) => (
+          <RevealOnScroll client:visible delayMs={index * 120}>
+            <TooltipCard
+              href={`/projects/${project.slug}`}
+              rarity={project.data.rarity}
+            >
+              <div class="project-card-head">
+                <span class="project-rarity">{project.data.rarity}</span>
+                <span class="project-year">{project.data.year}</span>
+              </div>
+              <h3 class="project-title">{project.data.title}</h3>
+              <p class="project-tagline">{project.data.tagline}</p>
+              <div class="project-stack">
+                {project.data.stack.slice(0, 4).map((tech) => (
+                  <StackBadge label={tech} />
+                ))}
+              </div>
+              <div class="project-footer">
+                <span class="project-status" data-status={project.data.status}>
+                  {project.data.status === "active"
+                    ? "◆ Currently active"
+                    : project.data.status === "shipped"
+                      ? "✔ Shipped"
+                      : project.data.status === "wip"
+                        ? "⚒ In the forge"
+                        : "✶ Archived"}
+                </span>
+                <span class="project-cta">Open →</span>
+              </div>
+            </TooltipCard>
+          </RevealOnScroll>
+        ))
+      }
     </div>
   </section>
 
@@ -184,10 +217,10 @@ const projects = (await getCollection('projects'))
           <p class="section-eyebrow">The Wider Realm</p>
           <h2 class="section-title">Enter the Bakerverse</h2>
           <p class="bakerverse-copy">
-            Beyond this site lives a growing network of tools and services
-            I've built for myself, my family, and anyone who needs them —
-            from a fully automated media stack on my NAS to side-projects
-            that scratch small itches the world hasn't solved yet.
+            Beyond this site lives a growing network of tools and services I've
+            built for myself, my family, and anyone who needs them — from a
+            fully automated media stack on my NAS to side-projects that scratch
+            small itches the world hasn't solved yet.
           </p>
           <div class="hero-ctas">
             <MagneticButton
@@ -202,16 +235,34 @@ const projects = (await getCollection('projects'))
         </div>
         <div class="bakerverse-teaser-decor" aria-hidden="true">
           <svg viewBox="0 0 200 200" fill="none">
-            <circle cx="100" cy="100" r="70" stroke="#d99e0b" stroke-width="1" opacity="0.3" />
-            <circle cx="100" cy="100" r="50" stroke="#d99e0b" stroke-width="1" opacity="0.5" />
-            <circle cx="100" cy="100" r="30" stroke="#d99e0b" stroke-width="1" opacity="0.7" />
-            <circle cx="100" cy="100" r="3" fill="#ffd968" />
+            <circle
+              cx="100"
+              cy="100"
+              r="70"
+              stroke="#d99e0b"
+              stroke-width="1"
+              opacity="0.3"></circle>
+            <circle
+              cx="100"
+              cy="100"
+              r="50"
+              stroke="#d99e0b"
+              stroke-width="1"
+              opacity="0.5"></circle>
+            <circle
+              cx="100"
+              cy="100"
+              r="30"
+              stroke="#d99e0b"
+              stroke-width="1"
+              opacity="0.7"></circle>
+            <circle cx="100" cy="100" r="3" fill="#ffd968"></circle>
             <!-- satellite dots -->
-            <circle cx="170" cy="100" r="4" fill="#f0b90b" />
-            <circle cx="100" cy="30" r="3" fill="#a335ee" />
-            <circle cx="30" cy="100" r="3" fill="#0070dd" />
-            <circle cx="100" cy="170" r="3" fill="#ff8000" />
-            <circle cx="150" cy="150" r="2" fill="#1eff00" />
+            <circle cx="170" cy="100" r="4" fill="#f0b90b"></circle>
+            <circle cx="100" cy="30" r="3" fill="#a335ee"></circle>
+            <circle cx="30" cy="100" r="3" fill="#0070dd"></circle>
+            <circle cx="100" cy="170" r="3" fill="#ff8000"></circle>
+            <circle cx="150" cy="150" r="2" fill="#1eff00"></circle>
           </svg>
         </div>
       </div>
@@ -236,8 +287,16 @@ const projects = (await getCollection('projects'))
     inset: 0;
     z-index: -1;
     background:
-      radial-gradient(ellipse at center, color-mix(in srgb, var(--gold-400) 10%, transparent) 0%, transparent 50%),
-      radial-gradient(ellipse at 80% 20%, rgba(164, 30, 34, 0.06) 0%, transparent 40%);
+      radial-gradient(
+        ellipse at center,
+        color-mix(in srgb, var(--gold-400) 10%, transparent) 0%,
+        transparent 50%
+      ),
+      radial-gradient(
+        ellipse at 80% 20%,
+        rgba(164, 30, 34, 0.06) 0%,
+        transparent 40%
+      );
   }
 
   .hero-sigil {
@@ -285,11 +344,18 @@ const projects = (await getCollection('projects'))
   }
 
   .hero-name-accent {
-    background: linear-gradient(180deg, var(--gold-200) 0%, var(--gold-400) 70%, var(--gold-600) 100%);
+    background: linear-gradient(
+      180deg,
+      var(--gold-200) 0%,
+      var(--gold-400) 70%,
+      var(--gold-600) 100%
+    );
     background-clip: text;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    filter: drop-shadow(0 0 24px color-mix(in srgb, var(--gold-400) 35%, transparent));
+    filter: drop-shadow(
+      0 0 24px color-mix(in srgb, var(--gold-400) 35%, transparent)
+    );
   }
 
   .hero-role {
@@ -353,7 +419,7 @@ const projects = (await getCollection('projects'))
 
   .hero-scroll-hint {
     position: absolute;
-    bottom: 1.5rem;
+    bottom: -0.5rem;
     left: 50%;
     transform: translateX(-50%);
     display: flex;
@@ -477,7 +543,11 @@ const projects = (await getCollection('projects'))
     align-items: center;
     padding: 3rem 2rem;
     background:
-      radial-gradient(ellipse at 80% 50%, rgba(240, 185, 11, 0.08) 0%, transparent 55%),
+      radial-gradient(
+        ellipse at 80% 50%,
+        rgba(240, 185, 11, 0.08) 0%,
+        transparent 55%
+      ),
       linear-gradient(135deg, rgba(29, 26, 38, 0.7), rgba(13, 12, 20, 0.7));
     border: 1px solid rgba(240, 185, 11, 0.15);
     border-radius: 2px;
@@ -520,7 +590,7 @@ const projects = (await getCollection('projects'))
   }
 
   .hero-forge-floor::before {
-    content: '';
+    content: "";
     position: absolute;
     bottom: 0;
     left: 8%;
@@ -534,11 +604,12 @@ const projects = (await getCollection('projects'))
       color-mix(in srgb, var(--gold-400) 30%, transparent) 85%,
       transparent 100%
     );
-    box-shadow: 0 0 20px 6px color-mix(in srgb, var(--gold-400) 18%, transparent);
+    box-shadow: 0 0 20px 6px
+      color-mix(in srgb, var(--gold-400) 18%, transparent);
   }
 
   .hero-forge-floor::after {
-    content: '';
+    content: "";
     position: absolute;
     bottom: 0;
     left: 10%;
