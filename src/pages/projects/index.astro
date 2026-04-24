@@ -16,15 +16,14 @@ const active = quests.filter(
   (q) => q.data.status === 'active' || q.data.status === 'wip',
 );
 const completed = quests.filter((q) => q.data.status === 'shipped');
-// 'upcoming' is not a status in the schema yet — kept as an empty-state
-// slot the page can fill later when the schema / content gains it.
-const upcoming: Quest[] = [];
+const upcoming = quests.filter((q) => q.data.status === 'upcoming');
 
 const statusCopy: Record<string, string> = {
   active: '◆ Currently active',
   shipped: '✔ Shipped',
   wip: '⚒ In the forge',
   archived: '✶ Archived',
+  upcoming: '☽ Next on the roll',
 };
 
 const themeEngineEntry = active.find((q) => q.slug === 'theme-engine');

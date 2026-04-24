@@ -118,6 +118,37 @@ a missing property is a compile error before it ever reaches the browser.
 and the serialize tests give confidence that share links and exported files
 are always valid. Running `pnpm test` takes under two seconds.
 
+## Five themes, one site
+
+Every screenshot below is the same `/` hero rendered under a different
+theme — zero component code changes, only the `:root` custom-property
+values swap.
+
+### Diablo — the default
+
+![Diablo theme — desktop](/images/themes/diablo-desktop.webp)
+![Diablo theme — mobile](/images/themes/diablo-mobile.webp)
+
+### Arcane — starlight spellwork
+
+![Arcane theme — desktop](/images/themes/arcane-desktop.webp)
+![Arcane theme — mobile](/images/themes/arcane-mobile.webp)
+
+### Infernal — hellfire ember
+
+![Infernal theme — desktop](/images/themes/infernal-desktop.webp)
+![Infernal theme — mobile](/images/themes/infernal-mobile.webp)
+
+### Celestial — moonlit vault
+
+![Celestial theme — desktop](/images/themes/celestial-desktop.webp)
+![Celestial theme — mobile](/images/themes/celestial-mobile.webp)
+
+### Terminal — hacker green
+
+![Terminal theme — desktop](/images/themes/terminal-desktop.webp)
+![Terminal theme — mobile](/images/themes/terminal-mobile.webp)
+
 ## The outcome
 
 Five fully distinct visual identities ship on josephkbaker.com with:
