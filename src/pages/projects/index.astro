@@ -26,8 +26,8 @@ const statusCopy: Record<string, string> = {
   upcoming: '☽ Next on the roll',
 };
 
-const themeEngineEntry = active.find((q) => q.slug === 'theme-engine');
-const otherActive = active.filter((q) => q.slug !== 'theme-engine');
+const featuredActive = active[0];
+const otherActive = active.slice(1);
 ---
 
 <BaseLayout
@@ -73,38 +73,40 @@ const otherActive = active.filter((q) => q.slug !== 'theme-engine');
       </div>
     </RevealOnScroll>
 
-    {themeEngineEntry && (
+    {featuredActive && (
       <RevealOnScroll client:visible delayMs={80}>
-        <div class="bento-hero">
+        <div class={`bento-hero${featuredActive.slug !== 'theme-engine' ? ' bento-hero--no-island' : ''}`}>
           <div class="bento-hero__content">
             <div class="bento-hero__head">
               <span
                 class="bento-hero__rarity"
-                style={`color: var(--rarity-${themeEngineEntry.data.rarity});`}
+                style={`color: var(--rarity-${featuredActive.data.rarity});`}
               >
-                {themeEngineEntry.data.rarity} · {themeEngineEntry.data.year}
+                {featuredActive.data.rarity} · {featuredActive.data.year}
               </span>
               <span class="bento-hero__status">◆ Currently active</span>
             </div>
 
-            <h3 class="bento-hero__title">{themeEngineEntry.data.title}</h3>
-            <p class="bento-hero__tagline">{themeEngineEntry.data.tagline}</p>
-            <p class="bento-hero__summary">{themeEngineEntry.data.summary}</p>
+            <h3 class="bento-hero__title">{featuredActive.data.title}</h3>
+            <p class="bento-hero__tagline">{featuredActive.data.tagline}</p>
+            <p class="bento-hero__summary">{featuredActive.data.summary}</p>
 
             <div class="bento-hero__stack">
-              {themeEngineEntry.data.stack.map((tech: string) => (
+              {featuredActive.data.stack.map((tech: string) => (
                 <StackBadge label={tech} />
               ))}
             </div>
 
-            <a href={`/projects/${themeEngineEntry.slug}`} class="bento-hero__cta">
+            <a href={`/projects/${featuredActive.slug}`} class="bento-hero__cta">
               Read the case study →
             </a>
           </div>
 
-          <div class="bento-hero__island">
-            <ThemeSwitcherMini client:visible />
-          </div>
+          {featuredActive.slug === 'theme-engine' && (
+            <div class="bento-hero__island">
+              <ThemeSwitcherMini client:visible />
+            </div>
+          )}
         </div>
       </RevealOnScroll>
     )}
@@ -143,7 +145,7 @@ const otherActive = active.filter((q) => q.slug !== 'theme-engine');
       </div>
     )}
 
-    {!themeEngineEntry && otherActive.length === 0 && (
+    {!featuredActive && otherActive.length === 0 && (
       <RevealOnScroll client:visible delayMs={80}>
         <p class="quest-empty-state">
           No active quests right now. The forge is quiet — for the moment.
@@ -461,6 +463,10 @@ const otherActive = active.filter((q) => q.slug !== 'theme-engine');
     .bento-hero {
       grid-template-columns: 1fr 340px;
       align-items: start;
+    }
+
+    .bento-hero--no-island {
+      grid-template-columns: 1fr;
     }
   }
 
