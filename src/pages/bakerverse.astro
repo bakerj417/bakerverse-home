@@ -486,4 +486,97 @@ const portals = [
     gap: 0.75rem;
     justify-content: center;
   }
+
+  /* ---------------------------------------------------------------
+     LARGE-SCREEN POLISH  ≥1024px
+     --------------------------------------------------------------- */
+  @media (min-width: 1024px) {
+    /* Center the monument hero content so friezes frame it properly */
+    .monument {
+      padding: 2.75rem 3rem 2.5rem;
+      text-align: center;
+      background:
+        radial-gradient(
+          ellipse at center top,
+          rgba(163, 53, 238, 0.12),
+          transparent 55%
+        ),
+        radial-gradient(
+          ellipse at center,
+          rgba(240, 185, 11, 0.05),
+          transparent 65%
+        ),
+        linear-gradient(
+          180deg,
+          rgba(29, 26, 38, 0.5) 0%,
+          rgba(13, 12, 20, 0) 100%
+        );
+    }
+
+    /* Mirror line on right side of eyebrow when centered */
+    .monument .section-eyebrow::after {
+      content: "";
+      display: inline-block;
+      width: 28px;
+      height: 1px;
+      background: linear-gradient(90deg, var(--gold-400), transparent);
+    }
+
+    .realm-h1 {
+      font-size: clamp(4rem, 5.5vw, 6.5rem);
+      margin: 1.25rem auto 2.25rem;
+    }
+
+    /* Sub paragraph: center the block, keep text left for readability */
+    .realm-sub {
+      max-width: 52rem;
+      margin: 0 auto;
+      text-align: left;
+      font-size: 1.1rem;
+      line-height: 1.75;
+    }
+
+    .realm-portals-head {
+      text-align: center;
+    }
+
+    .realm-portals-sub {
+      margin: 0 auto;
+    }
+
+    /* Lock to 3 columns so cards stay wide and readable */
+    .portal-grid {
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.25rem;
+    }
+
+    .portal {
+      padding: 1.75rem 1.5rem 1.5rem;
+    }
+
+    .realm-footer-cta {
+      padding: 2.5rem 3rem;
+    }
+
+    .realm-footer-cta p {
+      font-size: 1.05rem;
+    }
+  }
+
+  /* ---------------------------------------------------------------
+     EXTRA LARGE  ≥1280px
+     --------------------------------------------------------------- */
+  @media (min-width: 1280px) {
+    .realm-h1 {
+      font-size: clamp(5rem, 5vw, 7rem);
+    }
+
+    .portal-name {
+      font-size: 1.2rem;
+    }
+
+    .portal-teaser {
+      font-size: 0.95rem;
+    }
+  }
 </style>
