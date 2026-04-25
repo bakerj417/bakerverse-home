@@ -17,7 +17,7 @@ const projects = defineCollection({
     rarity: rarity.default('rare'),
     year: z.number(),
     status: z
-      .enum(['shipped', 'active', 'archived', 'wip', 'upcoming'])
+      .enum(['shipped', 'active', 'archived', 'wip', 'upcoming', 'paused'])
       .default('shipped'),
     stack: z.array(z.string()).default([]),
     repoUrl: z.string().url().optional(),

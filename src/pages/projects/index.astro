@@ -13,7 +13,7 @@ const quests = (await getCollection('projects')).sort(
 );
 
 const active = quests.filter(
-  (q) => q.data.status === 'active' || q.data.status === 'wip',
+  (q) => q.data.status === 'active' || q.data.status === 'wip' || q.data.status === 'paused',
 );
 const completed = quests.filter((q) => q.data.status === 'shipped');
 const upcoming = quests.filter((q) => q.data.status === 'upcoming');
@@ -24,6 +24,7 @@ const statusCopy: Record<string, string> = {
   wip: '⚒ In the forge',
   archived: '✶ Archived',
   upcoming: '☽ Next on the roll',
+  paused: '⏸ On hold',
 };
 
 const featuredActive = active[0];
@@ -423,6 +424,10 @@ const otherActive = active.slice(1);
 
   .quest-status[data-status='wip'] {
     color: var(--gold-300);
+  }
+
+  .quest-status[data-status='paused'] {
+    color: var(--ink-400);
   }
 
   .quest-cta {
