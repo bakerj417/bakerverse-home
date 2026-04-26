@@ -1,5 +1,5 @@
 import type { APIRoute } from 'astro';
-import { Resend } from 'resend';
+import nodemailer from 'nodemailer';
 
 // This route runs on Vercel serverless at request time, not at build.
 export const prerender = false;
@@ -97,11 +97,12 @@ function validate(payload: Partial<ContactPayload>): Result {
 }
 
 export const POST: APIRoute = async ({ request, clientAddress }) => {
-  const resendKey = import.meta.env.RESEND_API_KEY;
+  const gmailUser = import.meta.env.GMAIL_USER;
+  const gmailAppPassword = import.meta.env.GMAIL_APP_PASSWORD;
   const toEmail = import.meta.env.CONTACT_TO_EMAIL;
   const turnstileSecret = import.meta.env.TURNSTILE_SECRET_KEY;
 
-  if (!resendKey || !toEmail || !turnstileSecret) {
+  if (!gmailUser || !gmailAppPassword || !toEmail || !turnstileSecret) {
     return jsonResponse(
       { ok: false, error: 'Contact endpoint is not configured.' },
       500,
@@ -153,9 +154,15 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
   const subject = subjectInput || `A word from ${name}`;
   const message = (payload.message ?? '').trim();
 
-  const resend = new Resend(resendKey);
-
-  const fromAddress = 'Joseph Baker Contact <contact@josephkbaker.com>';
+  const transporter = nodemailer.createTransport({
+    host: 'smtp.gmail.com',
+    port: 587,
+    secure: false,
+    auth: {
+      user: gmailUser,
+      pass: gmailAppPassword,
+    },
+  });
 
   const textBody = [
     `New message via josephkbaker.com/contact`,
@@ -179,21 +186,14 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
   ].join('\n');
 
   try {
-    const result = await resend.emails.send({
-      from: fromAddress,
+    await transporter.sendMail({
+      from: `"Joseph Baker" <${gmailUser}>`,
       to: toEmail,
       replyTo: `${name} <${email}>`,
       subject,
       text: textBody,
       html: htmlBody,
     });
-
-    if (result.error) {
-      return jsonResponse(
-        { ok: false, error: 'Email service rejected the message.' },
-        502,
-      );
-    }
 
     return jsonResponse({ ok: true }, 200);
   } catch {
