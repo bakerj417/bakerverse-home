@@ -159,6 +159,53 @@ const otherActive = active.slice(1);
   </section>
 
   <!-- ======================================================
+       UPCOMING QUESTS
+       ====================================================== -->
+  <section class="section section-y-md quest-section" aria-label="Upcoming quests">
+    <RevealOnScroll client:visible>
+      <div class="quest-group-head">
+        <p class="section-eyebrow">Upcoming</p>
+        <h2 class="quest-group-h2">Next on the campaign roll</h2>
+      </div>
+    </RevealOnScroll>
+
+    {upcoming.length > 0 ? (
+      <div class="quest-grid">
+        {upcoming.map((quest, index) => (
+          <RevealOnScroll client:visible delayMs={index * 60}>
+            <TooltipCard
+              href={`/projects/${quest.slug}`}
+              rarity={quest.data.rarity}
+              class="quest-card"
+            >
+              <article data-rarity={quest.data.rarity}>
+                <div class="quest-card-head">
+                  <span class="quest-rarity">{quest.data.rarity}</span>
+                  <span class="quest-year">{quest.data.year}</span>
+                </div>
+                <h3 class="quest-title">{quest.data.title}</h3>
+                <p class="quest-tagline">{quest.data.tagline}</p>
+                <div class="quest-stack">
+                  {quest.data.stack.slice(0, 4).map((tech) => (
+                    <StackBadge label={tech} />
+                  ))}
+                </div>
+              </article>
+            </TooltipCard>
+          </RevealOnScroll>
+        ))}
+      </div>
+    ) : (
+      <RevealOnScroll client:visible delayMs={80}>
+        <p class="quest-empty-state">
+          No current upcoming quests. The next adventure hasn't been
+          scrolled yet — check back soon.
+        </p>
+      </RevealOnScroll>
+    )}
+  </section>
+
+  <!-- ======================================================
        COMPLETED QUESTS
        ====================================================== -->
   <section class="section section-y-md quest-section" aria-label="Completed quests">
@@ -206,53 +253,6 @@ const otherActive = active.slice(1);
         <p class="quest-empty-state">
           No completed quests yet. The first will appear here the moment it
           ships.
-        </p>
-      </RevealOnScroll>
-    )}
-  </section>
-
-  <!-- ======================================================
-       UPCOMING QUESTS
-       ====================================================== -->
-  <section class="section section-y-md quest-section" aria-label="Upcoming quests">
-    <RevealOnScroll client:visible>
-      <div class="quest-group-head">
-        <p class="section-eyebrow">Upcoming</p>
-        <h2 class="quest-group-h2">Next on the campaign roll</h2>
-      </div>
-    </RevealOnScroll>
-
-    {upcoming.length > 0 ? (
-      <div class="quest-grid">
-        {upcoming.map((quest, index) => (
-          <RevealOnScroll client:visible delayMs={index * 60}>
-            <TooltipCard
-              href={`/projects/${quest.slug}`}
-              rarity={quest.data.rarity}
-              class="quest-card"
-            >
-              <article data-rarity={quest.data.rarity}>
-                <div class="quest-card-head">
-                  <span class="quest-rarity">{quest.data.rarity}</span>
-                  <span class="quest-year">{quest.data.year}</span>
-                </div>
-                <h3 class="quest-title">{quest.data.title}</h3>
-                <p class="quest-tagline">{quest.data.tagline}</p>
-                <div class="quest-stack">
-                  {quest.data.stack.slice(0, 4).map((tech) => (
-                    <StackBadge label={tech} />
-                  ))}
-                </div>
-              </article>
-            </TooltipCard>
-          </RevealOnScroll>
-        ))}
-      </div>
-    ) : (
-      <RevealOnScroll client:visible delayMs={80}>
-        <p class="quest-empty-state">
-          No current upcoming quests. The next adventure hasn't been
-          scrolled yet — check back soon.
         </p>
       </RevealOnScroll>
     )}
