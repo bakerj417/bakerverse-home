@@ -3,7 +3,7 @@ title: "Hopp App — Demo Restoration"
 tagline: "Bringing a shipped, App Store–live rewards platform back as a fully interactive demo."
 rarity: legendary
 year: 2026
-status: paused
+status: upcoming
 stack:
   - React Native
   - Expo
