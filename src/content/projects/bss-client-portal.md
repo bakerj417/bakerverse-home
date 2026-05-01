@@ -14,8 +14,8 @@ stack:
   - Resend
   - Tailwind CSS
   - Vercel
-featured: false
-order: 6
+featured: true
+order: 1
 summary: >-
   A private branded client hub replacing the ad-hoc pile of email threads,
   Drive links, and PDF-attached invoices that most freelancers accept as normal.
