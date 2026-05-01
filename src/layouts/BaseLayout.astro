@@ -5,6 +5,8 @@ import Footer from '@/components/layout/Footer.astro';
 import SEO from '@/components/ui/SEO.astro';
 import { ViewTransitions } from 'astro:transitions';
 import { foucGuardScript, initialThemeStyle } from '@/lib/theme/ssr';
+import Analytics from '@vercel/analytics/astro';
+import SpeedInsights from '@vercel/speed-insights/astro';
 
 interface Props {
   title?: string;
@@ -83,6 +85,9 @@ const {
       // Fire after every ViewTransition so the new page gets the right theme
       document.addEventListener('astro:after-swap', reapply);
     </script>
+
+    <Analytics />
+    <SpeedInsights />
   </body>
 </html>
 
