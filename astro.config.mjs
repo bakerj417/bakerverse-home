@@ -2,6 +2,7 @@ import { defineConfig } from 'astro/config';
 import react from '@astrojs/react';
 import tailwind from '@astrojs/tailwind';
 import vercel from '@astrojs/vercel/serverless';
+import sentry from '@sentry/astro';
 
 // https://astro.build/config
 export default defineConfig({
@@ -19,12 +20,27 @@ export default defineConfig({
     tailwind({
       applyBaseStyles: false,
     }),
+    sentry({
+      org: 'baker-software-solutions',
+      project: 'bakerverse-home',
+      // Uploads source maps to Sentry at build time so stack traces are readable.
+      // SENTRY_AUTH_TOKEN must be set in Vercel env for production builds.
+      authToken: process.env.SENTRY_AUTH_TOKEN,
+      sourceMapsUploadOptions: {
+        enabled: !!process.env.SENTRY_AUTH_TOKEN,
+      },
+    }),
   ],
   prefetch: {
     prefetchAll: true,
     defaultStrategy: 'hover',
   },
   vite: {
+    // Expose SENTRY_DSN to the client bundle at build time.
+    // Empty string on localhost (no env var) → Sentry.init is skipped by the guard in sentry.client.config.ts.
+    define: {
+      'import.meta.env.PUBLIC_SENTRY_DSN': JSON.stringify(process.env.SENTRY_DSN ?? ''),
+    },
     ssr: {
       noExternal: ['framer-motion'],
     },
