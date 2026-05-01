@@ -83,6 +83,12 @@ const {
       // Fire after every ViewTransition so the new page gets the right theme
       document.addEventListener('astro:after-swap', reapply);
     </script>
+
+    <!-- Cloudflare Web Analytics — privacy-friendly RUM + Core Web Vitals -->
+    <script
+      defer
+      src="https://static.cloudflareinsights.com/beacon.min.js"
+      data-cf-beacon='{"token": "bb6eae944203479e985c98e928ced991"}'></script>
   </body>
 </html>
 
