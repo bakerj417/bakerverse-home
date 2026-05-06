@@ -174,7 +174,7 @@ const projects = (await getCollection("projects"))
         projects.map((project, index) => (
           <RevealOnScroll client:visible delayMs={index * 120}>
             <TooltipCard
-              href={`/projects/${project.slug}`}
+              href={`/projects/${project.id}`}
               rarity={project.data.rarity}
             >
               <div class="project-card-head">

@@ -1,4 +1,4 @@
-import { useEffect, useRef, type PropsWithChildren } from 'react';
+import { useEffect, useRef, type PropsWithChildren, type JSX } from 'react';
 
 /**
  * RevealOnScroll — adds `.is-visible` when the element enters

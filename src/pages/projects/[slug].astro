@@ -3,7 +3,7 @@ import BaseLayout from '@/layouts/BaseLayout.astro';
 import StackBadge from '@/components/ui/StackBadge.astro';
 import RevealOnScroll from '@/components/islands/RevealOnScroll.tsx';
 import MagneticButton from '@/components/islands/MagneticButton.tsx';
-import { getCollection, type CollectionEntry } from 'astro:content';
+import { getCollection, render, type CollectionEntry } from 'astro:content';
 
 // getStaticPaths runs in an isolated scope — any helpers it uses must be
 // declared inside the function body.
@@ -34,7 +34,7 @@ export async function getStaticPaths() {
   });
 
   return sorted.map((entry, i) => ({
-    params: { slug: entry.slug },
+    params: { slug: entry.id },
     props: {
       entry,
       prev: sorted[i - 1] ?? null,
@@ -50,7 +50,7 @@ interface Props {
 }
 
 const { entry, prev, next } = Astro.props;
-const { Content } = await entry.render();
+const { Content } = await render(entry);
 const { data } = entry;
 
 const statusCopy: Record<string, string> = {
@@ -157,13 +157,13 @@ const rarityColor = `var(--rarity-${data.rarity})`;
     <section class="section section-y-md quest-nav-section">
       <nav class="quest-nav" aria-label="Quest navigation">
         {prev ? (
-          <a href={`/projects/${prev.slug}`} class="quest-nav-link quest-nav-link--prev">
+          <a href={`/projects/${prev.id}`} class="quest-nav-link quest-nav-link--prev">
             <span class="quest-nav-dir">← Previous quest</span>
             <span class="quest-nav-title">{prev.data.title}</span>
           </a>
         ) : <span />}
         {next ? (
-          <a href={`/projects/${next.slug}`} class="quest-nav-link quest-nav-link--next">
+          <a href={`/projects/${next.id}`} class="quest-nav-link quest-nav-link--next">
             <span class="quest-nav-dir">Next quest →</span>
             <span class="quest-nav-title">{next.data.title}</span>
           </a>

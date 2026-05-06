@@ -77,7 +77,7 @@ const otherActive = active.slice(1);
     {featuredActive && (
       <RevealOnScroll client:visible delayMs={80}>
         <div
-          class={`bento-hero${featuredActive.slug !== 'theme-engine' ? ' bento-hero--no-island' : ''}`}
+          class={`bento-hero${featuredActive.id !== 'theme-engine' ? ' bento-hero--no-island' : ''}`}
           style={`--bento-color: var(--rarity-${featuredActive.data.rarity});`}
         >
           <div class="bento-hero__content">
@@ -101,12 +101,12 @@ const otherActive = active.slice(1);
               ))}
             </div>
 
-            <a href={`/projects/${featuredActive.slug}`} class="bento-hero__cta">
+            <a href={`/projects/${featuredActive.id}`} class="bento-hero__cta">
               Read the case study →
             </a>
           </div>
 
-          {featuredActive.slug === 'theme-engine' && (
+          {featuredActive.id === 'theme-engine' && (
             <div class="bento-hero__island">
               <ThemeSwitcherMini client:visible />
             </div>
@@ -120,7 +120,7 @@ const otherActive = active.slice(1);
         {otherActive.map((quest, index) => (
           <RevealOnScroll client:visible delayMs={index * 100}>
             <TooltipCard
-              href={`/projects/${quest.slug}`}
+              href={`/projects/${quest.id}`}
               rarity={quest.data.rarity}
               class="quest-card"
             >
@@ -174,7 +174,7 @@ const otherActive = active.slice(1);
         {upcoming.map((quest, index) => (
           <RevealOnScroll client:visible delayMs={index * 60}>
             <TooltipCard
-              href={`/projects/${quest.slug}`}
+              href={`/projects/${quest.id}`}
               rarity={quest.data.rarity}
               class="quest-card"
             >
@@ -221,7 +221,7 @@ const otherActive = active.slice(1);
         {completed.map((quest, index) => (
           <RevealOnScroll client:visible delayMs={index * 60}>
             <TooltipCard
-              href={`/projects/${quest.slug}`}
+              href={`/projects/${quest.id}`}
               rarity={quest.data.rarity}
               class="quest-card"
             >
