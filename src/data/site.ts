@@ -24,6 +24,7 @@ export const nav = [
   { href: "/about", label: "About", glyph: "✦" },
   { href: "/work", label: "Work", glyph: "⚔" },
   { href: "/projects", label: "Projects", glyph: "◆" },
+  { href: "/uses", label: "Uses", glyph: "⚒" },
   { href: "/bakerverse", label: "Bakerverse", glyph: "✴" },
   { href: "/contact", label: "Contact", glyph: "✉" },
 ] as const;
