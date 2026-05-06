@@ -1,7 +1,7 @@
 import { defineConfig } from 'astro/config';
 import react from '@astrojs/react';
-import tailwind from '@astrojs/tailwind';
-import vercel from '@astrojs/vercel/serverless';
+import tailwindcss from '@tailwindcss/vite';
+import vercel from '@astrojs/vercel';
 import sentry from '@sentry/astro';
 
 // https://astro.build/config
@@ -10,16 +10,13 @@ export default defineConfig({
   // Hybrid: pages are static-prerendered by default; routes that opt in
   // with `export const prerender = false` (e.g. /api/contact) run on
   // Vercel serverless at request time.
-  output: 'hybrid',
+  output: 'static',
   adapter: vercel(),
   // @astrojs/sitemap 3.x crashes against astro 4 hybrid + vercel
   // adapter (_routes is undefined in astro:build:done). Re-add after
   // the planned Astro 5 upgrade.
   integrations: [
     react(),
-    tailwind({
-      applyBaseStyles: false,
-    }),
     sentry({
       org: 'baker-software-solutions',
       project: 'bakerverse-home',
@@ -36,13 +33,9 @@ export default defineConfig({
     defaultStrategy: 'hover',
   },
   vite: {
-    // Expose SENTRY_DSN to the client bundle at build time.
-    // Empty string on localhost (no env var) → Sentry.init is skipped by the guard in sentry.client.config.ts.
+    plugins: [tailwindcss()],
     define: {
       'import.meta.env.PUBLIC_SENTRY_DSN': JSON.stringify(process.env.SENTRY_DSN ?? ''),
-    },
-    ssr: {
-      noExternal: ['framer-motion'],
     },
   },
 });

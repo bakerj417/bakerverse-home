@@ -9,9 +9,15 @@
    @fontsource/* packages if we want zero-third-party fetches. */
 @import url("https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap");
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+@theme {
+  --font-display: "Cinzel", Georgia, serif;
+  --font-body: "Inter", "SF Pro Text", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+
+  --shadow-tooltip: 0 20px 60px -20px rgba(0, 0, 0, 0.8), 0 8px 24px -8px rgba(0, 0, 0, 0.6);
+}
 
 /* ---------------------------------------------------------------
    base resets / body
