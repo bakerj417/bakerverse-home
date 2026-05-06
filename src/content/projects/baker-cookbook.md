@@ -1,17 +1,22 @@
 ---
 title: "Baker Family Cookbook"
 tagline: "Every recipe the Baker family loves — no fluff, no life stories, just the food."
+liveUrl: "https://cook.josephkbaker.com"
+repoUrl: "https://github.com/bakerj417/bakerverse-cookbook"
 rarity: epic
 year: 2026
-status: upcoming
+status: wip
 stack:
-  - Astro
-  - React
+  - Next.js 15
+  - React 19
   - TypeScript
-  - PostgreSQL
+  - Tailwind 4
+  - Postgres (Neon)
+  - Drizzle
+  - Clerk
   - Vercel
-featured: false
-order: 7
+featured: true
+order: 1
 summary: >-
   A private family recipe vault built around one obsession: getting to the
   actual recipe without reading a 1,200-word essay about someone's childhood
