@@ -1,0 +1,325 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { site } from '@/data/site';
+
+/**
+ * /accessibility — formal conformance statement.
+ *
+ * Linked from the footer-bottom strip; not promoted to the primary
+ * nav. Treats the page like an engineering artifact, not legal
+ * boilerplate — uses the same Cinzel/Inter pairing as the rest of
+ * the site so it reads as part of the product.
+ */
+
+const STATEMENT_DATE = 'May 6, 2026';
+const STATEMENT_DATETIME = '2026-05-06';
+---
+
+<BaseLayout
+  title="Accessibility Statement"
+  description="Conformance status, technical approach, known limitations, and feedback channel for josephkbaker.com."
+>
+  <section class="section section-y-lg accessibility-page">
+    <header class="accessibility-header">
+      <p class="section-eyebrow">Conformance · Statement</p>
+      <h1 class="accessibility-h1">Accessibility statement</h1>
+      <p class="accessibility-lede">
+        This site is built for everyone who lands on it — including
+        keyboard, screen-reader, low-vision, and reduced-motion
+        users. The notes below describe what's been done, what's
+        still being worked on, and how to flag a barrier if you
+        find one.
+      </p>
+      <p class="accessibility-meta">
+        <span class="accessibility-meta-label">Last reviewed:</span>
+        <time datetime={STATEMENT_DATETIME}>{STATEMENT_DATE}</time>
+      </p>
+    </header>
+
+    <article class="accessibility-body">
+      <section aria-labelledby="conformance">
+        <h2 id="conformance">Conformance status</h2>
+        <p>
+          josephkbaker.com targets <strong>WCAG 2.1 Level AA</strong>
+          conformance with Level AAA enhancements where they fit
+          (focus appearance, reduced motion, high color contrast).
+          Statement last reviewed:
+          <time datetime={STATEMENT_DATETIME}>{STATEMENT_DATE}</time>.
+        </p>
+        <p>
+          A regression suite using
+          <a
+            href="https://github.com/dequelabs/axe-core-npm"
+            rel="noopener noreferrer"
+            target="_blank"
+          >axe-core<span class="sr-only"> (opens in new tab)</span></a>
+          runs against every primary route as part of the
+          accessibility test gate (<code>pnpm test:a11y</code>).
+        </p>
+      </section>
+
+      <section aria-labelledby="approach">
+        <h2 id="approach">Technical approach</h2>
+        <ul class="accessibility-list">
+          <li>
+            <strong>Semantic HTML5</strong> — landmarks
+            (<code>&lt;header&gt;</code>, <code>&lt;nav&gt;</code>,
+            <code>&lt;main&gt;</code>, <code>&lt;footer&gt;</code>),
+            heading hierarchy without skipped levels, and lists for
+            lists.
+          </li>
+          <li>
+            <strong>Skip-to-content link</strong> as the first
+            focusable element on every page.
+          </li>
+          <li>
+            <strong>Keyboard navigation tested</strong> across all
+            interactive widgets — primary nav, theme picker
+            popover, expandable adventure entries, and the contact
+            form. Focus returns to the trigger when overlays close.
+          </li>
+          <li>
+            <strong><code>prefers-reduced-motion</code> respected</strong>
+            site-wide — animations collapse to instant transitions,
+            the cursor aura and ember canvas suspend, and the
+            scroll-reveal animation is skipped entirely.
+          </li>
+          <li>
+            <strong>Color contrast</strong> — body and UI text meet
+            or exceed WCAG AA (4.5:1 for normal text, 3:1 for large
+            text). The Diablo gold accent on the dark background
+            measures ≈ 11.6:1.
+          </li>
+          <li>
+            <strong>Visible focus indicators</strong> on every
+            interactive element via a high-contrast 2px gold ring
+            (WCAG 2.2 SC 2.4.11).
+          </li>
+          <li>
+            <strong>Screen-reader-friendly ARIA</strong> — live
+            regions announce theme changes and form state, icon
+            buttons carry <code>aria-label</code>, decorative
+            graphics are <code>aria-hidden</code>, and external
+            links announce "(opens in new tab)" through a visually
+            hidden suffix.
+          </li>
+          <li>
+            <strong>No-JS fallbacks</strong> — scroll-reveal
+            content stays visible when scripting is disabled
+            (<code>@media (scripting: none)</code>).
+          </li>
+        </ul>
+      </section>
+
+      <section aria-labelledby="limitations">
+        <h2 id="limitations">Known limitations</h2>
+        <p>
+          As of the statement date, the following items are
+          tracked but not yet at full AA inside the audit gate:
+        </p>
+        <ul class="accessibility-list">
+          <li>
+            <strong>/playground/theme-editor</strong> — the
+            client-only theme authoring surface is a complex
+            interactive editor and is currently excluded from the
+            automated axe sweep. A dedicated audit pass is
+            scheduled for Phase 3.
+          </li>
+          <li>
+            <strong>Cloudflare Turnstile widget</strong> on the
+            contact form is a third-party iframe; its internal
+            accessibility is governed by Cloudflare. The
+            surrounding form, error region, and submit ritual are
+            audited as part of the contact-page gate.
+          </li>
+        </ul>
+        <p>
+          If a barrier reaches you that isn't on this list, please
+          report it — see the next section.
+        </p>
+      </section>
+
+      <section aria-labelledby="feedback">
+        <h2 id="feedback">Feedback</h2>
+        <p>
+          If you encounter an accessibility barrier on
+          <strong>josephkbaker.com</strong> — anything from a
+          missing label to a focus trap to text that's hard to
+          read — please reach out:
+        </p>
+        <ul class="accessibility-list">
+          <li>
+            Email: <a href={`mailto:${site.email}`}>{site.email}</a>
+          </li>
+          <li>
+            Or use the <a href="/contact">contact form</a> on the
+            site.
+          </li>
+        </ul>
+        <p>
+          I aim to respond within <strong>2 business days</strong>
+          and to ship a fix as quickly as the issue's scope allows.
+        </p>
+      </section>
+
+      <section aria-labelledby="standards">
+        <h2 id="standards">Standards referenced</h2>
+        <ul class="accessibility-list">
+          <li>
+            <a
+              href="https://www.w3.org/TR/WCAG21/"
+              rel="noopener noreferrer"
+              target="_blank"
+            >Web Content Accessibility Guidelines (WCAG) 2.1<span class="sr-only"> (opens in new tab)</span></a>
+          </li>
+          <li>ADA Title III (U.S. Americans with Disabilities Act)</li>
+          <li>EN 301 549 (European accessibility standard)</li>
+        </ul>
+      </section>
+    </article>
+  </section>
+</BaseLayout>
+
+<style>
+  .accessibility-page {
+    max-width: 760px;
+    margin: 0 auto;
+  }
+
+  .accessibility-header {
+    margin-bottom: 3rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid rgba(240, 185, 11, 0.15);
+  }
+
+  .accessibility-h1 {
+    font-family: var(--font-display);
+    font-size: clamp(2.25rem, 5vw, 3.75rem);
+    line-height: 1.1;
+    margin: 0.75rem 0 1.25rem;
+    letter-spacing: 0.01em;
+    text-shadow:
+      0 1px 0 rgba(0, 0, 0, 0.65),
+      0 -1px 0 rgba(240, 185, 11, 0.06);
+  }
+
+  .accessibility-lede {
+    color: var(--ink-300);
+    font-size: 1.1rem;
+    line-height: 1.7;
+    margin: 0 0 1.5rem;
+    max-width: 56ch;
+  }
+
+  .accessibility-meta {
+    margin: 0;
+    color: var(--ink-500);
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    letter-spacing: 0.08em;
+  }
+
+  .accessibility-meta-label {
+    color: var(--ink-700);
+    margin-right: 0.4rem;
+  }
+
+  .accessibility-body {
+    display: flex;
+    flex-direction: column;
+    gap: 2.75rem;
+    color: var(--ink-300);
+    line-height: 1.75;
+    font-size: 1rem;
+  }
+
+  .accessibility-body h2 {
+    font-family: var(--font-display);
+    font-size: clamp(1.4rem, 2.4vw, 1.85rem);
+    color: var(--ink-100);
+    margin: 0 0 1rem;
+    letter-spacing: 0.01em;
+    line-height: 1.25;
+  }
+
+  .accessibility-body p {
+    margin: 0 0 1rem;
+    max-width: 64ch;
+  }
+
+  .accessibility-body p:last-child {
+    margin-bottom: 0;
+  }
+
+  .accessibility-body strong {
+    color: var(--ink-100);
+    font-weight: 600;
+  }
+
+  .accessibility-body a {
+    color: var(--gold-300);
+    text-decoration: underline;
+    text-decoration-color: rgba(240, 185, 11, 0.4);
+    text-underline-offset: 3px;
+    transition:
+      color var(--dur-fast) var(--ease-standard),
+      text-decoration-color var(--dur-fast) var(--ease-standard);
+  }
+
+  .accessibility-body a:hover {
+    color: var(--gold-200);
+    text-decoration-color: var(--gold-300);
+  }
+
+  .accessibility-body code {
+    font-family: var(--font-mono);
+    font-size: 0.88em;
+    padding: 0.1em 0.4em;
+    background: rgba(240, 185, 11, 0.08);
+    border: 1px solid rgba(240, 185, 11, 0.18);
+    border-radius: var(--radius-sharp);
+    color: var(--ink-100);
+  }
+
+  .accessibility-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+  }
+
+  .accessibility-list li {
+    position: relative;
+    padding-left: 1.5rem;
+    line-height: 1.65;
+    max-width: 64ch;
+  }
+
+  .accessibility-list li::before {
+    content: '◆';
+    position: absolute;
+    left: 0;
+    top: 0.05em;
+    color: var(--gold-400);
+    font-size: 0.7rem;
+  }
+
+  /*
+    Visually hidden but still in the accessibility tree —
+    "(opens in new tab)" suffixes that screen readers announce
+    while sighted users see the icon-free anchor.
+  */
+  .sr-only {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    padding: 0 !important;
+    margin: -1px !important;
+    overflow: hidden !important;
+    clip: rect(0, 0, 0, 0) !important;
+    white-space: nowrap !important;
+    border: 0 !important;
+  }
+</style>

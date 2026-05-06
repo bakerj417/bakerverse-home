@@ -132,6 +132,7 @@ const turnstileSiteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY ?? "";
                     autocomplete="name"
                     maxlength="120"
                     required
+                    aria-required="true"
                   />
                 </div>
 
@@ -144,6 +145,7 @@ const turnstileSiteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY ?? "";
                     autocomplete="email"
                     maxlength="254"
                     required
+                    aria-required="true"
                   />
                 </div>
 
@@ -169,7 +171,8 @@ const turnstileSiteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY ?? "";
                     name="message"
                     rows="6"
                     maxlength="5000"
-                    required></textarea>
+                    required
+                    aria-required="true"></textarea>
                 </div>
 
                 <div class="honeypot" aria-hidden="true">

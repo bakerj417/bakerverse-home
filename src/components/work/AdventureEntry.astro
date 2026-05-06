@@ -81,27 +81,38 @@ const bodyId = `adventure-body-${role.id.replace(/[^a-z0-9]+/gi, '-')}`;
         <span class="adventure-role">
           {role.data.role}
           <span class="adventure-at">at</span>
-          {
-            role.data.companyUrl ? (
-              <a
-                href={role.data.companyUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                class="adventure-company"
-                onclick="event.stopPropagation()"
-              >
-                {role.data.company}
-              </a>
-            ) : (
-              <span class="adventure-company">{role.data.company}</span>
-            )
-          }
+          {/*
+            The company name lives inside the toggle button as plain
+            text. Putting an <a> here would nest interactive elements
+            (button > a), which axe flags as a serious WCAG 2 SC 4.1.2
+            issue. The optional company link is rendered separately
+            below the toggle so both controls are reachable on their
+            own keyboard tab stop.
+          */}
+          <span class="adventure-company">{role.data.company}</span>
         </span>
         <span class="adventure-teaser">{role.data.teaser}</span>
       </span>
 
       <span class="adventure-chevron" aria-hidden="true">▾</span>
     </button>
+
+    {
+      role.data.companyUrl && (
+        <p class="adventure-company-link-row">
+          <a
+            href={role.data.companyUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="adventure-company-link"
+            aria-label={`Visit ${role.data.company} website (opens in new tab)`}
+          >
+            Visit {role.data.company}
+            <span aria-hidden="true">↗</span>
+          </a>
+        </p>
+      )
+    }
 
     <div id={bodyId} class="adventure-body">
       <div class="adventure-body-inner">
@@ -360,6 +371,40 @@ const bodyId = `adventure-body-${role.id.replace(/[^a-z0-9]+/gi, '-')}`;
   a.adventure-company:hover {
     color: var(--gold-200);
     text-decoration: underline;
+  }
+
+  /*
+    Company website link — lives outside the toggle button to avoid
+    nested interactive elements (axe `nested-interactive`). Sits as
+    a quiet mono-tone row under the title; visually subordinate to
+    the expand/collapse action so the primary affordance stays clear.
+  */
+  .adventure-company-link-row {
+    margin: -0.5rem 0 0;
+    padding: 0 1.5rem 1rem;
+    font-family: var(--font-mono, ui-monospace, monospace);
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  @media (min-width: 768px) {
+    .adventure-company-link-row {
+      padding: 0 2rem 1rem;
+    }
+  }
+
+  .adventure-company-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    color: var(--ink-500);
+    text-decoration: none;
+    transition: color var(--dur-fast) var(--ease-standard);
+  }
+
+  .adventure-company-link:hover {
+    color: var(--gold-300);
   }
 
   .adventure-teaser {

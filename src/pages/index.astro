@@ -128,8 +128,12 @@ const projects = (await getCollection("projects"))
         </MagneticButton>
       </div>
 
-      <!-- Compact stat block, live in the hero -->
-      <div class="hero-stats">
+      <!--
+        Compact stat block, live in the hero. Marked up as a
+        description list so the dt/dd pairs are valid markup
+        and screen readers announce them as definitions.
+      -->
+      <dl class="hero-stats">
         {
           characterSheet.stats.map((stat) => (
             <div class="hero-stat">
@@ -138,7 +142,7 @@ const projects = (await getCollection("projects"))
             </div>
           ))
         }
-      </div>
+      </dl>
 
       <div class="hero-scroll-hint" aria-hidden="true">
         <span>Scroll</span>

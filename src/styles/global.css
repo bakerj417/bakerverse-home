@@ -98,11 +98,56 @@
     background-color: var(--gold-400);
   }
 
-  /* Focus ring — gold, visible, a11y-forward */
+  /* ---------------------------------------------------------------
+     Focus ring system (WCAG 2.2 SC 2.4.11 + 2.4.13)
+
+     Every interactive element renders a high-contrast gold ring on
+     keyboard focus. The blanket `:focus-visible` rule below is the
+     baseline; the explicit element list reinforces it for components
+     that may have library or framework styles overriding the
+     universal selector. NEVER set `outline: none` without supplying
+     an alternative visible indicator.
+     --------------------------------------------------------------- */
   :focus-visible {
     outline: 2px solid var(--gold-300);
-    outline-offset: 3px;
+    outline-offset: 2px;
     border-radius: 2px;
+  }
+
+  a:focus-visible,
+  button:focus-visible,
+  input:focus-visible,
+  textarea:focus-visible,
+  select:focus-visible,
+  summary:focus-visible,
+  [role="button"]:focus-visible,
+  [role="link"]:focus-visible,
+  [role="option"]:focus-visible,
+  [role="menuitem"]:focus-visible,
+  [role="tab"]:focus-visible,
+  [tabindex]:not([tabindex="-1"]):focus-visible {
+    outline: 2px solid var(--gold-300);
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+}
+
+/* ---------------------------------------------------------------
+   Reduced-motion baseline (WCAG 2.1 SC 2.3.3)
+
+   Users with `prefers-reduced-motion: reduce` get an instant,
+   transition-free experience. Animations are squashed to ~1ms so
+   any "after-animation" listeners still fire, but nothing visibly
+   moves. Component-specific opt-outs live in their own files.
+   --------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
   }
 }
 
@@ -326,6 +371,30 @@
   .reveal.is-visible {
     opacity: 1;
     transform: translateY(0);
+  }
+
+  /*
+    Accessibility fallbacks for `.reveal`:
+    1. No-JS fallback — if scripting is disabled, IntersectionObserver
+       never fires, so the content would stay hidden. `@media
+       (scripting: none)` forces it visible immediately. (Modern UA
+       support: Chrome 120+, Firefox 113+, Safari 17+.)
+    2. Reduced motion — skip the slide and the fade entirely. Show
+       the content as if it had already finished revealing.
+  */
+  @media (scripting: none) {
+    .reveal {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .reveal {
+      opacity: 1;
+      transform: none;
+      transition: none;
+    }
   }
 }
 

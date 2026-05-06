@@ -30,3 +30,7 @@ pnpm-debug.log*
 # temp
 *.log
 .claude/
+
+# playwright
+test-results/
+playwright-report/

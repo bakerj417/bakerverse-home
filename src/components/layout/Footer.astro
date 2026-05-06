@@ -35,7 +35,7 @@ const year = new Date().getFullYear();
       </div>
     </div>
 
-    <div class="footer-columns">
+    <nav class="footer-columns" aria-label="Footer">
       <div class="footer-col">
         <h3 class="footer-heading">Map</h3>
         <ul>
@@ -48,13 +48,23 @@ const year = new Date().getFullYear();
       <div class="footer-col">
         <h3 class="footer-heading">Elsewhere</h3>
         <ul>
-          {socials.map((s) => (
-            <li>
-              <a href={s.href} target="_blank" rel="noopener noreferrer">
-                {s.label} <span class="footer-handle">{s.handle}</span>
-              </a>
-            </li>
-          ))}
+          {socials.map((s) => {
+            const isExternal = s.href.startsWith('http');
+            return (
+              <li>
+                <a
+                  href={s.href}
+                  target={isExternal ? '_blank' : undefined}
+                  rel={isExternal ? 'noopener noreferrer' : undefined}
+                >
+                  {s.label} <span class="footer-handle">{s.handle}</span>
+                  {isExternal && (
+                    <span class="sr-only"> (opens in new tab)</span>
+                  )}
+                </a>
+              </li>
+            );
+          })}
         </ul>
       </div>
 
@@ -66,11 +76,12 @@ const year = new Date().getFullYear();
         </p>
         <a href="/contact" class="btn-ghost footer-cta">Start a conversation</a>
       </div>
-    </div>
+    </nav>
   </div>
 
   <div class="footer-bottom">
     <span>© {year} {site.name} · {site.business.name}</span>
+    <a href="/accessibility" class="footer-a11y-link">Accessibility</a>
     <span class="footer-built">
       Built with Astro + Tailwind · Gamified in spirit, recruiter-safe in practice.
     </span>
@@ -187,11 +198,52 @@ const year = new Date().getFullYear();
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
+    align-items: center;
     gap: 1rem;
     border-top: 1px solid rgba(240, 185, 11, 0.08);
     font-family: var(--font-mono);
     font-size: 0.72rem;
     color: var(--ink-500);
     letter-spacing: 0.05em;
+  }
+
+  /*
+    Accessibility statement link in the footer-bottom bar.
+    Visual weight matches the surrounding mono copy — it should
+    feel like a peer of the copyright line, not a CTA. Hover is
+    quiet; :focus-visible inherits the global gold ring.
+  */
+  .footer-a11y-link {
+    color: var(--ink-500);
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.05em;
+    text-decoration: underline;
+    text-decoration-color: rgba(240, 185, 11, 0.25);
+    text-underline-offset: 3px;
+    transition: color var(--dur-fast) var(--ease-standard),
+      text-decoration-color var(--dur-fast) var(--ease-standard);
+  }
+
+  .footer-a11y-link:hover {
+    color: var(--gold-200);
+    text-decoration-color: var(--gold-300);
+  }
+
+  /*
+    Visually hidden but exposed to assistive tech — used on
+    "(opens in new tab)" suffixes so screen readers announce the
+    new-window behavior even when the visual UI omits it.
+  */
+  .sr-only {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    padding: 0 !important;
+    margin: -1px !important;
+    overflow: hidden !important;
+    clip: rect(0, 0, 0, 0) !important;
+    white-space: nowrap !important;
+    border: 0 !important;
   }
 </style>

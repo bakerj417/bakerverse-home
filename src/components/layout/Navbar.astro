@@ -325,23 +325,29 @@ const themes = listThemes();
   // Original nav hamburger logic (unchanged from before)
   // -------------------------------------------------------------------------
 
-  function closeNav() {
+  function closeNav(returnFocus = true): void {
     const root = document.querySelector<HTMLElement>('[data-nav-root]');
     const toggle = document.querySelector<HTMLButtonElement>('[data-nav-toggle]');
     if (!root || !toggle) return;
     root.removeAttribute('data-nav-open');
     toggle.setAttribute('aria-expanded', 'false');
     toggle.setAttribute('aria-label', 'Open menu');
+    // Return focus to the trigger so keyboard users land in a sensible spot.
+    if (returnFocus) toggle.focus();
   }
 
-  function openNav() {
+  function openNav(): void {
     const root = document.querySelector<HTMLElement>('[data-nav-root]');
     const toggle = document.querySelector<HTMLButtonElement>('[data-nav-toggle]');
-    if (!root || !toggle) return;
+    const panel = document.querySelector<HTMLElement>('[data-nav-panel]');
+    if (!root || !toggle || !panel) return;
     if (root.hasAttribute('data-nav-open')) return;
     root.setAttribute('data-nav-open', '');
     toggle.setAttribute('aria-expanded', 'true');
     toggle.setAttribute('aria-label', 'Close menu');
+    // Move focus into the panel so the next Tab cycles through its links.
+    const firstLink = panel.querySelector<HTMLAnchorElement>('a');
+    firstLink?.focus();
   }
 
   function initNav() {
@@ -359,7 +365,9 @@ const themes = listThemes();
     });
 
     panel.querySelectorAll<HTMLAnchorElement>('a').forEach((link) => {
-      link.addEventListener('click', closeNav);
+      // Don't yank focus back to the hamburger when the user has just
+      // clicked a link — they're navigating elsewhere.
+      link.addEventListener('click', () => closeNav(false));
     });
   }
 

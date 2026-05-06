@@ -88,7 +88,11 @@ export default function SubmissionForm({ theme, onClose }: SubmissionFormProps) 
       </div>
 
       {state.status === 'success' ? (
-        <p className="text-sm text-green-400">
+        <p
+          role="status"
+          aria-live="polite"
+          className="text-sm text-green-400"
+        >
           ✓ Theme submitted successfully! It will be reviewed before going live.
         </p>
       ) : (

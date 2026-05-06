@@ -57,6 +57,20 @@ import { characterSheet, site } from '@/data/site';
               clearing a Diablo season, or 3D printing something on my
               Bambu P2S. Based in Waxhaw, North Carolina.
             </p>
+
+            <aside class="about-a11y-callout" aria-label="Accessibility approach">
+              <p>
+                Accessibility isn't an afterthought — it's a baseline I
+                apply from day one. Every project I ship targets
+                <strong>WCAG 2.1 AA</strong> compliance: keyboard
+                navigation, screen-reader support, reduced-motion
+                respect, and sufficient color contrast.
+                <a href="/accessibility">
+                  Read this site's accessibility statement
+                  <span aria-hidden="true">→</span>
+                </a>
+              </p>
+            </aside>
           </div>
         </RevealOnScroll>
       </div>
@@ -354,6 +368,41 @@ import { characterSheet, site } from '@/data/site';
 
   .about-narrative strong {
     color: var(--ink-100);
+  }
+
+  /*
+    Inline accessibility callout — tonally a "passive" stat block
+    (matches the rune-icon list above), not a CTA. Uses the same
+    parchment-gold left rule as .character-identity to read as a
+    matter-of-fact line item rather than a promotional banner.
+  */
+  .about-a11y-callout {
+    margin-top: 0.5rem;
+    padding: 1rem 1.25rem;
+    background: rgba(240, 185, 11, 0.04);
+    border-left: 2px solid var(--gold-500);
+    border-radius: 2px;
+  }
+
+  .about-a11y-callout p {
+    margin: 0;
+    color: var(--ink-300);
+    font-size: 0.95rem;
+    line-height: 1.6;
+  }
+
+  .about-a11y-callout a {
+    color: var(--gold-200);
+    text-decoration: underline;
+    text-decoration-color: rgba(240, 185, 11, 0.35);
+    text-underline-offset: 3px;
+    margin-left: 0.25rem;
+    white-space: nowrap;
+  }
+
+  .about-a11y-callout a:hover {
+    color: var(--gold-100);
+    text-decoration-color: var(--gold-300);
   }
 
   .character-h2 {

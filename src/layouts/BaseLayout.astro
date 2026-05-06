@@ -107,8 +107,23 @@ const {
     transition: top var(--dur-base) var(--ease-standard);
   }
 
-  .skip-link:focus {
+  /*
+    Reveal the skip link the moment it gains focus. We listen on both
+    :focus and :focus-visible so screen-reader-driven focus also
+    surfaces it — VoiceOver in particular routes focus through paths
+    that don't always trigger :focus-visible heuristics.
+  */
+  .skip-link:focus,
+  .skip-link:focus-visible {
     top: 1rem;
+    outline: 2px solid var(--bg-void);
+    outline-offset: 2px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .skip-link {
+      transition: none;
+    }
   }
 
   main {

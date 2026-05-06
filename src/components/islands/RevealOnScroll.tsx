@@ -22,6 +22,17 @@ export default function RevealOnScroll({
     const el = ref.current;
     if (!el) return;
 
+    // Reduced-motion users get the final state immediately. The
+    // animation is not just slowed — it is skipped entirely so the
+    // content reads as if it were never animated.
+    const reduced =
+      typeof window !== 'undefined' &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduced) {
+      el.classList.add('is-visible');
+      return;
+    }
+
     if (typeof IntersectionObserver === 'undefined') {
       el.classList.add('is-visible');
       return;
