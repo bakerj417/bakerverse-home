@@ -100,7 +100,8 @@ const themes = listThemes();
     </a>
   </nav>
 
-  <!-- Desktop theme picker button + popover -->
+  <!-- Desktop: theme picker + resume grouped on the right -->
+  <div class="nav-actions">
   <div class="theme-picker" data-theme-picker>
     <button
       type="button"
@@ -159,6 +160,7 @@ const themes = listThemes();
     <span>Resume</span>
     <span aria-hidden="true">⤓</span>
   </a>
+  </div>
 </header>
 
 <script>
@@ -493,6 +495,8 @@ const themes = listThemes();
 
   @media (min-width: 900px) {
     .nav-root {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
       gap: 2rem;
       padding: 1rem 2rem;
     }
@@ -724,6 +728,7 @@ const themes = listThemes();
       max-height: none;
       overflow: visible;
       transition: none;
+      justify-content: center;
     }
 
     .nav-link,
@@ -843,15 +848,20 @@ const themes = listThemes();
   /* =====================================================================
      DESKTOP THEME PICKER
   ====================================================================== */
-  .theme-picker {
-    position: relative;
-    display: none; /* hidden on mobile — use the panel section instead */
+  .nav-actions {
+    display: none;
   }
 
   @media (min-width: 900px) {
-    .theme-picker {
-      display: block;
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
     }
+  }
+
+  .theme-picker {
+    position: relative;
   }
 
   .theme-picker-btn {
