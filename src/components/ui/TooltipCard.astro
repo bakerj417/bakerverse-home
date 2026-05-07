@@ -10,12 +10,14 @@ interface Props {
 }
 
 const {
-  rarity = 'rare',
+  rarity: rarityProp = 'rare',
   class: className = '',
   as: Tag = 'div',
   padded = true,
   href,
 } = Astro.props;
+
+const rarity: Rarity = rarityProp;
 
 const rarityColorMap: Record<Rarity, string> = {
   common:    'var(--rarity-common)',

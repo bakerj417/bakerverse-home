@@ -32,7 +32,19 @@ export interface SkillGroup {
   readonly items: readonly string[];
 }
 
-export const resume = {
+export interface Resume {
+  readonly name: string;
+  readonly title: string;
+  readonly location: string;
+  readonly email: string;
+  readonly links: readonly ResumeLink[];
+  readonly summary: string;
+  readonly experience: readonly ResumeExperience[];
+  readonly skills: readonly SkillGroup[];
+  readonly education: readonly ResumeEducation[];
+}
+
+export const resume: Resume = {
   name: 'Joseph Baker',
   title: 'Senior Frontend Engineer',
   location: 'Waxhaw, North Carolina',
