@@ -5,7 +5,7 @@ liveUrl: "https://cook.josephkbaker.com"
 repoUrl: "https://github.com/bakerj417/bakerverse-cookbook"
 rarity: epic
 year: 2026
-status: wip
+status: upcoming
 stack:
   - Next.js 15
   - React 19

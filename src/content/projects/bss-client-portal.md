@@ -3,7 +3,7 @@ title: "BSS Client Portal"
 tagline: "One hub for every client — projects, invoices, documents, and requests. No more email archaeology."
 rarity: legendary
 year: 2026
-status: active
+status: upcoming
 stack:
   - Next.js 14
   - TypeScript
