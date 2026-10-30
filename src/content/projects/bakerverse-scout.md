@@ -4,7 +4,7 @@ tagline: "An AI agent that hunts jobs across four boards every morning so family
 liveUrl: "https://scout.bakerverse.com"
 rarity: epic
 year: 2026
-status: active
+status: paused
 stack:
   - Next.js 15
   - React 19

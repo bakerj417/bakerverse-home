@@ -3,7 +3,7 @@ title: "BSS Client Portal"
 tagline: "One hub for every client — projects, invoices, documents, and requests. No more email archaeology."
 rarity: legendary
 year: 2026
-status: upcoming
+status: active
 stack:
   - Next.js 14
   - TypeScript
@@ -15,7 +15,7 @@ stack:
   - Tailwind CSS
   - Vercel
 featured: true
-order: 1
+order: 2
 summary: >-
   A private branded client hub replacing the ad-hoc pile of email threads,
   Drive links, and PDF-attached invoices that most freelancers accept as normal.

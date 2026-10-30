@@ -3,7 +3,7 @@ title: "Bakerverse Prinfo"
 tagline: "3D print inventory that knows how much PLA you have left — and what it looks like."
 rarity: rare
 year: 2026
-status: wip
+status: paused
 stack:
   - Next.js 15
   - TypeScript

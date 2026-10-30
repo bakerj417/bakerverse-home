@@ -13,8 +13,9 @@ const quests = (await getCollection('projects')).sort(
 );
 
 const active = quests.filter(
-  (q) => q.data.status === 'active' || q.data.status === 'wip' || q.data.status === 'paused',
+  (q) => q.data.status === 'active' || q.data.status === 'wip',
 );
+const onHold = quests.filter((q) => q.data.status === 'paused');
 const completed = quests.filter((q) => q.data.status === 'shipped');
 const upcoming = quests.filter((q) => q.data.status === 'upcoming');
 
@@ -204,6 +205,52 @@ const otherActive = active.slice(1);
       </RevealOnScroll>
     )}
   </section>
+
+  <!-- ======================================================
+       ON HOLD QUESTS
+       ====================================================== -->
+  {onHold.length > 0 && (
+    <section class="section section-y-md quest-section" aria-label="Quests on hold">
+      <RevealOnScroll client:visible>
+        <div class="quest-group-head">
+          <p class="section-eyebrow">On hold</p>
+          <h2 class="quest-group-h2">Prototype built, not in active development</h2>
+        </div>
+      </RevealOnScroll>
+
+      <div class="quest-grid">
+        {onHold.map((quest, index) => (
+          <RevealOnScroll client:visible delayMs={index * 60}>
+            <TooltipCard
+              href={`/projects/${quest.id}`}
+              rarity={quest.data.rarity}
+              class="quest-card"
+            >
+              <article data-rarity={quest.data.rarity}>
+                <div class="quest-card-head">
+                  <span class="quest-rarity">{quest.data.rarity}</span>
+                  <span class="quest-year">{quest.data.year}</span>
+                </div>
+                <h3 class="quest-title">{quest.data.title}</h3>
+                <p class="quest-tagline">{quest.data.tagline}</p>
+                <div class="quest-stack">
+                  {quest.data.stack.slice(0, 4).map((tech) => (
+                    <StackBadge label={tech} />
+                  ))}
+                </div>
+                <div class="quest-footer">
+                  <span class="quest-status" data-status={quest.data.status}>
+                    {statusCopy[quest.data.status] ?? quest.data.status}
+                  </span>
+                  <span class="quest-cta">Open journal →</span>
+                </div>
+              </article>
+            </TooltipCard>
+          </RevealOnScroll>
+        ))}
+      </div>
+    </section>
+  )}
 
   <!-- ======================================================
        COMPLETED QUESTS
