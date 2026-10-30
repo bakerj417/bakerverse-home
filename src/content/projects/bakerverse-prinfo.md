@@ -15,14 +15,20 @@ stack:
 featured: false
 order: 3
 summary: >-
-  A 3D print inventory and info app for tracking filament spools, printers, and
-  tools. The design language is industrial workshop — dark, rugged, feels like
+  A prototype 3D print inventory and info app for tracking filament spools,
+  printers, and tools, currently on hold. The design language is industrial workshop — dark, rugged, feels like
   a real tool. Each spool card shows a live color swatch pulled from the actual
   hex value and a progress bar that turns orange when stock runs low. An easter
   egg theme pays tribute to a 1994 SNES game with the right vibe: CRT scanlines,
   pixel drop shadows, zero-padded stat counters, and a teal brick wall. Prinfo
   is short for print + inventory + info.
 ---
+
+## Status: on hold
+
+The Phase 1 prototype is built: inventory for filament, printers, and tools,
+plus both themes. I'm not actively working on it right now, and the later
+phases below are ideas, not commitments.
 
 ## The problem with 3D print inventory
 
@@ -114,8 +120,8 @@ with a synchronized `padding-left` transition so nothing jumps.
 
 ## The roadmap
 
-**Phase 1 (current):** Core inventory. Filament, printers, tools. Both themes.
-Deployed to `3d.josephkbaker.com`.
+**Phase 1 (prototype built):** Core inventory. Filament, printers, tools. Both
+themes.
 
 **Phase 2:** Auto-reorder agent. A local cron process monitors low-stock spools
 and checks for deals via a filament price API. Email notification when

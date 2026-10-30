@@ -1,6 +1,6 @@
 ---
 title: "Bakerverse Scout"
-tagline: "An AI agent that hunts jobs across four boards every morning so family members don't have to."
+tagline: "A job-hunting agent prototype that sweeps four boards each morning so family members don't have to."
 liveUrl: "https://scout.bakerverse.com"
 rarity: epic
 year: 2026
@@ -19,14 +19,20 @@ stack:
 featured: false
 order: 2
 summary: >-
-  A fully automated job discovery agent built for family members in an active
-  job search. Every morning at 6 AM it scans four job boards, filters the noise
+  A prototype job discovery agent built for family members in an active job
+  search, currently on hold. Every morning at 6 AM it scans four job boards, filters the noise
   against each person's profile, and emails a curated daily summary. Click any
   match to get an AI-generated interview prep report — company research, role
   breakdown, tailored talking points, salary ranges, and practice questions.
   Gmail monitoring catches recruiter replies and surfaces them in the dashboard.
   The goal: zero job board doomscrolling, maximum signal.
 ---
+
+## Status: on hold
+
+The prototype works end to end: the morning sweep, the dashboard, interview prep
+reports, and Gmail monitoring. I'm not actively developing it right now. The
+sections below describe how it was built.
 
 ## The problem with job searching
 
