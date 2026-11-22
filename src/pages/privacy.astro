@@ -1,0 +1,80 @@
+---
+import LegalPage from '@/components/legal/LegalPage.astro';
+import { site } from '@/data/site';
+
+const UPDATED_LABEL = 'November 22, 2026';
+const UPDATED_ISO = '2026-11-22';
+---
+
+<LegalPage
+  title="Privacy policy"
+  description="What josephkbaker.com collects, why, and who can see it. Plain language."
+  eyebrow="Privacy · Policy"
+  lede="This is a personal site. It collects very little, sells nothing, and shares nothing with advertisers."
+  updatedLabel={UPDATED_LABEL}
+  updatedIso={UPDATED_ISO}
+>
+  <section aria-labelledby="who">
+    <h2 id="who">Who runs this site</h2>
+    <p>
+      {site.name} runs josephkbaker.com and the personal projects linked from it.
+      Questions about this policy: <a href={`mailto:${site.email}`}>{site.email}</a>.
+    </p>
+  </section>
+
+  <section aria-labelledby="collect">
+    <h2 id="collect">What is collected</h2>
+    <ul class="accessibility-list">
+      <li>
+        <strong>Contact form.</strong> If you send a message, the name, email address
+        and message you type are emailed to the site owner so a reply is possible.
+        They are not added to any mailing list. A spam check (Cloudflare Turnstile)
+        runs when you submit.
+      </li>
+      <li>
+        <strong>Visit statistics.</strong> Cloudflare Web Analytics measures page loads and
+        performance without cookies and without tracking you across sites.
+      </li>
+      <li>
+        <strong>Error reports.</strong> If the site breaks, Sentry may receive technical
+        details such as the page, browser type and the error, so the problem can be fixed.
+      </li>
+    </ul>
+    <p>The site does not use advertising cookies and does not sell or rent personal information.</p>
+  </section>
+
+  <section aria-labelledby="google">
+    <h2 id="google">Google sign-in used by the NAS backup tool</h2>
+    <p>
+      The owner runs a private backup tool, called NAS backup, that copies the owner's own
+      files to the owner's own Google Drive. It uses Google's <code>drive.file</code> permission,
+      which only lets it see and change files that the tool itself created. It is not offered to
+      the public, and no visitor of this site is asked to sign in to it.
+    </p>
+    <p>
+      The data stays between the owner's computers and the owner's Google Drive. It is not
+      shared with other people, used for advertising, or used to train AI models. The tool's use
+      of information received from Google follows the
+      <a
+        href="https://developers.google.com/terms/api-services-user-data-policy"
+        rel="noopener noreferrer"
+        target="_blank"
+      >Google API Services User Data Policy<span class="sr-only"> (opens in new tab)</span></a>,
+      including its Limited Use requirements.
+    </p>
+  </section>
+
+  <section aria-labelledby="keep">
+    <h2 id="keep">How long it is kept, and your choices</h2>
+    <p>
+      Contact messages stay in the owner's email until deleted. To ask for a message to be
+      deleted, or to ask what is held about you, email
+      <a href={`mailto:${site.email}`}>{site.email}</a>.
+    </p>
+  </section>
+
+  <section aria-labelledby="changes">
+    <h2 id="changes">Changes</h2>
+    <p>If this policy changes, the date at the top changes with it.</p>
+  </section>
+</LegalPage>

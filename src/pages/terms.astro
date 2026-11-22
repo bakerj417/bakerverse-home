@@ -1,0 +1,58 @@
+---
+import LegalPage from '@/components/legal/LegalPage.astro';
+import { site } from '@/data/site';
+
+const UPDATED_LABEL = 'November 22, 2026';
+const UPDATED_ISO = '2026-11-22';
+---
+
+<LegalPage
+  title="Terms of service"
+  description="The simple terms for using josephkbaker.com."
+  eyebrow="Terms · Of service"
+  lede="Short and plain. This is a personal site, offered as is."
+  updatedLabel={UPDATED_LABEL}
+  updatedIso={UPDATED_ISO}
+>
+  <section aria-labelledby="use">
+    <h2 id="use">Using the site</h2>
+    <p>
+      You may browse josephkbaker.com and read what is on it. Please do not try to break it,
+      overload it, or use the contact form to send spam or anything unlawful.
+    </p>
+  </section>
+
+  <section aria-labelledby="content">
+    <h2 id="content">Content</h2>
+    <p>
+      The writing, design and code on this site belong to {site.name} unless a page says
+      otherwise. Linking to the site is welcome. Copying large parts of it is not, without asking.
+    </p>
+  </section>
+
+  <section aria-labelledby="private-tools">
+    <h2 id="private-tools">Private tools</h2>
+    <p>
+      Some pages and subdomains are private tools for the owner and family. They are not public
+      services, carry no promise of availability, and may change or disappear at any time. The
+      owner's NAS backup tool is one of these. It is for the owner's own use only.
+    </p>
+  </section>
+
+  <section aria-labelledby="warranty">
+    <h2 id="warranty">No warranty</h2>
+    <p>
+      The site and everything on it is provided as is, without any warranty. To the extent the
+      law allows, {site.name} is not liable for losses from using it. Information here may be
+      out of date.
+    </p>
+  </section>
+
+  <section aria-labelledby="contact">
+    <h2 id="contact">Contact and changes</h2>
+    <p>
+      Questions: <a href={`mailto:${site.email}`}>{site.email}</a>. If these terms change, the
+      date at the top changes with them. See also the <a href="/privacy">privacy policy</a>.
+    </p>
+  </section>
+</LegalPage>
