@@ -1,0 +1,179 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+
+/**
+ * Shared shell for plain-language legal pages (privacy, terms).
+ * Reuses the accessibility statement's look so the pages read as
+ * part of the site. Content comes in through the default slot.
+ */
+interface Props {
+  title: string;
+  description: string;
+  eyebrow: string;
+  lede: string;
+  updatedLabel: string;
+  updatedIso: string;
+}
+const { title, description, eyebrow, lede, updatedLabel, updatedIso } = Astro.props;
+---
+
+<BaseLayout title={title} description={description}>
+  <section class="section section-y-lg accessibility-page">
+    <header class="accessibility-header">
+      <p class="section-eyebrow">{eyebrow}</p>
+      <h1 class="accessibility-h1">{title}</h1>
+      <p class="accessibility-lede">{lede}</p>
+      <p class="accessibility-meta">
+        <span class="accessibility-meta-label">Last updated:</span>
+        <time datetime={updatedIso}>{updatedLabel}</time>
+      </p>
+    </header>
+    <article class="accessibility-body">
+      <slot />
+    </article>
+  </section>
+</BaseLayout>
+
+<style is:global>
+  .accessibility-page {
+    max-width: 760px;
+    margin: 0 auto;
+  }
+
+  .accessibility-header {
+    margin-bottom: 3rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid rgba(240, 185, 11, 0.15);
+  }
+
+  .accessibility-h1 {
+    font-family: var(--font-display);
+    font-size: clamp(2.25rem, 5vw, 3.75rem);
+    line-height: 1.1;
+    margin: 0.75rem 0 1.25rem;
+    letter-spacing: 0.01em;
+    text-shadow:
+      0 1px 0 rgba(0, 0, 0, 0.65),
+      0 -1px 0 rgba(240, 185, 11, 0.06);
+  }
+
+  .accessibility-lede {
+    color: var(--ink-300);
+    font-size: 1.1rem;
+    line-height: 1.7;
+    margin: 0 0 1.5rem;
+    max-width: 56ch;
+  }
+
+  .accessibility-meta {
+    margin: 0;
+    color: var(--ink-500);
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    letter-spacing: 0.08em;
+  }
+
+  .accessibility-meta-label {
+    color: var(--ink-700);
+    margin-right: 0.4rem;
+  }
+
+  .accessibility-body {
+    display: flex;
+    flex-direction: column;
+    gap: 2.75rem;
+    color: var(--ink-300);
+    line-height: 1.75;
+    font-size: 1rem;
+  }
+
+  .accessibility-body h2 {
+    font-family: var(--font-display);
+    font-size: clamp(1.4rem, 2.4vw, 1.85rem);
+    color: var(--ink-100);
+    margin: 0 0 1rem;
+    letter-spacing: 0.01em;
+    line-height: 1.25;
+  }
+
+  .accessibility-body p {
+    margin: 0 0 1rem;
+    max-width: 64ch;
+  }
+
+  .accessibility-body p:last-child {
+    margin-bottom: 0;
+  }
+
+  .accessibility-body strong {
+    color: var(--ink-100);
+    font-weight: 600;
+  }
+
+  .accessibility-body a {
+    color: var(--gold-300);
+    text-decoration: underline;
+    text-decoration-color: rgba(240, 185, 11, 0.4);
+    text-underline-offset: 3px;
+    transition:
+      color var(--dur-fast) var(--ease-standard),
+      text-decoration-color var(--dur-fast) var(--ease-standard);
+  }
+
+  .accessibility-body a:hover {
+    color: var(--gold-200);
+    text-decoration-color: var(--gold-300);
+  }
+
+  .accessibility-body code {
+    font-family: var(--font-mono);
+    font-size: 0.88em;
+    padding: 0.1em 0.4em;
+    background: rgba(240, 185, 11, 0.08);
+    border: 1px solid rgba(240, 185, 11, 0.18);
+    border-radius: var(--radius-sharp);
+    color: var(--ink-100);
+  }
+
+  .accessibility-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+  }
+
+  .accessibility-list li {
+    position: relative;
+    padding-left: 1.5rem;
+    line-height: 1.65;
+    max-width: 64ch;
+  }
+
+  .accessibility-list li::before {
+    content: '◆';
+    position: absolute;
+    left: 0;
+    top: 0.05em;
+    color: var(--gold-400);
+    font-size: 0.7rem;
+  }
+
+  /*
+    Visually hidden but still in the accessibility tree —
+    "(opens in new tab)" suffixes that screen readers announce
+    while sighted users see the icon-free anchor.
+  */
+  .sr-only {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    padding: 0 !important;
+    margin: -1px !important;
+    overflow: hidden !important;
+    clip: rect(0, 0, 0, 0) !important;
+    white-space: nowrap !important;
+    border: 0 !important;
+  }
+</style>
