@@ -80,6 +80,46 @@ test.describe('WCAG 2.2 AA — site-wide axe sweep', () => {
     expect(results.violations).toEqual([]);
   });
 
+  test('ad blocking guide — no axe violations with all details open', async ({ page }) => {
+    await page.goto('/guides/ad-blocking');
+    await page.evaluate(() => {
+      document.querySelectorAll('details').forEach((d) => {
+        d.open = true;
+      });
+    });
+    const results = await runAxe(page);
+    expect(results.violations).toEqual([]);
+  });
+
+  test('ad blocking guide — no axe violations at 320px', async ({ page }) => {
+    await page.setViewportSize({ width: 320, height: 800 });
+    await page.goto('/guides/ad-blocking');
+    await page.evaluate(() => {
+      document.querySelectorAll('details').forEach((d) => {
+        d.open = true;
+      });
+    });
+    const results = await runAxe(page);
+    expect(results.violations).toEqual([]);
+    const overflow = await page.evaluate(
+      () => document.documentElement.scrollWidth - window.innerWidth,
+    );
+    expect(overflow).toBeLessThanOrEqual(0);
+  });
+
+  test('ad blocking guide — copy button works from the keyboard and announces', async ({
+    page,
+    context,
+  }) => {
+    await context.grantPermissions(['clipboard-read', 'clipboard-write']);
+    await page.goto('/guides/ad-blocking');
+    const button = page.locator('.code-block-copy').first();
+    await button.focus();
+    await expect(button).toBeFocused();
+    await page.keyboard.press('Enter');
+    await expect(page.locator('#copy-status')).toHaveText('Copied');
+  });
+
   test('ad blocking guide — noindex until published', async ({ page }) => {
     await page.goto('/guides/ad-blocking');
     const robots = page.locator('meta[name="robots"]');

@@ -21,7 +21,6 @@ export const GUIDE_UPDATED_LABEL = 'November 23, 2026';
 export const PLACEHOLDERS = {
   tailnetIp: '100.x.y.z',
   lanIp: '192.168.1.x',
-  tailnetName: 'demo-tailnet',
 } as const;
 
 export const ADGUARD_DNS = {
@@ -34,6 +33,9 @@ export const ADGUARD_DNS = {
   /** Non-filtering. Do NOT use as a Tailscale nameserver for ad blocking. */
   nonFilteringPrimary: '94.140.14.140',
   nonFilteringSecondary: '94.140.14.141',
+  /** Default (filtering) IPv6 addresses. Optional. */
+  ipv6Primary: '2a10:50c0::ad1:ff',
+  ipv6Secondary: '2a10:50c0::ad2:ff',
   dohUrl: 'https://dns.adguard-dns.com/dns-query',
 } as const;
 
@@ -41,36 +43,43 @@ export const ADGUARD_DNS = {
 export const TEST_DOMAIN = 'doubleclick.net';
 
 export const LIMITS = {
-  /** UNVERIFIED. Recheck on the NextDNS pricing page before publishing. */
+  /** Recheck on the NextDNS pricing page before publishing. */
   nextDnsFreeQueriesPerMonth: '300,000',
   /** Recheck at publish. */
   tailscalePersonalUsers: 6,
 } as const;
 
+/** Pinned AdGuard Home image tag. Recheck on Docker Hub at publish. */
+export const ADGUARD_HOME_IMAGE_TAG = 'v0.107.80';
+
 export const COSTS = {
   pathA: '$0',
-  pathB: 'Hardware you already own, or a few dollars a month for a small cloud server',
+  pathB: 'Hardware you already own',
   pathC: '$0 if you already have the NAS',
   pathD: '$0',
 } as const;
 
 export const URLS = {
-  tailscaleDns: 'https://tailscale.com/kb/1054/dns',
-  tailscalePiHole: 'https://tailscale.com/kb/1114/pi-hole',
+  tailscaleDns: 'https://tailscale.com/docs/reference/dns-in-tailscale',
+  tailscalePiHole: 'https://tailscale.com/docs/solutions/block-ads-all-devices-anywhere-using-raspberry-pi',
   tailscalePricing: 'https://tailscale.com/pricing',
   tailscaleDownload: 'https://tailscale.com/download',
   tailscaleOtherVpns: 'https://tailscale.com/docs/reference/faq/other-vpns',
-  tailscaleExitNodes: 'https://tailscale.com/kb/1103/exit-nodes',
-  tailscaleSubnets: 'https://tailscale.com/kb/1019/subnets',
-  tailscaleAcls: 'https://tailscale.com/kb/1018/acls',
-  tailscaleKeyExpiry: 'https://tailscale.com/kb/1028/key-expiry',
+  tailscaleExitNodes: 'https://tailscale.com/docs/features/exit-nodes',
+  tailscaleSubnets: 'https://tailscale.com/docs/features/subnet-routers',
+  tailscaleAcls: 'https://tailscale.com/docs/features/access-control/acls',
+  tailscaleKeyExpiry: 'https://tailscale.com/docs/features/access-control/key-expiry',
+  tailscaleClientPrefs: 'https://tailscale.com/docs/features/client/manage-preferences',
   tailscaleAdminDns: 'https://login.tailscale.com/admin/dns',
   tailscaleNextDns: 'https://tailscale.com/docs/integrations/nextdns',
   tailscaleControlD: 'https://tailscale.com/blog/controld',
   adguardPublicDns: 'https://adguard-dns.io/en/public-dns.html',
+  adguardCheckPage: 'https://adguard-dns.io/en/support/make_sure.html',
+  adguardPrivateRelay: 'https://adguard-dns.io/kb/private-dns/solving-problems/icloud-private-relay/',
+  nextDnsPricing: 'https://nextdns.io/pricing',
   adguardHomeStart: 'https://adguard-dns.io/kb/adguard-home/getting-started/',
   adguardHomeDocker: 'https://hub.docker.com/r/adguard/adguardhome',
-  /** Third-party test page. Not checked for accuracy by me. */
+  /** Third-party test page. Optional; not checked for accuracy by me. */
   blockTestPage: 'https://d3ward.github.io/toolz/adblock.html',
 } as const;
 
@@ -106,6 +115,11 @@ export const CHANGELOG = [
     label: 'November 23, 2026',
     note: 'First draft. No path has been tested yet.',
   },
+  {
+    iso: '2026-11-23',
+    label: 'November 23, 2026',
+    note: 'Fact-check pass: safer cloud-box steps, first-aid box, parallel DNS behaviour, reverse steps.',
+  },
 ] as const;
 
 export interface ComparisonRow {
@@ -135,7 +149,7 @@ export const COMPARISON: readonly ComparisonRow[] = [
     time: 'About an hour',
     hardware: 'Any always-on box',
     away: 'Yes, on every device with Tailscale',
-    privacy: 'Lookups stay with you and your chosen upstream',
+    privacy: 'Mostly your box; some lookups go to the fallback',
   },
   {
     id: 'c',
@@ -144,7 +158,7 @@ export const COMPARISON: readonly ComparisonRow[] = [
     time: 'One to two hours',
     hardware: 'A NAS that runs Docker',
     away: 'Yes, with Tailscale on the NAS',
-    privacy: 'Lookups stay with you and your chosen upstream',
+    privacy: 'Mostly your box; some lookups go to the fallback, if you add one',
   },
   {
     id: 'd',

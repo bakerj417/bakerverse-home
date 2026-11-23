@@ -133,6 +133,12 @@ const { title, description, eyebrow, lede, updatedLabel, updatedIso, noindex = f
     text-decoration-color: var(--gold-300);
   }
 
+  @media (prefers-reduced-motion: reduce) {
+    .doc-body a {
+      transition: none;
+    }
+  }
+
   .doc-body code {
     font-family: var(--font-mono);
     font-size: 0.88em;

@@ -281,3 +281,34 @@
     transition: none;
   }
 }
+
+.guide-glossary {
+  margin: 0;
+  display: grid;
+  gap: 0.5rem 1rem;
+  grid-template-columns: max-content 1fr;
+}
+
+.guide-glossary dt {
+  color: var(--ink-100);
+  font-weight: 600;
+}
+
+.guide-glossary dd {
+  margin: 0;
+}
+
+@media (max-width: 40rem) {
+  .guide-glossary {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+
+  .guide-glossary dd {
+    margin-bottom: 0.75rem;
+  }
+}
+
+.doc-body li > .code-block {
+  margin-top: 0.75rem;
+}
