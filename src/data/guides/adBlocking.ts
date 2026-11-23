@@ -85,40 +85,41 @@ export const URLS = {
 
 export type PathId = 'a' | 'b' | 'c' | 'd';
 
-const NOT_TESTED = 'Not tested by me yet. Steps are from the official docs.';
+/** Date of the live lookups and the container sandbox test. */
+export const TESTED_ISO = '2026-11-23';
 
-/**
- * Per-path test status. When a path is tested, set `testedOn` and
- * `versions` and leave `status` as the formatted line.
- */
-export interface PathStatus {
-  readonly testedOn: string | null;
-  readonly versions: string | null;
-}
+export const PAGE_STATUS_LINE = `Written from the official docs. I have not tested the Tailscale steps myself. The AdGuard Home steps were tested in a container sandbox on ${TESTED_ISO} (see each path). When in doubt, follow the official docs.`;
 
-export const PATH_STATUS: Readonly<Record<PathId, PathStatus>> = {
-  a: { testedOn: null, versions: null },
-  b: { testedOn: null, versions: null },
-  c: { testedOn: null, versions: null },
-  d: { testedOn: null, versions: null },
+const ADGUARD_HOME_TESTED =
+  'a blocked ad address answered 0.0.0.0, a normal site answered normally, an allow-list rule made the blocked site load, removing the rule blocked it again, and removing the container closed the port.';
+
+/** Per-path test label. Update the text and date here when a path is tested. */
+export const PATH_STATUS: Readonly<Record<PathId, string>> = {
+  a: `Not tested by me. Steps are from the official docs. The AdGuard public DNS addresses were checked with a live lookup on ${TESTED_ISO}: a blocked ad address answered 0.0.0.0, the non-filtering address returned real addresses.`,
+  b: `The AdGuard Home part (setup, blocking, allow-listing a site, removing it) was tested in a container on ${TESTED_ISO}: ${ADGUARD_HOME_TESTED} The Tailscale parts are from the official docs and not tested by me.`,
+  c: `The AdGuard Home part (setup, blocking, allow-listing a site, removing it) was tested in a container on ${TESTED_ISO}, with port mapping, NOT with host networking or on a NAS: ${ADGUARD_HOME_TESTED} Host networking, the NAS specifics and the Tailscale parts are from the docs, not tested.`,
+  d: 'Not tested by me. Steps are from the official docs and general router knowledge.',
 };
 
 export function statusLine(id: PathId): string {
-  const { testedOn, versions } = PATH_STATUS[id];
-  if (!testedOn) return NOT_TESTED;
-  return `Tested on ${testedOn}${versions ? ` (${versions})` : ''}.`;
+  return PATH_STATUS[id];
 }
 
 export const CHANGELOG = [
   {
     iso: '2026-11-23',
     label: 'November 23, 2026',
-    note: 'First draft. No path has been tested yet.',
+    note: 'First draft, written from the official docs.',
   },
   {
     iso: '2026-11-23',
     label: 'November 23, 2026',
     note: 'Fact-check pass: safer cloud-box steps, first-aid box, parallel DNS behaviour, reverse steps.',
+  },
+  {
+    iso: TESTED_ISO,
+    label: 'November 23, 2026',
+    note: 'Labels made precise: AdGuard public DNS addresses checked live; AdGuard Home tested in a container sandbox.',
   },
 ] as const;
 

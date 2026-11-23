@@ -12,6 +12,7 @@ import {
   GUIDE_UPDATED_ISO,
   GUIDE_UPDATED_LABEL,
   LIMITS,
+  PAGE_STATUS_LINE,
   PLACEHOLDERS as PH,
   TEST_DOMAIN,
   URLS,
@@ -42,6 +43,8 @@ const composeFile = `services:
   wide
 >
   <p id="copy-status" class="sr-only" role="status" aria-live="polite"></p>
+
+  <p class="path-status" id="page-status">{PAGE_STATUS_LINE}</p>
 
   <!-- 1. TL;DR + warnings -->
   <section aria-labelledby="tldr">
@@ -517,7 +520,7 @@ const composeFile = `services:
     <ul class="doc-list">
       <li>DNS blocking is not perfect. It stops ads by domain, so ads served from the same domain as content get through.</li>
       <li>DNS does not hide you or make you anonymous.</li>
-      <li>This guide is a draft. <strong>No path has been tested yet.</strong> Each path says so above.</li>
+      <li>This guide is a draft. <strong>I have not tested the Tailscale steps myself.</strong> Each path says exactly what was and was not tested.</li>
       <li>No warranty. I am not affiliated with Tailscale, AdGuard, NextDNS or Control D.</li>
       <li>When in doubt, follow the official docs, not this page.</li>
       <li>I cannot offer one-to-one support.</li>
@@ -548,8 +551,8 @@ const composeFile = `services:
       ))}
     </ul>
     <p>
-      <strong>Tested on:</strong> not tested yet. When a path is tested, its date and
-      versions will appear in that path's section.
+      <strong>Tested on:</strong> see the label at the top of each path. Anything not
+      marked as tested comes from the official docs.
     </p>
   </section>
 </DocPage>
