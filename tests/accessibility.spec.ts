@@ -2,7 +2,7 @@
  * Accessibility regression gate for josephkbaker.com.
  *
  * Each route below is crawled with @axe-core/playwright using the
- * WCAG 2.1 A + AA tag set. Any new violation fails CI before it ever
+ * WCAG 2.2 A + AA tag set. Any new violation fails CI before it ever
  * reaches main. The /accessibility statement page documents the
  * conformance target and any acknowledged limitations.
  *
@@ -13,13 +13,13 @@
 import { expect, test, type Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 
-const WCAG_TAGS = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'] as const;
+const WCAG_TAGS = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'] as const;
 
 async function runAxe(page: Page) {
   return new AxeBuilder({ page }).withTags([...WCAG_TAGS]).analyze();
 }
 
-test.describe('WCAG 2.1 AA — site-wide axe sweep', () => {
+test.describe('WCAG 2.2 AA — site-wide axe sweep', () => {
   test('home — no axe violations', async ({ page }) => {
     await page.goto('/');
     const results = await runAxe(page);
@@ -72,5 +72,17 @@ test.describe('WCAG 2.1 AA — site-wide axe sweep', () => {
     await page.goto('/accessibility');
     const results = await runAxe(page);
     expect(results.violations).toEqual([]);
+  });
+
+  test('ad blocking guide — no axe violations', async ({ page }) => {
+    await page.goto('/guides/ad-blocking');
+    const results = await runAxe(page);
+    expect(results.violations).toEqual([]);
+  });
+
+  test('ad blocking guide — noindex until published', async ({ page }) => {
+    await page.goto('/guides/ad-blocking');
+    const robots = page.locator('meta[name="robots"]');
+    await expect(robots).toHaveAttribute('content', /noindex/);
   });
 });

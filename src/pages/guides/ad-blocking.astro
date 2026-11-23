@@ -1,0 +1,451 @@
+---
+import DocPage from '@/components/doc/DocPage.astro';
+import CodeBlock from '@/components/doc/CodeBlock.astro';
+import ExtLink from '@/components/doc/ExtLink.astro';
+import '@/components/doc/guide.css';
+import {
+  ADGUARD_DNS as DNS,
+  CHANGELOG,
+  COMPARISON,
+  GUIDE_IS_PUBLISHED,
+  GUIDE_UPDATED_ISO,
+  GUIDE_UPDATED_LABEL,
+  LIMITS,
+  PLACEHOLDERS as PH,
+  TEST_DOMAIN,
+  URLS,
+  statusLine,
+} from '@/data/guides/adBlocking';
+
+const nslookup = (server: string) => `nslookup ${TEST_DOMAIN} ${server}`;
+
+const composeFile = `services:
+  adguardhome:
+    image: adguard/adguardhome
+    container_name: adguardhome
+    restart: unless-stopped
+    network_mode: host
+    volumes:
+      - ./work:/opt/adguardhome/work
+      - ./conf:/opt/adguardhome/conf`;
+---
+
+<DocPage
+  title="Block ads on all your devices, at home and away"
+  description="A plain-language guide to ad blocking with DNS and Tailscale. Four paths, starting with the one that needs no hardware."
+  eyebrow="Guide · Ad blocking"
+  lede="I run AdGuard at home and a few people asked how to get the same thing. Most of you do not have a NAS, so the first path needs no hardware at all."
+  updatedLabel={GUIDE_UPDATED_LABEL}
+  updatedIso={GUIDE_UPDATED_ISO}
+  noindex={!GUIDE_IS_PUBLISHED}
+  wide
+>
+  <p id="copy-status" class="sr-only" role="status" aria-live="polite"></p>
+
+  <!-- 1. TL;DR + work warning -->
+  <section aria-labelledby="tldr">
+    <h2 id="tldr">The short version</h2>
+    <p>
+      Ads are blocked by your DNS, the lookup your device does before it loads a site.
+      Point your devices at a DNS service that refuses to look up ad domains, and the
+      ads never load. Tailscale lets your phone and laptop keep using that DNS when you
+      leave home.
+    </p>
+    <p>
+      <strong>Easiest start:</strong> <a href="#path-a">Path A</a>. Free, about 15 minutes,
+      no hardware.
+    </p>
+    <div class="callout callout--warn" role="note" aria-labelledby="work-warning">
+      <p id="work-warning" class="callout-title">Work devices: stop here first</p>
+      <p>
+        <strong>
+          Do not install Tailscale or change DNS on a work-managed laptop or phone
+          without IT's written OK.
+        </strong>
+        A work VPN and Tailscale can clash, and your employer may see changes to DNS
+        as a policy breach. See Tailscale's page on
+        <ExtLink href={URLS.tailscaleOtherVpns}>using Tailscale with other VPNs</ExtLink>.
+      </p>
+    </div>
+  </section>
+
+  <!-- 2. Chooser -->
+  <section aria-labelledby="chooser">
+    <h2 id="chooser">Which path is for me? (30 seconds)</h2>
+    <p>Answer in order. Stop at the first answer that sends you somewhere.</p>
+    <ol class="chooser-list">
+      <li>
+        <strong>Do you have a computer, mini PC, Raspberry Pi or NAS that stays on all the time?</strong>
+        <div class="chooser-answers">
+          <a href="#path-a">No: Path A</a>
+          <span class="sr-only">or</span>
+          <span aria-hidden="true">Yes: keep going</span>
+        </div>
+      </li>
+      <li>
+        <strong>Is it a NAS (Synology, QNAP, Ugreen, Unraid, TrueNAS)?</strong>
+        <div class="chooser-answers">
+          <a href="#path-c">Yes: Path C</a>
+          <span class="sr-only">or</span>
+          <span aria-hidden="true">No: keep going</span>
+        </div>
+      </li>
+      <li>
+        <strong>Do you want ad blocking when you are away from home?</strong>
+        <div class="chooser-answers">
+          <a href="#path-b">Yes: Path B</a>
+          <a href="#path-d">No, home only: Path D</a>
+        </div>
+      </li>
+    </ol>
+  </section>
+
+  <!-- 3. Table -->
+  <section aria-labelledby="compare">
+    <h2 id="compare">The four paths side by side</h2>
+    <div class="table-wrap">
+      <table class="compare-table" role="table">
+        <caption>Cost, time and trade-offs for each ad-blocking path</caption>
+        <thead role="rowgroup">
+          <tr role="row">
+            <th scope="col" role="columnheader">Path</th>
+            <th scope="col" role="columnheader">Cost</th>
+            <th scope="col" role="columnheader">Time</th>
+            <th scope="col" role="columnheader">Hardware</th>
+            <th scope="col" role="columnheader">Works away from home</th>
+            <th scope="col" role="columnheader">Who sees your lookups</th>
+          </tr>
+        </thead>
+        <tbody role="rowgroup">
+          {COMPARISON.map((row) => (
+            <tr role="row">
+              <th scope="row" role="rowheader"><a href={`#path-${row.id}`}>{row.name}</a></th>
+              <td role="cell" data-label="Cost">{row.cost}</td>
+              <td role="cell" data-label="Time">{row.time}</td>
+              <td role="cell" data-label="Hardware">{row.hardware}</td>
+              <td role="cell" data-label="Works away from home">{row.away}</td>
+              <td role="cell" data-label="Who sees your lookups">{row.privacy}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+    <p>
+      Tailscale's Personal plan is free for up to {LIMITS.tailscalePersonalUsers} users and
+      unlimited personal devices at the time of writing. Check
+      <ExtLink href={URLS.tailscalePricing}>the pricing page</ExtLink> before you rely on it.
+    </p>
+  </section>
+
+  <!-- 4A -->
+  <section aria-labelledby="path-a">
+    <h2 id="path-a">Path A: No hardware (Tailscale and AdGuard DNS)</h2>
+    <p class="path-status">{statusLine('a')}</p>
+    <p>
+      <strong>Trade-off:</strong> AdGuard's public DNS service can see the domains you
+      look up. If that bothers you, use Path B.
+    </p>
+    <h3>What you need</h3>
+    <ul class="guide-plain">
+      <li>A free Tailscale account.</li>
+      <li>Admin rights on your own tailnet (the first person to sign up has them).</li>
+      <li>Personal devices only. See the work warning above.</li>
+    </ul>
+    <h3>Steps</h3>
+    <ol>
+      <li>
+        Install Tailscale on each of your personal devices from
+        <ExtLink href={URLS.tailscaleDownload}>the download page</ExtLink> and sign in to the
+        same account on all of them.
+      </li>
+      <li>
+        Open the <ExtLink href={URLS.tailscaleAdminDns}>DNS page of the admin console</ExtLink>.
+      </li>
+      <li>
+        Under <strong>Nameservers</strong>, add a global nameserver and enter the first
+        address below. Add the second one the same way.
+      </li>
+      <li>
+        Turn on <strong>Override DNS servers</strong>, so your devices use these
+        nameservers instead of the Wi-Fi's.
+      </li>
+      <li>
+        Make sure each device is using Tailscale DNS. Most apps do this by default. On
+        iPhone and Android, look for a setting like <strong>Use Tailscale DNS settings</strong>
+        and turn it on (exact wording not verified). On Linux run the command below.
+      </li>
+    </ol>
+    <CodeBlock id="code-a-nameservers" label="AdGuard DNS addresses to add as global nameservers" code={`${DNS.primary}\n${DNS.secondary}`} />
+    <CodeBlock id="code-a-linux" label="Linux only: let Tailscale manage DNS" code="sudo tailscale set --accept-dns=true" />
+    <div class="callout" role="note" aria-labelledby="a-only-filtering">
+      <p id="a-only-filtering" class="callout-title">Only add filtering nameservers</p>
+      <p>
+        Tailscale may ask all nameservers at once and use whichever answers fastest
+        (<ExtLink href={URLS.tailscaleDns}>Tailscale DNS docs</ExtLink>). A second,
+        non-filtering nameserver such as {DNS.nonFilteringPrimary} would let ads through.
+      </p>
+    </div>
+    <h3>Verify</h3>
+    <ol>
+      <li>
+        Run this on a device. The answer for a blocked domain should be an empty
+        or all-zero address, not a real one (exact answer not verified).
+      </li>
+      <li>
+        Open a
+        <ExtLink href={URLS.blockTestPage}>third-party ad-block test page</ExtLink>.
+        I have not verified its accuracy. A blocked ad domain should show as blocked.
+      </li>
+    </ol>
+    <CodeBlock id="code-a-verify" label="Check that a known ad domain is blocked" code={nslookup(DNS.primary)} />
+    <details id="reverse-a">
+      <summary>How to reverse this</summary>
+      <ol>
+        <li>In the DNS page of the admin console, remove the two nameservers or turn <strong>Override DNS servers</strong> off.</li>
+        <li>Or, on one device only: disconnect Tailscale, or uninstall the app.</li>
+        <li>Your devices go back to using the DNS from the Wi-Fi they are on.</li>
+      </ol>
+    </details>
+    <p>
+      Prefer a service with a dashboard? NextDNS
+      (<ExtLink href={URLS.tailscaleNextDns}>Tailscale integration</ExtLink>) and Control D
+      (<ExtLink href={URLS.tailscaleControlD}>announcement</ExtLink>) are built into Tailscale.
+      NextDNS has a free tier of about {LIMITS.nextDnsFreeQueriesPerMonth} queries a month
+      (unverified, check their site).
+    </p>
+  </section>
+
+  <!-- 4B -->
+  <section aria-labelledby="path-b">
+    <h2 id="path-b">Path B: Your own AdGuard Home on an always-on box</h2>
+    <p class="path-status">{statusLine('b')}</p>
+    <p>
+      This follows Tailscale's own
+      <ExtLink href={URLS.tailscalePiHole}>Pi-hole guide</ExtLink>, using AdGuard Home
+      instead of Pi-hole. Lookups go to your box, which is on your tailnet.
+    </p>
+    <h3>What you need</h3>
+    <ul class="guide-plain">
+      <li>A box that stays on: Raspberry Pi, mini PC, old laptop, or a cheap cloud server.</li>
+      <li>A free Tailscale account with your personal devices on it.</li>
+    </ul>
+    <h3>Steps</h3>
+    <ol>
+      <li>
+        Install AdGuard Home by following
+        <ExtLink href={URLS.adguardHomeStart}>the official getting started guide</ExtLink>.
+        In the setup wizard, choose a strong admin username and password.
+      </li>
+      <li>Install Tailscale on the same box, and tell it not to use the tailnet's DNS (the box is the DNS server). Then find its tailnet address.</li>
+      <li>
+        In the DNS page of the admin console, add a global nameserver with the box's tailnet
+        address (it looks like <code>{PH.tailnetIp}</code>).
+      </li>
+      <li>
+        Add <code>{DNS.primary}</code> as a second global nameserver, as a fallback if the box is off.
+        Use a <em>filtering</em> fallback only.
+      </li>
+      <li>Turn on <strong>Override DNS servers</strong>.</li>
+      <li>
+        Optional: stop the box's Tailscale login from expiring. See
+        <ExtLink href={URLS.tailscaleKeyExpiry}>key expiry</ExtLink>.
+      </li>
+    </ol>
+    <CodeBlock id="code-b-install" label="On the box: install Tailscale and keep its own DNS" code={`curl -fsSL https://tailscale.com/install.sh | sh\nsudo tailscale up --accept-dns=false\ntailscale ip -4`} />
+    <div class="callout callout--warn" role="note" aria-labelledby="b-safety">
+      <p id="b-safety" class="callout-title">Keep it off the internet</p>
+      <p>
+        Never expose AdGuard Home's admin page or port 53 to the internet, and do not
+        forward them on your router. Change any default admin password.
+      </p>
+    </div>
+    <h3>Verify</h3>
+    <p>Replace the address with your box's tailnet address.</p>
+    <CodeBlock id="code-b-verify" label="Check that your box blocks a known ad domain" code={nslookup(PH.tailnetIp)} />
+    <details id="reverse-b">
+      <summary>How to reverse this</summary>
+      <ol>
+        <li>In the DNS page of the admin console, remove the box's address and the fallback, or turn <strong>Override DNS servers</strong> off.</li>
+        <li>On the box, disconnect Tailscale with the command below, or just turn the box off. The fallback keeps blocking until you remove it from the admin console.</li>
+      </ol>
+      <CodeBlock id="code-b-reverse" label="On the box: disconnect Tailscale" code="sudo tailscale down" />
+    </details>
+  </section>
+
+  <!-- 4C -->
+  <section aria-labelledby="path-c">
+    <h2 id="path-c">Path C: On a NAS (Docker)</h2>
+    <p class="path-status">{statusLine('c')}</p>
+    <p>
+      Same as Path B, but AdGuard Home runs as a container. Use Container Manager, Docker,
+      or the Docker app on Synology, QNAP, Ugreen, Unraid or TrueNAS.
+    </p>
+    <h3>What you need</h3>
+    <ul class="guide-plain">
+      <li>A NAS that runs Docker containers, with Tailscale installed on it.</li>
+      <li>Some comfort with a compose file. Image notes are on the <ExtLink href={URLS.adguardHomeDocker}>Docker Hub page</ExtLink>.</li>
+    </ul>
+    <h3>Steps</h3>
+    <ol>
+      <li>
+        Port 53 is often already taken by a NAS service (a built-in DNS or DHCP feature, for
+        example). Turn that off, or give AdGuard its own address.
+      </li>
+      <li>
+        The simplest option is <strong>host networking</strong>, shown below. A
+        <strong>macvlan</strong> network gives the container its own LAN address
+        (like <code>{PH.lanIp}</code>), but with macvlan the NAS itself usually cannot reach the
+        container. That can break Tailscale on the NAS.
+      </li>
+      <li>Start the container, then open its setup page and choose a strong admin password.</li>
+      <li>Install Tailscale on the NAS, then follow steps 3 to 5 of Path B using the NAS's tailnet address.</li>
+    </ol>
+    <CodeBlock id="code-c-compose" label="docker-compose.yml with host networking" code={composeFile} />
+    <p>
+      <strong>Advanced variant:</strong> run a separate Tailscale gateway container next to
+      AdGuard, advertise the AdGuard address as a
+      <ExtLink href={URLS.tailscaleSubnets}>subnet route</ExtLink>, and add an
+      <ExtLink href={URLS.tailscaleAcls}>access rule</ExtLink> so devices can only reach it on
+      the DNS port. I do not cover the steps here.
+    </p>
+    <h3>Verify</h3>
+    <CodeBlock id="code-c-verify" label="Check that the NAS blocks a known ad domain" code={nslookup(PH.tailnetIp)} />
+    <details id="reverse-c">
+      <summary>How to reverse this</summary>
+      <ol>
+        <li>In the DNS page of the admin console, remove the NAS address and fallback, or turn <strong>Override DNS servers</strong> off.</li>
+        <li>Stop the AdGuard container in your NAS's Docker app.</li>
+        <li>If you turned a NAS service off to free port 53, turn it back on.</li>
+      </ol>
+    </details>
+  </section>
+
+  <!-- 4D -->
+  <section aria-labelledby="path-d">
+    <h2 id="path-d">Path D: Home only (router DNS)</h2>
+    <p class="path-status">{statusLine('d')}</p>
+    <p>
+      Easiest to set up once, and it covers every device at home without installing anything.
+      It does nothing when you are away.
+    </p>
+    <h3>What you need</h3>
+    <ul class="guide-plain">
+      <li>Access to your router's settings.</li>
+      <li>Either AdGuard public DNS (below) or an AdGuard Home address like <code>{PH.lanIp}</code>.</li>
+    </ul>
+    <h3>Steps</h3>
+    <ol>
+      <li>Sign in to your router's admin page.</li>
+      <li>Find the DNS setting. It is often under Internet, WAN or DHCP. Enter the addresses below, or your AdGuard Home address.</li>
+      <li>Save, then restart your devices or reconnect them to Wi-Fi.</li>
+      <li>
+        Some ISP routers lock the DNS setting. If yours does, set DNS on each device
+        instead, or put your own router behind it.
+      </li>
+    </ol>
+    <CodeBlock id="code-d-dns" label="AdGuard public DNS addresses for the router" code={`${DNS.primary}\n${DNS.secondary}`} />
+    <p>
+      Details on the other AdGuard modes are on
+      <ExtLink href={URLS.adguardPublicDns}>the public DNS page</ExtLink>. Family protection also
+      blocks adult sites ({DNS.familyPrimary} and {DNS.familySecondary}).
+    </p>
+    <h3>Verify</h3>
+    <CodeBlock id="code-d-verify" label="Check that your router's DNS blocks a known ad domain" code={`nslookup ${TEST_DOMAIN}`} />
+    <details id="reverse-d">
+      <summary>How to reverse this</summary>
+      <ol>
+        <li>Go back to the router's DNS setting and choose automatic, or clear the addresses.</li>
+        <li>Save and reconnect your devices.</li>
+      </ol>
+    </details>
+  </section>
+
+  <!-- 5. FAQ -->
+  <section aria-labelledby="faq">
+    <h2 id="faq">Troubleshooting</h2>
+    <details>
+      <summary>Ads still show up in YouTube</summary>
+      <p>
+        DNS cannot block them. YouTube serves ads from the same domains as the video.
+      </p>
+    </details>
+    <details>
+      <summary>A site or app is broken (over-blocking)</summary>
+      <p>
+        Allow that domain. In AdGuard Home add it under allowed domains in the filters
+        settings. For public AdGuard DNS, use a non-filtering address for that device, or
+        a personal account with an allowlist.
+      </p>
+    </details>
+    <details>
+      <summary>Hotel or airport Wi-Fi will not let me sign in</summary>
+      <p>
+        Sign-in pages can need your Wi-Fi's own DNS. Pause Tailscale for a minute, sign in,
+        then turn it back on.
+      </p>
+    </details>
+    <details>
+      <summary>It works, but some ads still load</summary>
+      <p>
+        Check for a non-filtering nameserver in the mix. iCloud Private Relay, and browsers
+        with their own secure DNS setting, skip your filter. Turn those off for the test.
+      </p>
+    </details>
+    <details>
+      <summary>Android: DNS does not seem to apply</summary>
+      <p>
+        Android's Private DNS setting may clash with Tailscale DNS. This comes from forum
+        reports and is unverified. Try turning Private DNS off, or set it to automatic.
+      </p>
+    </details>
+    <details>
+      <summary>I want all my traffic protected, not only DNS</summary>
+      <p>
+        An <ExtLink href={URLS.tailscaleExitNodes}>exit node</ExtLink> sends all your
+        traffic through another machine. It is a different tool with a different privacy trade-off.
+      </p>
+    </details>
+  </section>
+
+  <!-- 6. Limits -->
+  <section aria-labelledby="limits">
+    <h2 id="limits">Limits and honesty</h2>
+    <ul class="doc-list">
+      <li>DNS blocking is not perfect. It stops ads by domain, so ads served from the same domain as content get through.</li>
+      <li>DNS does not hide you or make you anonymous.</li>
+      <li>This guide is a draft. <strong>No path has been tested yet.</strong> Each path says so above.</li>
+      <li>No warranty. I am not affiliated with Tailscale, AdGuard, NextDNS or Control D.</li>
+      <li>When in doubt, follow the official docs, not this page.</li>
+      <li>I cannot offer one-to-one support.</li>
+    </ul>
+  </section>
+
+  <!-- 7. Links -->
+  <section aria-labelledby="links">
+    <h2 id="links">Official docs</h2>
+    <ul class="guide-links">
+      <li><ExtLink href={URLS.tailscaleDns}>Tailscale: DNS</ExtLink></li>
+      <li><ExtLink href={URLS.tailscalePiHole}>Tailscale: Block ads using a Raspberry Pi</ExtLink></li>
+      <li><ExtLink href={URLS.tailscaleOtherVpns}>Tailscale: using it with other VPNs</ExtLink></li>
+      <li><ExtLink href={URLS.tailscaleExitNodes}>Tailscale: exit nodes</ExtLink></li>
+      <li><ExtLink href={URLS.adguardPublicDns}>AdGuard public DNS</ExtLink></li>
+      <li><ExtLink href={URLS.adguardHomeStart}>AdGuard Home: getting started</ExtLink></li>
+      <li><ExtLink href={URLS.tailscaleNextDns}>Tailscale and NextDNS</ExtLink></li>
+      <li><ExtLink href={URLS.tailscaleControlD}>Tailscale and Control D</ExtLink></li>
+    </ul>
+  </section>
+
+  <!-- 8. Changelog -->
+  <section aria-labelledby="changelog">
+    <h2 id="changelog">Changelog</h2>
+    <ul class="doc-list">
+      {CHANGELOG.map((entry) => (
+        <li><time datetime={entry.iso}>{entry.label}</time>: {entry.note}</li>
+      ))}
+    </ul>
+    <p>
+      <strong>Tested on:</strong> not tested yet. When a path is tested, its date and
+      versions will appear in that path's section.
+    </p>
+  </section>
+</DocPage>

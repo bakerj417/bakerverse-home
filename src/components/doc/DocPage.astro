@@ -2,9 +2,10 @@
 import BaseLayout from '@/layouts/BaseLayout.astro';
 
 /**
- * Shared shell for plain-language legal pages (privacy, terms).
- * Reuses the accessibility statement's look so the pages read as
- * part of the site. Content comes in through the default slot.
+ * Shared shell for plain-language long-form pages: legal pages
+ * (privacy, terms) and guides. Reuses the accessibility statement's
+ * look so the pages read as part of the site. Content comes in through
+ * the default slot. Set `noindex` to keep a page out of search engines.
  */
 interface Props {
   title: string;
@@ -13,40 +14,47 @@ interface Props {
   lede: string;
   updatedLabel: string;
   updatedIso: string;
+  noindex?: boolean;
+  /** Wider column for pages with tables and code blocks. */
+  wide?: boolean;
 }
-const { title, description, eyebrow, lede, updatedLabel, updatedIso } = Astro.props;
+const { title, description, eyebrow, lede, updatedLabel, updatedIso, noindex = false, wide = false } = Astro.props;
 ---
 
-<BaseLayout title={title} description={description}>
-  <section class="section section-y-lg accessibility-page">
-    <header class="accessibility-header">
+<BaseLayout title={title} description={description} noindex={noindex}>
+  <section class:list={["section section-y-lg doc-page", { "doc-page--wide": wide }]}>
+    <header class="doc-header">
       <p class="section-eyebrow">{eyebrow}</p>
-      <h1 class="accessibility-h1">{title}</h1>
-      <p class="accessibility-lede">{lede}</p>
-      <p class="accessibility-meta">
-        <span class="accessibility-meta-label">Last updated:</span>
+      <h1 class="doc-h1">{title}</h1>
+      <p class="doc-lede">{lede}</p>
+      <p class="doc-meta">
+        <span class="doc-meta-label">Last updated:</span>
         <time datetime={updatedIso}>{updatedLabel}</time>
       </p>
     </header>
-    <article class="accessibility-body">
+    <article class="doc-body">
       <slot />
     </article>
   </section>
 </BaseLayout>
 
 <style is:global>
-  .accessibility-page {
+  .doc-page {
     max-width: 760px;
     margin: 0 auto;
   }
 
-  .accessibility-header {
+  .doc-page--wide {
+    max-width: 920px;
+  }
+
+  .doc-header {
     margin-bottom: 3rem;
     padding-bottom: 2rem;
     border-bottom: 1px solid rgba(240, 185, 11, 0.15);
   }
 
-  .accessibility-h1 {
+  .doc-h1 {
     font-family: var(--font-display);
     font-size: clamp(2.25rem, 5vw, 3.75rem);
     line-height: 1.1;
@@ -57,7 +65,7 @@ const { title, description, eyebrow, lede, updatedLabel, updatedIso } = Astro.pr
       0 -1px 0 rgba(240, 185, 11, 0.06);
   }
 
-  .accessibility-lede {
+  .doc-lede {
     color: var(--ink-300);
     font-size: 1.1rem;
     line-height: 1.7;
@@ -65,7 +73,7 @@ const { title, description, eyebrow, lede, updatedLabel, updatedIso } = Astro.pr
     max-width: 56ch;
   }
 
-  .accessibility-meta {
+  .doc-meta {
     margin: 0;
     color: var(--ink-500);
     font-family: var(--font-mono);
@@ -73,12 +81,12 @@ const { title, description, eyebrow, lede, updatedLabel, updatedIso } = Astro.pr
     letter-spacing: 0.08em;
   }
 
-  .accessibility-meta-label {
+  .doc-meta-label {
     color: var(--ink-700);
     margin-right: 0.4rem;
   }
 
-  .accessibility-body {
+  .doc-body {
     display: flex;
     flex-direction: column;
     gap: 2.75rem;
@@ -87,7 +95,7 @@ const { title, description, eyebrow, lede, updatedLabel, updatedIso } = Astro.pr
     font-size: 1rem;
   }
 
-  .accessibility-body h2 {
+  .doc-body h2 {
     font-family: var(--font-display);
     font-size: clamp(1.4rem, 2.4vw, 1.85rem);
     color: var(--ink-100);
@@ -96,21 +104,21 @@ const { title, description, eyebrow, lede, updatedLabel, updatedIso } = Astro.pr
     line-height: 1.25;
   }
 
-  .accessibility-body p {
+  .doc-body p {
     margin: 0 0 1rem;
     max-width: 64ch;
   }
 
-  .accessibility-body p:last-child {
+  .doc-body p:last-child {
     margin-bottom: 0;
   }
 
-  .accessibility-body strong {
+  .doc-body strong {
     color: var(--ink-100);
     font-weight: 600;
   }
 
-  .accessibility-body a {
+  .doc-body a {
     color: var(--gold-300);
     text-decoration: underline;
     text-decoration-color: rgba(240, 185, 11, 0.4);
@@ -120,12 +128,12 @@ const { title, description, eyebrow, lede, updatedLabel, updatedIso } = Astro.pr
       text-decoration-color var(--dur-fast) var(--ease-standard);
   }
 
-  .accessibility-body a:hover {
+  .doc-body a:hover {
     color: var(--gold-200);
     text-decoration-color: var(--gold-300);
   }
 
-  .accessibility-body code {
+  .doc-body code {
     font-family: var(--font-mono);
     font-size: 0.88em;
     padding: 0.1em 0.4em;
@@ -135,7 +143,7 @@ const { title, description, eyebrow, lede, updatedLabel, updatedIso } = Astro.pr
     color: var(--ink-100);
   }
 
-  .accessibility-list {
+  .doc-list {
     list-style: none;
     padding: 0;
     margin: 0 0 1rem;
@@ -144,14 +152,14 @@ const { title, description, eyebrow, lede, updatedLabel, updatedIso } = Astro.pr
     gap: 0.65rem;
   }
 
-  .accessibility-list li {
+  .doc-list li {
     position: relative;
     padding-left: 1.5rem;
     line-height: 1.65;
     max-width: 64ch;
   }
 
-  .accessibility-list li::before {
+  .doc-list li::before {
     content: '◆';
     position: absolute;
     left: 0;

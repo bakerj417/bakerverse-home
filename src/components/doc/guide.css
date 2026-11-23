@@ -1,0 +1,283 @@
+/* Guide-only styles. Layered on top of DocPage's doc-* classes. */
+
+.guide-tokens,
+.doc-body {
+  --guide-target-size: 2.75rem; /* 44px touch target */
+  --guide-surface: var(--bg-dusk);
+  --guide-code-bg: var(--bg-void);
+  --guide-utility: var(--accent-arcane, #5b8cff);
+  --guide-border: rgba(91, 140, 255, 0.35);
+  --guide-warn-border: var(--gold-400);
+  --guide-table-break: 40rem;
+}
+
+.doc-body h3 {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  color: var(--ink-100);
+  margin: 1.75rem 0 0.75rem;
+}
+
+.doc-body ol,
+.doc-body ul.guide-plain {
+  margin: 0 0 1rem;
+  padding-left: 1.4rem;
+  max-width: 64ch;
+}
+
+.doc-body li {
+  margin-bottom: 0.5rem;
+}
+
+.doc-body section[id],
+.doc-body details[id] {
+  scroll-margin-top: 5rem;
+}
+
+/* Callouts */
+.callout {
+  border: 1px solid var(--guide-border);
+  border-left-width: 4px;
+  background: var(--guide-surface);
+  border-radius: var(--radius-soft);
+  padding: 1rem 1.25rem;
+}
+
+.callout--warn {
+  border-color: var(--guide-warn-border);
+}
+
+.callout > :last-child {
+  margin-bottom: 0;
+}
+
+.callout-title {
+  font-family: var(--font-display);
+  color: var(--ink-100);
+  font-size: 1.05rem;
+  margin: 0 0 0.5rem;
+}
+
+.path-status {
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  color: var(--ink-300);
+  border: 1px dashed var(--guide-border);
+  border-radius: var(--radius-sharp);
+  padding: 0.5rem 0.75rem;
+  margin: 0 0 1rem;
+  max-width: none;
+}
+
+/* Chooser */
+.chooser-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.chooser-answers {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+.chooser-answers a {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--guide-target-size);
+  padding: 0 1rem;
+  border: 1px solid var(--guide-border);
+  border-radius: var(--radius-soft);
+}
+
+/* Disclosure blocks (reverse, FAQ) */
+.doc-body details {
+  border: 1px solid var(--guide-border);
+  border-radius: var(--radius-soft);
+  background: var(--guide-surface);
+}
+
+.doc-body details + details {
+  margin-top: 0.75rem;
+}
+
+.doc-body summary {
+  cursor: pointer;
+  min-height: var(--guide-target-size);
+  display: flex;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  color: var(--ink-100);
+  font-weight: 600;
+}
+
+.doc-body details > :not(summary) {
+  margin-left: 1rem;
+  margin-right: 1rem;
+}
+
+.doc-body details > :last-child {
+  margin-bottom: 1rem;
+}
+
+/* Code blocks */
+.code-block {
+  margin: 0 0 1.25rem;
+  border: 1px solid var(--guide-border);
+  border-radius: var(--radius-soft);
+  background: var(--guide-code-bg);
+  overflow: hidden;
+  max-width: 100%;
+}
+
+.code-block-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.25rem 0.5rem 0.25rem 1rem;
+  border-bottom: 1px solid var(--guide-border);
+}
+
+.code-block-label {
+  font-size: 0.82rem;
+  color: var(--ink-300);
+}
+
+.code-block-copy {
+  min-width: var(--guide-target-size);
+  min-height: var(--guide-target-size);
+  padding: 0 1rem;
+  font: inherit;
+  font-size: 0.85rem;
+  color: var(--ink-100);
+  background: transparent;
+  border: 1px solid var(--guide-utility);
+  border-radius: var(--radius-sharp);
+  cursor: pointer;
+  transition: background-color var(--dur-fast) var(--ease-standard);
+}
+
+.code-block-copy[hidden] {
+  display: none;
+}
+
+.code-block-copy:hover,
+.code-block-copy[data-state='copied'] {
+  background: rgba(91, 140, 255, 0.18);
+}
+
+.code-block pre {
+  margin: 0;
+  padding: 1rem;
+  overflow-x: auto;
+  font-family: var(--font-mono);
+  font-size: 0.88rem;
+  line-height: 1.6;
+  color: var(--ink-100);
+}
+
+.doc-body .code-block pre code {
+  padding: 0;
+  background: none;
+  border: 0;
+  font-size: inherit;
+  white-space: pre;
+}
+
+/* Comparison table */
+.table-wrap {
+  max-width: 100%;
+}
+
+.compare-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.92rem;
+  line-height: 1.5;
+}
+
+.compare-table caption {
+  text-align: left;
+  color: var(--ink-300);
+  padding-bottom: 0.75rem;
+}
+
+.compare-table th,
+.compare-table td {
+  text-align: left;
+  vertical-align: top;
+  padding: 0.75rem;
+  border-bottom: 1px solid var(--guide-border);
+}
+
+.compare-table thead th {
+  color: var(--ink-100);
+  font-family: var(--font-display);
+}
+
+.compare-table tbody th {
+  color: var(--ink-100);
+  font-weight: 600;
+}
+
+@media (max-width: 40rem) {
+  .compare-table,
+  .compare-table tbody,
+  .compare-table tr,
+  .compare-table th,
+  .compare-table td {
+    display: block;
+  }
+
+  .compare-table caption {
+    display: block;
+  }
+
+  .compare-table thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+  }
+
+  .compare-table tr {
+    border: 1px solid var(--guide-border);
+    border-radius: var(--radius-soft);
+    margin-bottom: 1rem;
+    background: var(--guide-surface);
+  }
+
+  .compare-table td {
+    border-bottom: 0;
+    padding: 0.4rem 0.75rem;
+  }
+
+  .compare-table td::before {
+    content: attr(data-label) ': ';
+    color: var(--ink-100);
+    font-weight: 600;
+  }
+}
+
+.guide-links {
+  list-style: none;
+  padding: 0;
+}
+
+.guide-links a {
+  display: inline-block;
+  padding: 0.35rem 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .code-block-copy {
+    transition: none;
+  }
+}
