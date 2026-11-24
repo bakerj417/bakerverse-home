@@ -1,0 +1,66 @@
+---
+/**
+ * Labelled, copyable code block. Reads fine without JS: the copy button
+ * is hidden until the script below reveals it. The <pre> is focusable so
+ * keyboard users can scroll long lines.
+ */
+interface Props {
+  /** Visible label, also the accessible name of the figure. */
+  label: string;
+  /** The text to show and copy. */
+  code: string;
+  id: string;
+}
+const { label, code, id } = Astro.props;
+const captionId = `${id}-caption`;
+---
+
+<figure class="code-block" aria-labelledby={captionId}>
+  <figcaption class="code-block-bar">
+    <span id={captionId} class="code-block-label">{label}</span>
+    <button type="button" class="code-block-copy" data-copy-target={id} hidden>
+      Copy<span class="sr-only"> {label}</span>
+    </button>
+  </figcaption>
+  <pre tabindex="0"><code id={id}>{code}</code></pre>
+</figure>
+
+<script>
+  const COPIED_RESET_MS = 2000;
+  const STATUS_ID = 'copy-status';
+
+  function announce(message: string): void {
+    const region = document.getElementById(STATUS_ID);
+    if (region) region.textContent = message;
+  }
+
+  function initCopyButtons(): void {
+    document.querySelectorAll<HTMLButtonElement>('.code-block-copy').forEach((button) => {
+      button.hidden = false;
+    });
+  }
+
+  document.addEventListener('click', async (event) => {
+    const target = event.target as Element | null;
+    const button = target?.closest<HTMLButtonElement>('.code-block-copy');
+    if (!button) return;
+    const source = document.getElementById(button.dataset.copyTarget ?? '');
+    if (!source) return;
+    try {
+      await navigator.clipboard.writeText(source.textContent ?? '');
+      announce('Copied');
+      button.dataset.state = 'copied';
+      button.firstChild!.textContent = 'Copied';
+      window.setTimeout(() => {
+        button.dataset.state = '';
+        button.firstChild!.textContent = 'Copy';
+        announce('');
+      }, COPIED_RESET_MS);
+    } catch {
+      announce('Copy failed. Select the text and copy it by hand.');
+    }
+  });
+
+  initCopyButtons();
+  document.addEventListener('astro:page-load', initCopyButtons);
+</script>

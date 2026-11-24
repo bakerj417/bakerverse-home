@@ -1,12 +1,12 @@
 ---
-import LegalPage from '@/components/legal/LegalPage.astro';
+import DocPage from '@/components/doc/DocPage.astro';
 import { site } from '@/data/site';
 
 const UPDATED_LABEL = 'November 22, 2026';
 const UPDATED_ISO = '2026-11-22';
 ---
 
-<LegalPage
+<DocPage
   title="Privacy policy"
   description="What josephkbaker.com collects, why, and who can see it. Plain language."
   eyebrow="Privacy · Policy"
@@ -24,7 +24,7 @@ const UPDATED_ISO = '2026-11-22';
 
   <section aria-labelledby="collect">
     <h2 id="collect">What is collected</h2>
-    <ul class="accessibility-list">
+    <ul class="doc-list">
       <li>
         <strong>Contact form.</strong> If you send a message, the name, email address
         and message you type are emailed to the site owner so a reply is possible.
@@ -77,4 +77,4 @@ const UPDATED_ISO = '2026-11-22';
     <h2 id="changes">Changes</h2>
     <p>If this policy changes, the date at the top changes with it.</p>
   </section>
-</LegalPage>
+</DocPage>
