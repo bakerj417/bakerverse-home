@@ -36,7 +36,7 @@ const composeFile = `services:
   title="Block ads on all your devices, at home and away"
   description="A plain-language guide to ad blocking with DNS and Tailscale. Four paths, starting with the one that needs no hardware."
   eyebrow="Guide · Ad blocking"
-  lede="I run AdGuard at home and a few people asked how to get the same thing. Most of you do not have a NAS, so the first path needs no hardware at all."
+  lede="I run AdGuard at home and a few people asked how to get the same thing. Since not all of you have a NAS, the first path needs no hardware at all."
   updatedLabel={GUIDE_UPDATED_LABEL}
   updatedIso={GUIDE_UPDATED_ISO}
   noindex={!GUIDE_IS_PUBLISHED}
@@ -60,7 +60,7 @@ const composeFile = `services:
       no hardware.
     </p>
     <div class="callout callout--warn" role="note" aria-labelledby="work-warning">
-      <p id="work-warning" class="callout-title">Work devices: stop here first</p>
+      <p id="work-warning" class="callout-title">Work devices: please read this first</p>
       <p>
         <strong>
           Do not install Tailscale or change DNS on a work-managed laptop or phone
@@ -104,7 +104,7 @@ const composeFile = `services:
   <!-- 2. Chooser -->
   <section aria-labelledby="chooser">
     <h2 id="chooser">Which path is for me? (30 seconds)</h2>
-    <p>Answer in order. Stop at the first answer that sends you somewhere.</p>
+    <p>Answer in order. The first answer that points to a path is your path.</p>
     <ol class="chooser-list">
       <li>
         <strong>Do you have a computer, mini PC, Raspberry Pi or NAS that stays on all the time at home?</strong>
@@ -175,7 +175,7 @@ const composeFile = `services:
     <p class="path-status">{statusLine('a')}</p>
     <p>
       <strong>Trade-off:</strong> AdGuard's public DNS service can see the domains you
-      look up. If that bothers you, use Path B.
+      look up. If you would rather not share that, Path B keeps your lookups with you.
     </p>
     <h3>What you need</h3>
     <ul class="guide-plain">
@@ -239,7 +239,7 @@ const composeFile = `services:
     </ol>
     <details id="reverse-a">
       <summary>How to reverse Path A</summary>
-      <p>Stuck? Start with <a href="#first-aid">first aid</a>.</p>
+      <p>Need help? Start with <a href="#first-aid">first aid</a>.</p>
       <ol>
         <li>In the DNS page of the admin console, remove the two nameservers or turn <strong>Override DNS servers</strong> off.</li>
         <li>Or, on one device only: disconnect Tailscale, or uninstall the app.</li>
@@ -266,10 +266,10 @@ const composeFile = `services:
       instead of Pi-hole. Lookups go to your box, which is on your tailnet.
     </p>
     <div class="callout callout--warn" role="note" aria-labelledby="b-cloud">
-      <p id="b-cloud" class="callout-title">Home boxes only. Not a cloud server.</p>
+      <p id="b-cloud" class="callout-title">This path is for a box at home, not a cloud server</p>
       <p>
         AdGuard Home's first-run setup page listens on every network address, and once running,
-        port 53 on a public server would be an open resolver anyone could abuse. This guide does
+        port 53 on a public server would be an open resolver that anyone on the internet could use. This guide does
         not cover cloud servers. Run the box on your home network, and never forward its
         ports on your router.
       </p>
@@ -294,7 +294,7 @@ const composeFile = `services:
       </li>
       <li>
         Install Tailscale on the same box. This is Tailscale's official install script
-        (<code>curl | sh</code>, so read it first if you like). The first time you run
+        (<code>curl | sh</code>, you are welcome to read it first). The first time you run
         <code>tailscale up</code> it prints a sign-in link: open the link it prints. The
         <code>--accept-dns=false</code> part tells the box not to use the tailnet's DNS, because the
         box is the DNS server. The last command shows the box's tailnet address.
@@ -341,7 +341,7 @@ const composeFile = `services:
     <p>A blocked domain should answer <code>0.0.0.0</code>. Then run the no-server check from Path A on a device, to prove that device really uses it.</p>
     <details id="reverse-b">
       <summary>How to reverse Path B</summary>
-      <p>Stuck? Start with <a href="#first-aid">first aid</a>.</p>
+      <p>Need help? Start with <a href="#first-aid">first aid</a>.</p>
       <ol>
         <li>In the DNS page of the admin console, remove the box's address and any fallback, or turn <strong>Override DNS servers</strong> off.</li>
         <li>If you turned key expiry off for the box, turn it back on.</li>
@@ -406,7 +406,7 @@ const composeFile = `services:
     <p>A blocked domain should answer <code>0.0.0.0</code>. Then run the no-server check from Path A on a device.</p>
     <details id="reverse-c">
       <summary>How to reverse Path C</summary>
-      <p>Stuck? Start with <a href="#first-aid">first aid</a>.</p>
+      <p>Need help? Start with <a href="#first-aid">first aid</a>.</p>
       <ol>
         <li>In the DNS page of the admin console, remove the NAS address and any fallback, or turn <strong>Override DNS servers</strong> off.</li>
         <li>If you turned key expiry off for the NAS, turn it back on.</li>
@@ -523,7 +523,7 @@ const composeFile = `services:
       <li>This guide is a draft. <strong>I have not tested the Tailscale steps myself.</strong> Each path says exactly what was and was not tested.</li>
       <li>No warranty. I am not affiliated with Tailscale, AdGuard, NextDNS or Control D.</li>
       <li>When in doubt, follow the official docs, not this page.</li>
-      <li>I cannot offer one-to-one support.</li>
+      <li>Sorry, I am not able to offer one-to-one support.</li>
     </ul>
   </section>
 
