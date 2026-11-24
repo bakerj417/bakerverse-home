@@ -4,12 +4,11 @@
  */
 
 /**
- * TODO(joseph): PUBLISH SWITCH. While false the page is served with
- * `noindex, nofollow`. When you are ready to publish, flip this to true,
- * then add the page to the nav/footer and the sitemap by hand.
- * The page is deliberately NOT linked from the nav or footer yet.
+ * PUBLISH SWITCH. While false the page is served with `noindex, nofollow`.
+ * Published 2026-11-23: linked from the footer. (No sitemap: the sitemap
+ * integration is disabled in astro.config.mjs until the Astro 5 upgrade.)
  */
-export const GUIDE_IS_PUBLISHED = false;
+export const GUIDE_IS_PUBLISHED = true;
 
 export const GUIDE_PATH = '/guides/ad-blocking';
 
