@@ -85,18 +85,24 @@ export const URLS = {
 
 export type PathId = 'a' | 'b' | 'c' | 'd';
 
+/** Tailscale version used in the Linux container test. */
+export const TAILSCALE_TESTED_VERSION = 'v1.104.7';
+
+/** Result of the mixed filtering and non-filtering nameserver test. */
+export const MIXED_TEST = { blocked: 7, total: 20 } as const;
+
 /** Date of the live lookups and the container sandbox test. */
 export const TESTED_ISO = '2026-11-23';
 
-export const PAGE_STATUS_LINE = `Written from the official docs. I have not tested the Tailscale steps myself. The AdGuard Home steps were tested in a container sandbox on ${TESTED_ISO} (see each path). When in doubt, follow the official docs.`;
+export const PAGE_STATUS_LINE = `Written from the official docs. The Tailscale DNS settings steps were tested in a Linux test setup, not on real phones or laptops. The AdGuard Home steps were tested in a container sandbox on ${TESTED_ISO} (see each path). When in doubt, follow the official docs.`;
 
 const ADGUARD_HOME_TESTED =
   'a blocked ad address answered 0.0.0.0, a normal site answered normally, an allow-list rule made the blocked site load, removing the rule blocked it again, and removing the container closed the port.';
 
 /** Per-path test label. Update the text and date here when a path is tested. */
 export const PATH_STATUS: Readonly<Record<PathId, string>> = {
-  a: `Not tested by me. Steps are from the official docs. The AdGuard public DNS addresses were checked with a live lookup on ${TESTED_ISO}: a blocked ad address answered 0.0.0.0, the non-filtering address returned real addresses.`,
-  b: `The AdGuard Home part (setup, blocking, allow-listing a site, removing it) was tested in a container on ${TESTED_ISO}: ${ADGUARD_HOME_TESTED} The Tailscale parts are from the official docs and not tested by me.`,
+  a: `Tested on ${TESTED_ISO}: the DNS settings steps, in a Linux test setup (Tailscale ${TAILSCALE_TESTED_VERSION} in a container, on a throwaway tailnet). With AdGuard's two filtering servers as global nameservers and Override DNS servers on, a blocked ad address answered 0.0.0.0 on 20 of 20 lookups. Turning the settings off again stopped the blocking, so undoing works. Not tested: real phones or laptops (iOS, Android, macOS, Windows), and Override off on a normal device. Those steps are from the official docs. The AdGuard public DNS addresses were also checked with a live lookup on ${TESTED_ISO}: a blocked ad address answered 0.0.0.0, the non-filtering address returned real addresses.`,
+  b: `The AdGuard Home part (setup, blocking, allow-listing a site, removing it) was tested in a container on ${TESTED_ISO}: ${ADGUARD_HOME_TESTED} The Tailscale parts of this path (a home AdGuard Home as the nameserver) are from the official docs and not tested by me.`,
   c: `The AdGuard Home part (setup, blocking, allow-listing a site, removing it) was tested in a container on ${TESTED_ISO}, with port mapping, NOT with host networking or on a NAS: ${ADGUARD_HOME_TESTED} Host networking, the NAS specifics and the Tailscale parts are from the docs, not tested.`,
   d: 'Not tested by me. Steps are from the official docs and general router knowledge.',
 };
@@ -115,6 +121,11 @@ export const CHANGELOG = [
     iso: '2026-11-23',
     label: 'November 23, 2026',
     note: 'Fact-check pass: safer cloud-box steps, first-aid box, parallel DNS behaviour, reverse steps.',
+  },
+  {
+    iso: TESTED_ISO,
+    label: 'November 23, 2026',
+    note: 'Tailscale DNS settings tested in a Linux test setup; labels updated.',
   },
   {
     iso: TESTED_ISO,

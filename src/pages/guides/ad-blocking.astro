@@ -12,6 +12,7 @@ import {
   GUIDE_UPDATED_ISO,
   GUIDE_UPDATED_LABEL,
   LIMITS,
+  MIXED_TEST,
   PAGE_STATUS_LINE,
   PLACEHOLDERS as PH,
   TEST_DOMAIN,
@@ -215,8 +216,9 @@ const composeFile = `services:
       <p id="a-only-filtering" class="callout-title">Only add filtering nameservers</p>
       <p>
         Tailscale may ask all nameservers at the same time and use whichever answers first
-        (<ExtLink href={URLS.tailscaleDns}>Tailscale DNS docs</ExtLink>). A non-filtering
-        nameserver such as {DNS.nonFilteringPrimary} would let ads through.
+        (<ExtLink href={URLS.tailscaleDns}>Tailscale DNS docs</ExtLink>). In my test, a list with one filtering and one
+        non-filtering nameserver blocked only {MIXED_TEST.blocked} of {MIXED_TEST.total} lookups, so ads leaked
+        through. Please never add a non-filtering nameserver such as {DNS.nonFilteringPrimary}.
       </p>
     </div>
     <h3>Verify</h3>
@@ -520,7 +522,7 @@ const composeFile = `services:
     <ul class="doc-list">
       <li>DNS blocking is not perfect. It stops ads by domain, so ads served from the same domain as content get through.</li>
       <li>DNS does not hide you or make you anonymous.</li>
-      <li>This guide is a draft. <strong>I have not tested the Tailscale steps myself.</strong> Each path says exactly what was and was not tested.</li>
+      <li>This guide is a draft. <strong>The Tailscale steps were tested only in a Linux test setup, not on real phones or laptops.</strong> Each path says exactly what was and was not tested.</li>
       <li>No warranty. I am not affiliated with Tailscale, AdGuard, NextDNS or Control D.</li>
       <li>When in doubt, follow the official docs, not this page.</li>
       <li>Sorry, I am not able to offer one-to-one support.</li>
